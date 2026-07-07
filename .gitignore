@@ -1,0 +1,26 @@
+.gradle/
+build/
+/local.properties
+.kotlin/
+.idea/
+captures/
+.cxx/
+*.iml
+/.claude/
+/.kangentic/
+kangentic.json
+.kangentic/
+.claude/settings.local.json
+kangentic.local.json
+
+# Lokale README-Vorschau (nicht Teil des Repos)
+README-preview.html
+
+# Design-Originale (nur die verkleinerten docs/ kommen ins Repo)
+Design/
+
+# Signing-Geheimnisse gehoeren nie ins Repo (Keystore liegt in ../_signing)
+*.keystore
+*.jks
+keystore.properties
+/keystore/

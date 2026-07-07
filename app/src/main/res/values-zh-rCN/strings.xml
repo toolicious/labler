@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LaBLEr</string>
+
+    <!-- Actions -->
+    <string name="action_cancel">取消</string>
+    <string name="action_save">保存</string>
+    <string name="action_create">创建</string>
+    <string name="action_print">打印</string>
+    <string name="action_connect">连接</string>
+    <string name="action_grant_permission">授予权限</string>
+    <string name="action_disconnect">断开连接</string>
+    <string name="action_forget">忘记</string>
+    <string name="action_clear">清除</string>
+    <string name="action_import_file">或从文件导入 …</string>
+    <string name="action_import">导入</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">返回</string>
+    <string name="cd_settings">设置</string>
+    <string name="cd_history">打印历史</string>
+    <string name="cd_new_label">新建标签</string>
+    <string name="cd_favorite">收藏</string>
+    <string name="cd_menu">菜单</string>
+    <string name="cd_clear">清除</string>
+    <string name="cd_delete">删除</string>
+    <string name="cd_rotate">旋转</string>
+    <string name="cd_print">打印</string>
+    <string name="cd_undo">撤销</string>
+    <string name="cd_redo">重做</string>
+
+    <!-- Home -->
+    <string name="home_search_hint">搜索</string>
+    <string name="home_empty">还没有标签。\n点按 + 创建第一个。</string>
+    <string name="home_no_results">无结果。</string>
+    <string name="template_size">%1$d x %2$d mm</string>
+    <string name="menu_edit">编辑</string>
+    <string name="menu_duplicate">复制</string>
+    <string name="menu_export">导出</string>
+    <string name="menu_delete">删除</string>
+    <string name="toast_export_failed">导出失败：%1$s</string>
+    <string name="toast_export_ok">已导出。</string>
+    <string name="toast_import_failed">导入失败：%1$s</string>
+    <string name="delete_title">删除标签？</string>
+    <string name="delete_message">%1$s 将被永久删除。</string>
+
+    <!-- Label dialog -->
+    <string name="dialog_new_title">新建标签</string>
+    <string name="dialog_edit_title">编辑标签</string>
+    <string name="field_name">名称</string>
+    <string name="size_hint">尺寸（标签带宽度 x 长度）：</string>
+    <string name="preset_custom">自定义 …</string>
+    <string name="field_tape_mm">标签带 (mm)</string>
+    <string name="field_length_mm">长度 (mm)</string>
+    <string name="media_die_cut">模切标签</string>
+    <string name="media_continuous">连续</string>
+
+    <!-- Editor -->
+    <string name="group_add">添加</string>
+    <string name="group_elements">元素</string>
+    <string name="add_text">文本</string>
+    <string name="add_symbol">符号</string>
+    <string name="add_frame">边框</string>
+    <string name="element_frame">边框</string>
+    <string name="editor_hint">点按标签上的元素，或从上方添加。选中的元素可拖动；右下角的手柄用于缩放。</string>
+    <string name="group_format">格式</string>
+    <string name="group_align">对齐</string>
+    <string name="group_variables">变量</string>
+    <string name="group_symbol">选择符号</string>
+    <string name="group_raster">抖动</string>
+    <string name="raster_hint">仅对多色表情符号可见。</string>
+    <string name="prop_text">文本</string>
+    <string name="prop_size">大小</string>
+    <string name="prop_bold">粗体</string>
+    <string name="prop_italic">斜体</string>
+    <string name="prop_underline">下划线</string>
+    <string name="align_left">左对齐</string>
+    <string name="align_center">居中</string>
+    <string name="align_right">右对齐</string>
+    <string name="group_font">字体</string>
+    <string name="font_sans">Sans</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_mono">Mono</string>
+    <string name="prop_symbol">符号/表情符号</string>
+    <string name="dither_threshold">阈值</string>
+    <string name="dither_fs">Floyd-Steinberg</string>
+    <string name="dither_atkinson">Atkinson</string>
+    <string name="dither_outline">轮廓</string>
+    <string name="frame_rect">边框</string>
+    <string name="frame_round">圆角</string>
+    <string name="frame_line_h">线 −</string>
+    <string name="frame_line_v">线 |</string>
+    <string name="prop_stroke">线宽</string>
+    <string name="prop_radius">圆角半径</string>
+    <string name="prop_contrast">对比度</string>
+    <string name="prop_outline_detail">灵敏度</string>
+    <string name="prop_line_width">线条粗细</string>
+    <string name="prop_width">宽度</string>
+    <string name="prop_height">高度</string>
+    <string name="var_date">date</string>
+    <string name="var_time">time</string>
+    <string name="var_number">#</string>
+    <string name="var_var">var</string>
+    <string name="symbol_current">当前符号</string>
+    <string name="action_choose_symbol">选择符号 …</string>
+    <string name="symbol_field">表情符号或字符</string>
+    <string name="symbol_keyboard_hint">表情符号请使用键盘的表情键，或从下方选择符号。</string>
+    <string name="action_done">完成</string>
+    <string name="cat_arrows">箭头</string>
+    <string name="cat_shapes">形状</string>
+    <string name="cat_stars">星形</string>
+    <string name="cat_signs">标志</string>
+    <string name="cat_tech">技术与办公</string>
+    <string name="cat_weather">天气与自然</string>
+    <string name="cat_math">数学</string>
+    <string name="cat_misc">其他</string>
+    <string name="tab_symbols">符号</string>
+    <string name="tab_emojis">表情符号</string>
+    <string name="cat_smileys">笑脸</string>
+    <string name="cat_animals">动物与自然</string>
+    <string name="cat_food">食物</string>
+    <string name="cat_activity">活动与旅行</string>
+    <string name="cat_objects">物体</string>
+    <string name="cat_hearts">爱心与符号</string>
+
+    <!-- Print dialog -->
+    <string name="print_title">打印：%1$s</string>
+    <string name="print_preview">预览（%1$d mm，按打印效果的 1 位）：</string>
+    <string name="print_paper">纸张：</string>
+    <string name="print_copies">份数：</string>
+    <string name="print_counter_start">编号从 %1$d 开始</string>
+    <string name="print_label_progress">标签 %1$d/%2$d</string>
+
+    <!-- Settings -->
+    <string name="settings_title">设置</string>
+    <string name="settings_printer">打印机</string>
+    <string name="status_disconnected">未连接</string>
+    <string name="status_connecting">正在连接（第 %1$d/3 次）…</string>
+    <string name="status_ready">已连接：%1$s</string>
+    <string name="status_ready_battery">已连接：%1$s，电量 %2$d %%</string>
+    <string name="status_printing">正在打印（%1$d %%）</string>
+    <string name="status_error">错误：%1$s</string>
+    <string name="settings_saved">已记住：%1$s (%2$s)</string>
+    <string name="info_model">型号：%1$s</string>
+    <string name="info_firmware">固件：%1$s</string>
+    <string name="info_serial">序列号：%1$s</string>
+    <string name="info_hardware">硬件：%1$s</string>
+    <string name="settings_diagnostics">诊断</string>
+    <string name="settings_testtools">测试打印工具（几何图案）</string>
+    <string name="settings_experimental">实验性</string>
+    <string name="settings_experimental_hint">实验性打印机命令，未在 P15 上验证。仅在已连接打印机时使用；不确定就忽略。</string>
+    <string name="exp_learn_gap">校准标签间隙</string>
+    <string name="settings_about">关于</string>
+    <string name="about_text">LaBLEr %1$s\n\n通过 Bluetooth LE 用于 P15 标签打印机的独立 FOSS 应用。该协议是从 BleWebler 逆向工程得到的，BleWebler 是一个无需安装、在 Chrome 浏览器中运行的网页版。未使用任何代码。</string>
+    <string name="scan_title">查找打印机</string>
+    <string name="scan_show_all">显示所有蓝牙设备</string>
+    <string name="scan_empty">未找到任何设备。打印机开着吗？</string>
+    <string name="scan_device_line">%1$s  (RSSI %2$d)</string>
+
+    <!-- Status chip -->
+    <string name="chip_no_printer">无打印机</string>
+    <string name="chip_connecting">连接中（%1$d/3）</string>
+    <string name="chip_printing">打印中 %1$d %%</string>
+    <string name="chip_error">错误</string>
+    <string name="chip_permission">缺少蓝牙权限</string>
+
+    <!-- Test print -->
+    <string name="testprint_title">测试打印</string>
+    <string name="testprint_geometry">几何测试图案（40 mm）</string>
+    <string name="testprint_text_label">文本样本</string>
+    <string name="testprint_show">显示预览</string>
+
+    <!-- History -->
+    <string name="history_title">打印历史</string>
+    <string name="history_empty">尚未打印任何内容。</string>
+    <string name="history_meta">%1$s · %2$d× · %3$d x %4$d mm</string>
+
+    <!-- Backend error messages -->
+    <string name="err_no_bluetooth">此设备没有蓝牙</string>
+    <string name="err_bt_off">蓝牙已关闭</string>
+    <string name="err_no_printer_found">未找到打印机。它是否已开机并在范围内？</string>
+    <string name="err_connect_failed">连接失败</string>
+    <string name="err_not_connected">未连接打印机</string>
+    <string name="err_print_failed">打印失败</string>
+    <string name="about_description">LaBLEr 是一款用于 Marklife 系列（P15、P12、L13）Bluetooth Low Energy 热敏标签打印机的标签打印应用。直接在手机上用文本、符号和边框设计自己的标签，将其保存为模板，随时再次打印。</string>
+    <string name="about_license">许可证：GPL-3.0-or-later</string>
+    <string name="about_source">源代码和帮助</string>
+    <string name="about_thanks">感谢开源的 Chrome 网页应用 %1$s，它使 P15 协议得以公开。</string>
+    <string name="about_version">版本 %1$s</string>
+    <string name="action_close">关闭</string>
+    <string name="add_barcode">条码</string>
+    <string name="add_image">图片</string>
+    <string name="app_language">语言</string>
+    <string name="app_language_system">系统（自动）</string>
+    <string name="app_language_title">语言</string>
+    <string name="backup">备份</string>
+    <string name="backup_add">添加</string>
+    <string name="backup_export">导出</string>
+    <string name="backup_failed">备份失败。</string>
+    <string name="backup_import">导入</string>
+    <string name="backup_ok">备份完成。</string>
+    <string name="backup_replace">替换</string>
+    <string name="backup_replace_message">替换现有标签，还是添加导入的标签？</string>
+    <string name="backup_replace_title">导入备份</string>
+    <string name="cd_info">信息</string>
+    <string name="default_label_name">新建标签</string>
+    <string name="duplicate_name">%1$s（副本）</string>
+    <string name="err_file_invalid">无效文件</string>
+    <string name="err_file_not_readable">文件无法读取</string>
+    <string name="err_file_not_writable">文件无法写入</string>
+    <string name="err_no_scanner">BLE 扫描器不可用</string>
+    <string name="forget_message">将不再记住 %1$s，也不再自动连接。</string>
+    <string name="forget_title">忘记打印机？</string>
+    <string name="group_scale">缩放</string>
+    <string name="outline_canny">照片</string>
+    <string name="outline_lines">图形</string>
+    <string name="outline_smooth">平滑</string>
+    <string name="print_need_printer">必须连接打印机才能打印。</string>
+    <string name="perm_bluetooth_missing">缺少蓝牙权限。没有它就无法连接打印机。</string>
+    <string name="print_printer_settings">打印机设置</string>
+    <string name="prop_barcode_caption">显示文本</string>
+    <string name="prop_barcode_data">内容</string>
+    <string name="prop_barcode_type">类型</string>
+    <string name="prop_image_threshold">阈值</string>
+    <string name="prop_invert">反色</string>
+    <string name="prop_outline_style">样式</string>
+    <string name="qr_auth">加密</string>
+    <string name="qr_auth_none">无</string>
+    <string name="qr_content">QR 内容</string>
+    <string name="qr_email_addr">电子邮件地址</string>
+    <string name="qr_hidden">隐藏网络</string>
+    <string name="qr_password">密码</string>
+    <string name="qr_password_hint">可选。以明文形式存储在 QR 码和模板中。</string>
+    <string name="qr_phone">电话号码</string>
+    <string name="qr_show_password">显示密码</string>
+    <string name="qr_ssid">网络名称（SSID）</string>
+    <string name="qr_subject">主题（可选）</string>
+    <string name="qr_type_contact">联系人</string>
+    <string name="qr_type_email">电子邮件</string>
+    <string name="qr_type_link">链接</string>
+    <string name="qr_type_phone">电话</string>
+    <string name="qr_type_text">文本</string>
+    <string name="qr_type_wifi">Wi-Fi</string>
+    <string name="qr_url">URL</string>
+    <string name="qr_wifi_pw_error_wep">5 或 13 个字符</string>
+    <string name="qr_wifi_pw_error_wpa">8 到 63 个字符</string>
+</resources>

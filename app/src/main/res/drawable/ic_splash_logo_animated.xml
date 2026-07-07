@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Splash-Animation: der Drucker-Koerper steht sofort. Die Label-Karte liegt hinter dem
+     Koerper und ist in dessen Aussparung eingezogen (translateX -20, siehe
+     ic_splash_logo.xml). Nach einem kurzen Versatz schiebt sie sich aus der Aussparung
+     heraus; die Koerper-Aussparung maskiert sie dabei in der richtigen Form. Nur
+     API 31+; der Splash wird dafuer in der MainActivity kurz gehalten. -->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/ic_splash_logo">
+    <target android:name="labelGroup">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="translateX"
+                android:valueFrom="-20"
+                android:valueTo="0"
+                android:startOffset="150"
+                android:duration="320"
+                android:interpolator="@android:interpolator/decelerate_cubic" />
+        </aapt:attr>
+    </target>
+</animated-vector>

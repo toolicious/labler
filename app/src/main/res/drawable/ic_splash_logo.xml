@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Splash-Logo (Grundlage fuer ic_splash_logo_animated). Die Label-Karte liegt HINTER
+     dem Drucker-Koerper und wird dadurch exakt von dessen Aussparung maskiert. So kommt
+     die Karte beim Animieren in der Form der Aussparung heraus, nicht an einem geraden
+     Rand. Der Clip x>=23 liegt komplett hinter dem Koerper und verhindert nur, dass die
+     Karte bei starkem Einzug links neben dem Koerper herausragt (nicht sichtbar).
+     Startzustand: Karte in die Aussparung eingezogen (translateX -20). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:translateX="37.5"
+        android:translateY="32"
+        android:scaleX="0.7732"
+        android:scaleY="0.7732">
+        <group
+            android:translateX="-22.3023071"
+            android:translateY="-18.055908">
+            <group android:name="labelClip">
+                <clip-path android:pathData="M 23,-20 H 130 V 130 H 23 Z" />
+                <group
+                    android:name="labelGroup"
+                    android:translateX="-20">
+                    <path
+                        android:name="labelPath"
+                        android:pathData="M 37.797607,53.168823 c -2.150236,0 -3.881225,1.73099 -3.881225,3.881226 v 12.32605 c 0,2.150236 1.730989,3.881225 3.881225,3.881225 h 26.84021 c 2.150237,0 3.881531,-1.730989 3.881531,-3.881225 v -12.32605 c 0,-2.150236 -1.731294,-3.881226 -3.881531,-3.881226 z m 2.139588,5.897827 h 22.095337 c 0.609694,0 1.100464,0.49077 1.100464,1.100464 0,0.609693 -0.49077,1.100464 -1.100464,1.100464 H 39.937195 c -0.609694,0 -1.100464,-0.490771 -1.100464,-1.100464 0,-0.609694 0.49077,-1.100464 1.100464,-1.100464 z m -0.04242,6.091614 h 12.952576 c 0.586243,0 1.058045,0.472107 1.058045,1.05835 v 0.08453 c 0,0.586243 -0.471802,1.05835 -1.058045,1.05835 H 39.894775 c -0.586243,0 -1.058044,-0.472107 -1.058044,-1.05835 v -0.08453 c 0,-0.586243 0.471801,-1.05835 1.058044,-1.05835 z">
+                        <aapt:attr name="android:fillColor">
+                            <gradient
+                                android:type="linear"
+                                android:startX="34" android:startY="49"
+                                android:endX="68" android:endY="71"
+                                android:startColor="#FFFFFF"
+                                android:endColor="#E7E8EA" />
+                        </aapt:attr>
+                    </path>
+                </group>
+            </group>
+            <path
+                android:name="bodyPath"
+                android:pathData="m 26.044678,18.134033 c -2.03001,0 -3.664246,1.634236 -3.664246,3.664246 v 49.419555 c 0,2.030009 1.634236,3.664551 3.664246,3.664551 h 8.78479 C 32.736072,74.32569 31.202454,72.423764 31.202454,70.15033 V 55.887939 c 0,-2.71303 2.184125,-4.897155 4.897155,-4.897155 h 9.147644 V 21.798279 c 0,-2.03001 -1.634235,-3.664246 -3.664245,-3.664246 z m 7.769165,7.541504 a 2.8783069,2.8783069 0 0 1 2.878418,2.878418 2.8783069,2.8783069 0 0 1 -2.878418,2.878113 2.8783069,2.8783069 0 0 1 -2.878113,-2.878113 2.8783069,2.8783069 0 0 1 2.878113,-2.878418 z">
+                <aapt:attr name="android:fillColor">
+                    <gradient
+                        android:type="linear"
+                        android:startX="22" android:startY="18"
+                        android:endX="45" android:endY="74"
+                        android:startColor="#FBF5EA"
+                        android:endColor="#EFE4CE" />
+                </aapt:attr>
+            </path>
+        </group>
+    </group>
+</vector>

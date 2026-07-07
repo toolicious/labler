@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LaBLEr</string>
+
+    <!-- Actions -->
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Salvar</string>
+    <string name="action_create">Criar</string>
+    <string name="action_print">Imprimir</string>
+    <string name="action_connect">Conectar</string>
+    <string name="action_grant_permission">Conceder permissão</string>
+    <string name="action_disconnect">Desconectar</string>
+    <string name="action_forget">Esquecer</string>
+    <string name="action_clear">Limpar</string>
+    <string name="action_import_file">Ou importar de um arquivo …</string>
+    <string name="action_import">Importar</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">Voltar</string>
+    <string name="cd_settings">Configurações</string>
+    <string name="cd_history">Histórico de impressão</string>
+    <string name="cd_new_label">Nova etiqueta</string>
+    <string name="cd_favorite">Favorito</string>
+    <string name="cd_menu">Menu</string>
+    <string name="cd_clear">Limpar</string>
+    <string name="cd_delete">Excluir</string>
+    <string name="cd_rotate">Girar</string>
+    <string name="cd_print">Imprimir</string>
+    <string name="cd_undo">Desfazer</string>
+    <string name="cd_redo">Refazer</string>
+
+    <!-- Home -->
+    <string name="home_search_hint">Pesquisar</string>
+    <string name="home_empty">Ainda não há etiquetas.\nToque em + para criar a primeira.</string>
+    <string name="home_no_results">Nenhum resultado.</string>
+    <string name="template_size">%1$d x %2$d mm</string>
+    <string name="menu_edit">Editar</string>
+    <string name="menu_duplicate">Duplicar</string>
+    <string name="menu_export">Exportar</string>
+    <string name="menu_delete">Excluir</string>
+    <string name="toast_export_failed">Falha ao exportar: %1$s</string>
+    <string name="toast_export_ok">Exportado.</string>
+    <string name="toast_import_failed">Falha ao importar: %1$s</string>
+    <string name="delete_title">Excluir etiqueta?</string>
+    <string name="delete_message">%1$s será excluída permanentemente.</string>
+
+    <!-- Label dialog -->
+    <string name="dialog_new_title">Nova etiqueta</string>
+    <string name="dialog_edit_title">Editar etiqueta</string>
+    <string name="field_name">Nome</string>
+    <string name="size_hint">Tamanho (largura da fita x comprimento):</string>
+    <string name="preset_custom">Personalizado …</string>
+    <string name="field_tape_mm">Fita (mm)</string>
+    <string name="field_length_mm">Comprimento (mm)</string>
+    <string name="media_die_cut">Etiqueta destacável (die-cut)</string>
+    <string name="media_continuous">Contínuo</string>
+
+    <!-- Editor -->
+    <string name="group_add">Adicionar</string>
+    <string name="group_elements">Elementos</string>
+    <string name="add_text">Texto</string>
+    <string name="add_symbol">Símbolo</string>
+    <string name="add_frame">Moldura</string>
+    <string name="element_frame">Moldura</string>
+    <string name="editor_hint">Toque em um elemento na etiqueta ou adicione um acima. Os elementos selecionados podem ser arrastados; a alça no canto inferior direito redimensiona.</string>
+    <string name="group_format">Formato</string>
+    <string name="group_align">Alinhamento</string>
+    <string name="group_variables">Variáveis</string>
+    <string name="group_symbol">Escolher um símbolo</string>
+    <string name="group_raster">Pontilhado</string>
+    <string name="raster_hint">Visível apenas em emojis multicoloridos.</string>
+    <string name="prop_text">Texto</string>
+    <string name="prop_size">Tamanho</string>
+    <string name="prop_bold">Negrito</string>
+    <string name="prop_italic">Itálico</string>
+    <string name="prop_underline">Sublinhado</string>
+    <string name="align_left">Esquerda</string>
+    <string name="align_center">Centro</string>
+    <string name="align_right">Direita</string>
+    <string name="group_font">Fonte</string>
+    <string name="font_sans">Sans</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_mono">Mono</string>
+    <string name="prop_symbol">Símbolo/emoji</string>
+    <string name="dither_threshold">Limiar</string>
+    <string name="dither_fs">Floyd-Steinberg</string>
+    <string name="dither_atkinson">Atkinson</string>
+    <string name="dither_outline">Contorno</string>
+    <string name="frame_rect">Moldura</string>
+    <string name="frame_round">Arredondado</string>
+    <string name="frame_line_h">Linha −</string>
+    <string name="frame_line_v">Linha |</string>
+    <string name="prop_stroke">Espessura</string>
+    <string name="prop_radius">Raio dos cantos</string>
+    <string name="prop_contrast">Contraste</string>
+    <string name="prop_outline_detail">Sensibilidade</string>
+    <string name="prop_line_width">Espessura da linha</string>
+    <string name="prop_width">Largura</string>
+    <string name="prop_height">Altura</string>
+    <string name="var_date">date</string>
+    <string name="var_time">time</string>
+    <string name="var_number">#</string>
+    <string name="var_var">var</string>
+    <string name="symbol_current">Símbolo atual</string>
+    <string name="action_choose_symbol">Escolher símbolo …</string>
+    <string name="symbol_field">Emoji ou caractere</string>
+    <string name="symbol_keyboard_hint">Para emojis use a tecla de emoji do teclado, ou escolha um símbolo abaixo.</string>
+    <string name="action_done">Concluído</string>
+    <string name="cat_arrows">Setas</string>
+    <string name="cat_shapes">Formas</string>
+    <string name="cat_stars">Estrelas</string>
+    <string name="cat_signs">Sinais</string>
+    <string name="cat_tech">Tecnologia e escritório</string>
+    <string name="cat_weather">Clima e natureza</string>
+    <string name="cat_math">Matemática</string>
+    <string name="cat_misc">Diversos</string>
+    <string name="tab_symbols">Símbolos</string>
+    <string name="tab_emojis">Emojis</string>
+    <string name="cat_smileys">Rostos</string>
+    <string name="cat_animals">Animais e natureza</string>
+    <string name="cat_food">Comida</string>
+    <string name="cat_activity">Atividade e viagens</string>
+    <string name="cat_objects">Objetos</string>
+    <string name="cat_hearts">Corações e símbolos</string>
+
+    <!-- Print dialog -->
+    <string name="print_title">Imprimir: %1$s</string>
+    <string name="print_preview">Prévia (%1$d mm, 1 bit como impresso):</string>
+    <string name="print_paper">Papel:</string>
+    <string name="print_copies">Cópias:</string>
+    <string name="print_counter_start">Nº começa em %1$d</string>
+    <string name="print_label_progress">Etiqueta %1$d/%2$d</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Configurações</string>
+    <string name="settings_printer">Impressora</string>
+    <string name="status_disconnected">Não conectado</string>
+    <string name="status_connecting">Conectando (tentativa %1$d/3) …</string>
+    <string name="status_ready">Conectado: %1$s</string>
+    <string name="status_ready_battery">Conectado: %1$s, bateria %2$d %%</string>
+    <string name="status_printing">Imprimindo (%1$d %%)</string>
+    <string name="status_error">Erro: %1$s</string>
+    <string name="settings_saved">Salvo: %1$s (%2$s)</string>
+    <string name="info_model">Modelo: %1$s</string>
+    <string name="info_firmware">Firmware: %1$s</string>
+    <string name="info_serial">Número de série: %1$s</string>
+    <string name="info_hardware">Hardware: %1$s</string>
+    <string name="settings_diagnostics">Diagnóstico</string>
+    <string name="settings_testtools">Ferramentas de impressão de teste (padrão geométrico)</string>
+    <string name="settings_experimental">Experimental</string>
+    <string name="settings_experimental_hint">Comandos de impressora experimentais, não verificados na P15. Somente com uma impressora conectada; ignore se tiver dúvida.</string>
+    <string name="exp_learn_gap">Calibrar intervalo das etiquetas</string>
+    <string name="settings_about">Sobre</string>
+    <string name="about_text">LaBLEr %1$s\n\nApp FOSS independente para a impressora de etiquetas P15 via Bluetooth LE. O protocolo foi obtido por engenharia reversa do BleWebler, uma versão web para navegadores Chrome que funciona sem instalação. Nenhum código foi aproveitado.</string>
+    <string name="scan_title">Procurar impressora</string>
+    <string name="scan_show_all">Mostrar todos os dispositivos Bluetooth</string>
+    <string name="scan_empty">Nada encontrado. A impressora está ligada?</string>
+    <string name="scan_device_line">%1$s  (RSSI %2$d)</string>
+
+    <!-- Status chip -->
+    <string name="chip_no_printer">Sem impressora</string>
+    <string name="chip_connecting">Conectando (%1$d/3)</string>
+    <string name="chip_printing">Imprimindo %1$d %%</string>
+    <string name="chip_error">Erro</string>
+    <string name="chip_permission">Falta permissão BT</string>
+
+    <!-- Test print -->
+    <string name="testprint_title">Impressão de teste</string>
+    <string name="testprint_geometry">Padrão de teste de geometria (40 mm)</string>
+    <string name="testprint_text_label">Amostra de texto</string>
+    <string name="testprint_show">Mostrar prévia</string>
+
+    <!-- History -->
+    <string name="history_title">Histórico de impressão</string>
+    <string name="history_empty">Nada impresso ainda.</string>
+    <string name="history_meta">%1$s · %2$d× · %3$d x %4$d mm</string>
+
+    <!-- Backend error messages -->
+    <string name="err_no_bluetooth">Este dispositivo não tem Bluetooth</string>
+    <string name="err_bt_off">O Bluetooth está desligado</string>
+    <string name="err_no_printer_found">Nenhuma impressora encontrada. Está ligada e ao alcance?</string>
+    <string name="err_connect_failed">Falha na conexão</string>
+    <string name="err_not_connected">Nenhuma impressora conectada</string>
+    <string name="err_print_failed">Falha na impressão</string>
+
+    <!-- Additional strings -->
+    <string name="about_description">LaBLEr é um app de impressão de etiquetas para impressoras térmicas Bluetooth Low Energy da família Marklife (P15, P12, L13). Crie suas próprias etiquetas direto no celular com texto, símbolos e molduras, salve-as como modelos e imprima novamente quando quiser.</string>
+    <string name="about_license">Licença: GPL-3.0-or-later</string>
+    <string name="about_source">Código-fonte &amp; ajuda</string>
+    <string name="about_thanks">Agradecemos ao app web Chrome de código aberto %1$s, que tornou o protocolo da P15 acessível.</string>
+    <string name="about_version">Versão %1$s</string>
+    <string name="action_close">Fechar</string>
+    <string name="add_barcode">Código</string>
+    <string name="add_image">Imagem</string>
+    <string name="app_language">Idioma</string>
+    <string name="app_language_system">Sistema (automático)</string>
+    <string name="app_language_title">Idioma</string>
+    <string name="backup">Backup</string>
+    <string name="backup_add">Adicionar</string>
+    <string name="backup_export">Exportar</string>
+    <string name="backup_failed">Falha no backup.</string>
+    <string name="backup_import">Importar</string>
+    <string name="backup_ok">Backup concluído.</string>
+    <string name="backup_replace">Substituir</string>
+    <string name="backup_replace_message">Substituir as etiquetas existentes ou adicionar as importadas?</string>
+    <string name="backup_replace_title">Importar backup</string>
+    <string name="cd_info">Informações</string>
+    <string name="default_label_name">Nova etiqueta</string>
+    <string name="duplicate_name">%1$s (Cópia)</string>
+    <string name="err_file_invalid">Arquivo inválido</string>
+    <string name="err_file_not_readable">Não foi possível ler o arquivo</string>
+    <string name="err_file_not_writable">Não foi possível gravar o arquivo</string>
+    <string name="err_no_scanner">Scanner BLE indisponível</string>
+    <string name="forget_message">%1$s não será mais lembrada nem conectada automaticamente.</string>
+    <string name="forget_title">Esquecer impressora?</string>
+    <string name="group_scale">Escala</string>
+    <string name="outline_canny">Foto</string>
+    <string name="outline_lines">Gráfico</string>
+    <string name="outline_smooth">Suave</string>
+    <string name="print_need_printer">É necessário conectar uma impressora para imprimir.</string>
+    <string name="perm_bluetooth_missing">Falta a permissão de Bluetooth. Sem ela nenhuma impressora pode se conectar.</string>
+    <string name="print_printer_settings">Configurações da impressora</string>
+    <string name="prop_barcode_caption">Mostrar texto</string>
+    <string name="prop_barcode_data">Conteúdo</string>
+    <string name="prop_barcode_type">Tipo</string>
+    <string name="prop_image_threshold">Limiar</string>
+    <string name="prop_invert">Inverter</string>
+    <string name="prop_outline_style">Estilo</string>
+    <string name="qr_auth">Criptografia</string>
+    <string name="qr_auth_none">Nenhuma</string>
+    <string name="qr_content">Conteúdo do QR</string>
+    <string name="qr_email_addr">Endereço de e-mail</string>
+    <string name="qr_hidden">Rede oculta</string>
+    <string name="qr_password">Senha</string>
+    <string name="qr_password_hint">Opcional. Armazenada em texto simples no código QR e no modelo.</string>
+    <string name="qr_phone">Número de telefone</string>
+    <string name="qr_show_password">Mostrar senha</string>
+    <string name="qr_ssid">Nome da rede (SSID)</string>
+    <string name="qr_subject">Assunto (opcional)</string>
+    <string name="qr_type_contact">Contato</string>
+    <string name="qr_type_email">E-mail</string>
+    <string name="qr_type_link">Link</string>
+    <string name="qr_type_phone">Telefone</string>
+    <string name="qr_type_text">Texto</string>
+    <string name="qr_type_wifi">Wi-Fi</string>
+    <string name="qr_url">URL</string>
+    <string name="qr_wifi_pw_error_wep">5 ou 13 caracteres</string>
+    <string name="qr_wifi_pw_error_wpa">8 a 63 caracteres</string>
+</resources>

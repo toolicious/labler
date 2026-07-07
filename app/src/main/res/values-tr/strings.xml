@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LaBLEr</string>
+
+    <!-- Actions -->
+    <string name="action_cancel">İptal</string>
+    <string name="action_save">Kaydet</string>
+    <string name="action_create">Oluştur</string>
+    <string name="action_print">Yazdır</string>
+    <string name="action_connect">Bağlan</string>
+    <string name="action_grant_permission">İzin ver</string>
+    <string name="action_disconnect">Bağlantıyı kes</string>
+    <string name="action_forget">Unut</string>
+    <string name="action_clear">Temizle</string>
+    <string name="action_import_file">Veya bir dosyadan içe aktar …</string>
+    <string name="action_import">İçe aktar</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">Geri</string>
+    <string name="cd_settings">Ayarlar</string>
+    <string name="cd_history">Yazdırma geçmişi</string>
+    <string name="cd_new_label">Yeni etiket</string>
+    <string name="cd_favorite">Favori</string>
+    <string name="cd_menu">Menü</string>
+    <string name="cd_clear">Temizle</string>
+    <string name="cd_delete">Sil</string>
+    <string name="cd_rotate">Döndür</string>
+    <string name="cd_print">Yazdır</string>
+    <string name="cd_undo">Geri al</string>
+    <string name="cd_redo">Yinele</string>
+
+    <!-- Home -->
+    <string name="home_search_hint">Ara</string>
+    <string name="home_empty">Henüz etiket yok.\nİlkini oluşturmak için + simgesine dokun.</string>
+    <string name="home_no_results">Sonuç yok.</string>
+    <string name="template_size">%1$d x %2$d mm</string>
+    <string name="menu_edit">Düzenle</string>
+    <string name="menu_duplicate">Çoğalt</string>
+    <string name="menu_export">Dışa aktar</string>
+    <string name="menu_delete">Sil</string>
+    <string name="toast_export_failed">Dışa aktarma başarısız: %1$s</string>
+    <string name="toast_export_ok">Dışa aktarıldı.</string>
+    <string name="toast_import_failed">İçe aktarma başarısız: %1$s</string>
+    <string name="delete_title">Etiket silinsin mi?</string>
+    <string name="delete_message">%1$s kalıcı olarak silinecek.</string>
+
+    <!-- Label dialog -->
+    <string name="dialog_new_title">Yeni etiket</string>
+    <string name="dialog_edit_title">Etiketi düzenle</string>
+    <string name="field_name">Ad</string>
+    <string name="size_hint">Boyut (şerit genişliği x uzunluk):</string>
+    <string name="preset_custom">Özel …</string>
+    <string name="field_tape_mm">Şerit (mm)</string>
+    <string name="field_length_mm">Uzunluk (mm)</string>
+    <string name="media_die_cut">Kalıp kesim etiket</string>
+    <string name="media_continuous">Sürekli</string>
+
+    <!-- Editor -->
+    <string name="group_add">Ekle</string>
+    <string name="group_elements">Öğeler</string>
+    <string name="add_text">Metin</string>
+    <string name="add_symbol">Simge</string>
+    <string name="add_frame">Çerçeve</string>
+    <string name="element_frame">Çerçeve</string>
+    <string name="editor_hint">Etiketteki bir öğeye dokun veya yukarıdan yeni bir öğe ekle. Seçili öğeler sürüklenebilir; sağ alttaki tutamaç boyutlandırır.</string>
+    <string name="group_format">Biçim</string>
+    <string name="group_align">Hizalama</string>
+    <string name="group_variables">Değişkenler</string>
+    <string name="group_symbol">Bir simge seç</string>
+    <string name="group_raster">Tramlama</string>
+    <string name="raster_hint">Yalnızca çok renkli emojilerde görünür.</string>
+    <string name="prop_text">Metin</string>
+    <string name="prop_size">Boyut</string>
+    <string name="prop_bold">Kalın</string>
+    <string name="prop_italic">İtalik</string>
+    <string name="prop_underline">Altı çizili</string>
+    <string name="align_left">Sola</string>
+    <string name="align_center">Ortala</string>
+    <string name="align_right">Sağa</string>
+    <string name="group_font">Yazı tipi</string>
+    <string name="font_sans">Sans</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_mono">Mono</string>
+    <string name="prop_symbol">Simge/emoji</string>
+    <string name="dither_threshold">Eşik</string>
+    <string name="dither_fs">Floyd-Steinberg</string>
+    <string name="dither_atkinson">Atkinson</string>
+    <string name="dither_outline">Anahat</string>
+    <string name="frame_rect">Çerçeve</string>
+    <string name="frame_round">Yuvarlatılmış</string>
+    <string name="frame_line_h">Çizgi −</string>
+    <string name="frame_line_v">Çizgi |</string>
+    <string name="prop_stroke">Çizgi kalınlığı</string>
+    <string name="prop_radius">Köşe yarıçapı</string>
+    <string name="prop_contrast">Kontrast</string>
+    <string name="prop_outline_detail">Hassasiyet</string>
+    <string name="prop_line_width">Çizgi kalınlığı</string>
+    <string name="prop_width">Genişlik</string>
+    <string name="prop_height">Yükseklik</string>
+    <string name="var_date">date</string>
+    <string name="var_time">time</string>
+    <string name="var_number">#</string>
+    <string name="var_var">var</string>
+    <string name="symbol_current">Geçerli simge</string>
+    <string name="action_choose_symbol">Simge seç …</string>
+    <string name="symbol_field">Emoji veya karakter</string>
+    <string name="symbol_keyboard_hint">Emojiler için klavyenin emoji tuşunu kullan ya da aşağıdan bir simge seç.</string>
+    <string name="action_done">Bitti</string>
+    <string name="cat_arrows">Oklar</string>
+    <string name="cat_shapes">Şekiller</string>
+    <string name="cat_stars">Yıldızlar</string>
+    <string name="cat_signs">İşaretler</string>
+    <string name="cat_tech">Teknik ve ofis</string>
+    <string name="cat_weather">Hava ve doğa</string>
+    <string name="cat_math">Matematik</string>
+    <string name="cat_misc">Çeşitli</string>
+    <string name="tab_symbols">Simgeler</string>
+    <string name="tab_emojis">Emojiler</string>
+    <string name="cat_smileys">İfadeler</string>
+    <string name="cat_animals">Hayvanlar ve doğa</string>
+    <string name="cat_food">Yiyecek</string>
+    <string name="cat_activity">Etkinlik ve seyahat</string>
+    <string name="cat_objects">Nesneler</string>
+    <string name="cat_hearts">Kalpler ve simgeler</string>
+
+    <!-- Print dialog -->
+    <string name="print_title">Yazdır: %1$s</string>
+    <string name="print_preview">Önizleme (%1$d mm, yazdırıldığı gibi 1 bit):</string>
+    <string name="print_paper">Kâğıt:</string>
+    <string name="print_copies">Kopya:</string>
+    <string name="print_counter_start">No. %1$d ile başlıyor</string>
+    <string name="print_label_progress">Etiket %1$d/%2$d</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_printer">Yazıcı</string>
+    <string name="status_disconnected">Bağlı değil</string>
+    <string name="status_connecting">Bağlanıyor (deneme %1$d/3) …</string>
+    <string name="status_ready">Bağlandı: %1$s</string>
+    <string name="status_ready_battery">Bağlandı: %1$s, pil %2$d %%</string>
+    <string name="status_printing">Yazdırılıyor (%1$d %%)</string>
+    <string name="status_error">Hata: %1$s</string>
+    <string name="settings_saved">Kaydedildi: %1$s (%2$s)</string>
+    <string name="info_model">Model: %1$s</string>
+    <string name="info_firmware">Ürün yazılımı: %1$s</string>
+    <string name="info_serial">Seri numarası: %1$s</string>
+    <string name="info_hardware">Donanım: %1$s</string>
+    <string name="settings_diagnostics">Tanılama</string>
+    <string name="settings_testtools">Test yazdırma araçları (geometri deseni)</string>
+    <string name="settings_experimental">Deneysel</string>
+    <string name="settings_experimental_hint">Deneysel yazıcı komutları, P15\'te doğrulanmadı. Yalnızca yazıcı bağlıyken; emin değilsen yoksay.</string>
+    <string name="exp_learn_gap">Etiket boşluğunu kalibre et</string>
+    <string name="settings_about">Hakkında</string>
+    <string name="about_text">LaBLEr %1$s\n\nBluetooth LE üzerinden P15 etiket yazıcısı için bağımsız FOSS uygulaması. Protokol, kurulum gerektirmeden Chrome tarayıcılarda çalışan bir web sürümü olan BleWebler\'dan tersine mühendislikle elde edildi. Hiçbir kod alınmadı.</string>
+    <string name="scan_title">Yazıcı ara</string>
+    <string name="scan_show_all">Tüm Bluetooth cihazlarını göster</string>
+    <string name="scan_empty">Hiçbir şey bulunamadı. Yazıcı açık mı?</string>
+    <string name="scan_device_line">%1$s  (RSSI %2$d)</string>
+
+    <!-- Status chip -->
+    <string name="chip_no_printer">Yazıcı yok</string>
+    <string name="chip_connecting">Bağlanıyor (%1$d/3)</string>
+    <string name="chip_printing">Yazdırılıyor %1$d %%</string>
+    <string name="chip_error">Hata</string>
+    <string name="chip_permission">BT izni gerekli</string>
+
+    <!-- Test print -->
+    <string name="testprint_title">Test yazdırma</string>
+    <string name="testprint_geometry">Geometri test deseni (40 mm)</string>
+    <string name="testprint_text_label">Metin örneği</string>
+    <string name="testprint_show">Önizlemeyi göster</string>
+
+    <!-- History -->
+    <string name="history_title">Yazdırma geçmişi</string>
+    <string name="history_empty">Henüz bir şey yazdırılmadı.</string>
+    <string name="history_meta">%1$s · %2$d× · %3$d x %4$d mm</string>
+
+    <!-- Backend error messages -->
+    <string name="err_no_bluetooth">Bu cihazda Bluetooth yok</string>
+    <string name="err_bt_off">Bluetooth kapalı</string>
+    <string name="err_no_printer_found">Yazıcı bulunamadı. Açık ve menzilde mi?</string>
+    <string name="err_connect_failed">Bağlantı başarısız</string>
+    <string name="err_not_connected">Bağlı yazıcı yok</string>
+    <string name="err_print_failed">Yazdırma başarısız</string>
+
+    <!-- About -->
+    <string name="about_description">LaBLEr, Marklife ailesinin (P15, P12, L13) Bluetooth Low Energy termal etiket yazıcıları için bir etiket yazıcısı uygulamasıdır. Kendi etiketlerini telefonunda metin, simge ve çerçevelerle tasarla, şablon olarak kaydet ve istediğin zaman tekrar yazdır.</string>
+    <string name="about_license">Lisans: GPL-3.0-or-later</string>
+    <string name="about_source">Kaynak kodu &amp; yardım</string>
+    <string name="about_thanks">P15 protokolünü erişilebilir kılan açık kaynaklı Chrome web uygulaması %1$s için teşekkürler.</string>
+    <string name="about_version">Sürüm %1$s</string>
+    <string name="action_close">Kapat</string>
+    <string name="add_barcode">Kod</string>
+    <string name="add_image">Görsel</string>
+    <string name="app_language">Dil</string>
+    <string name="app_language_system">Sistem (otomatik)</string>
+    <string name="app_language_title">Dil</string>
+    <string name="backup">Yedek</string>
+    <string name="backup_add">Ekle</string>
+    <string name="backup_export">Dışa aktar</string>
+    <string name="backup_failed">Yedekleme başarısız.</string>
+    <string name="backup_import">İçe aktar</string>
+    <string name="backup_ok">Yedekleme tamamlandı.</string>
+    <string name="backup_replace">Değiştir</string>
+    <string name="backup_replace_message">Mevcut etiketler değiştirilsin mi yoksa içe aktarılanlar eklensin mi?</string>
+    <string name="backup_replace_title">Yedeği içe aktar</string>
+    <string name="cd_info">Bilgi</string>
+    <string name="default_label_name">Yeni etiket</string>
+    <string name="duplicate_name">%1$s (Kopya)</string>
+    <string name="err_file_invalid">Geçersiz dosya</string>
+    <string name="err_file_not_readable">Dosya okunamıyor</string>
+    <string name="err_file_not_writable">Dosya yazılamıyor</string>
+    <string name="err_no_scanner">BLE tarayıcı kullanılamıyor</string>
+    <string name="forget_message">%1$s artık hatırlanmayacak veya otomatik bağlanmayacak.</string>
+    <string name="forget_title">Yazıcı unutulsun mu?</string>
+    <string name="group_scale">Ölçek</string>
+    <string name="outline_canny">Fotoğraf</string>
+    <string name="outline_lines">Grafik</string>
+    <string name="outline_smooth">Yumuşak</string>
+    <string name="print_need_printer">Yazdırmak için bir yazıcı bağlı olmalı.</string>
+    <string name="perm_bluetooth_missing">Bluetooth izni eksik. İzin verilmeden hiçbir yazıcıya bağlanılamaz.</string>
+    <string name="print_printer_settings">Yazıcı ayarları</string>
+    <string name="prop_barcode_caption">Metni göster</string>
+    <string name="prop_barcode_data">İçerik</string>
+    <string name="prop_barcode_type">Tür</string>
+    <string name="prop_image_threshold">Eşik</string>
+    <string name="prop_invert">Ters çevir</string>
+    <string name="prop_outline_style">Stil</string>
+    <string name="qr_auth">Şifreleme</string>
+    <string name="qr_auth_none">Yok</string>
+    <string name="qr_content">QR içeriği</string>
+    <string name="qr_email_addr">E-posta adresi</string>
+    <string name="qr_hidden">Gizli ağ</string>
+    <string name="qr_password">Parola</string>
+    <string name="qr_password_hint">İsteğe bağlı. QR kodunda ve şablonda düz metin olarak saklanır.</string>
+    <string name="qr_phone">Telefon numarası</string>
+    <string name="qr_show_password">Parolayı göster</string>
+    <string name="qr_ssid">Ağ adı (SSID)</string>
+    <string name="qr_subject">Konu (isteğe bağlı)</string>
+    <string name="qr_type_contact">Kişi</string>
+    <string name="qr_type_email">E-posta</string>
+    <string name="qr_type_link">Bağlantı</string>
+    <string name="qr_type_phone">Telefon</string>
+    <string name="qr_type_text">Metin</string>
+    <string name="qr_type_wifi">Wi-Fi</string>
+    <string name="qr_url">URL</string>
+    <string name="qr_wifi_pw_error_wep">5 veya 13 karakter</string>
+    <string name="qr_wifi_pw_error_wpa">8 ila 63 karakter</string>
+</resources>

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LaBLEr</string>
+
+    <!-- Actions -->
+    <string name="action_cancel">Annuleren</string>
+    <string name="action_save">Opslaan</string>
+    <string name="action_create">Aanmaken</string>
+    <string name="action_print">Afdrukken</string>
+    <string name="action_connect">Verbinden</string>
+    <string name="action_grant_permission">Toestemming verlenen</string>
+    <string name="action_disconnect">Verbinding verbreken</string>
+    <string name="action_forget">Vergeten</string>
+    <string name="action_clear">Wissen</string>
+    <string name="action_import_file">Of importeren uit een bestand …</string>
+    <string name="action_import">Importeren</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">Terug</string>
+    <string name="cd_settings">Instellingen</string>
+    <string name="cd_history">Afdrukgeschiedenis</string>
+    <string name="cd_new_label">Nieuw label</string>
+    <string name="cd_favorite">Favoriet</string>
+    <string name="cd_menu">Menu</string>
+    <string name="cd_clear">Wissen</string>
+    <string name="cd_delete">Verwijderen</string>
+    <string name="cd_rotate">Draaien</string>
+    <string name="cd_print">Afdrukken</string>
+    <string name="cd_undo">Ongedaan maken</string>
+    <string name="cd_redo">Opnieuw</string>
+
+    <!-- Home -->
+    <string name="home_search_hint">Zoeken</string>
+    <string name="home_empty">Nog geen labels.\nTik op + om je eerste te maken.</string>
+    <string name="home_no_results">Geen resultaten.</string>
+    <string name="template_size">%1$d x %2$d mm</string>
+    <string name="menu_edit">Bewerken</string>
+    <string name="menu_duplicate">Dupliceren</string>
+    <string name="menu_export">Exporteren</string>
+    <string name="menu_delete">Verwijderen</string>
+    <string name="toast_export_failed">Exporteren mislukt: %1$s</string>
+    <string name="toast_export_ok">Geëxporteerd.</string>
+    <string name="toast_import_failed">Importeren mislukt: %1$s</string>
+    <string name="delete_title">Label verwijderen?</string>
+    <string name="delete_message">%1$s wordt permanent verwijderd.</string>
+
+    <!-- Label dialog -->
+    <string name="dialog_new_title">Nieuw label</string>
+    <string name="dialog_edit_title">Label bewerken</string>
+    <string name="field_name">Naam</string>
+    <string name="size_hint">Grootte (tapebreedte x lengte):</string>
+    <string name="preset_custom">Aangepast …</string>
+    <string name="field_tape_mm">Tape (mm)</string>
+    <string name="field_length_mm">Lengte (mm)</string>
+    <string name="media_die_cut">Gestanst label</string>
+    <string name="media_continuous">Doorlopend</string>
+
+    <!-- Editor -->
+    <string name="group_add">Toevoegen</string>
+    <string name="group_elements">Elementen</string>
+    <string name="add_text">Tekst</string>
+    <string name="add_symbol">Symbool</string>
+    <string name="add_frame">Kader</string>
+    <string name="element_frame">Kader</string>
+    <string name="editor_hint">Tik op een element op het label of voeg er bovenaan een toe. Geselecteerde elementen kun je slepen; de greep rechtsonder schaalt.</string>
+    <string name="group_format">Opmaak</string>
+    <string name="group_align">Uitlijning</string>
+    <string name="group_variables">Variabelen</string>
+    <string name="group_symbol">Een symbool kiezen</string>
+    <string name="group_raster">Rasteren</string>
+    <string name="raster_hint">Alleen zichtbaar bij meerkleurige emoji.</string>
+    <string name="prop_text">Tekst</string>
+    <string name="prop_size">Grootte</string>
+    <string name="prop_bold">Vet</string>
+    <string name="prop_italic">Cursief</string>
+    <string name="prop_underline">Onderstreept</string>
+    <string name="align_left">Links</string>
+    <string name="align_center">Midden</string>
+    <string name="align_right">Rechts</string>
+    <string name="group_font">Lettertype</string>
+    <string name="font_sans">Sans</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_mono">Mono</string>
+    <string name="prop_symbol">Symbool/emoji</string>
+    <string name="dither_threshold">Drempel</string>
+    <string name="dither_fs">Floyd-Steinberg</string>
+    <string name="dither_atkinson">Atkinson</string>
+    <string name="dither_outline">Contour</string>
+    <string name="frame_rect">Kader</string>
+    <string name="frame_round">Afgerond</string>
+    <string name="frame_line_h">Lijn −</string>
+    <string name="frame_line_v">Lijn |</string>
+    <string name="prop_stroke">Lijndikte</string>
+    <string name="prop_radius">Hoekradius</string>
+    <string name="prop_contrast">Contrast</string>
+    <string name="prop_outline_detail">Gevoeligheid</string>
+    <string name="prop_line_width">Lijndikte</string>
+    <string name="prop_width">Breedte</string>
+    <string name="prop_height">Hoogte</string>
+    <string name="var_date">date</string>
+    <string name="var_time">time</string>
+    <string name="var_number">#</string>
+    <string name="var_var">var</string>
+    <string name="symbol_current">Huidig symbool</string>
+    <string name="action_choose_symbol">Symbool kiezen …</string>
+    <string name="symbol_field">Emoji of teken</string>
+    <string name="symbol_keyboard_hint">Gebruik voor emoji de emoji-toets van je toetsenbord, of kies hieronder een symbool.</string>
+    <string name="action_done">Klaar</string>
+    <string name="cat_arrows">Pijlen</string>
+    <string name="cat_shapes">Vormen</string>
+    <string name="cat_stars">Sterren</string>
+    <string name="cat_signs">Tekens</string>
+    <string name="cat_tech">Techniek &amp; kantoor</string>
+    <string name="cat_weather">Weer &amp; natuur</string>
+    <string name="cat_math">Wiskunde</string>
+    <string name="cat_misc">Diversen</string>
+    <string name="tab_symbols">Symbolen</string>
+    <string name="tab_emojis">Emoji</string>
+    <string name="cat_smileys">Smileys</string>
+    <string name="cat_animals">Dieren &amp; natuur</string>
+    <string name="cat_food">Eten</string>
+    <string name="cat_activity">Activiteit &amp; reizen</string>
+    <string name="cat_objects">Objecten</string>
+    <string name="cat_hearts">Harten &amp; symbolen</string>
+
+    <!-- Print dialog -->
+    <string name="print_title">Afdrukken: %1$s</string>
+    <string name="print_preview">Voorbeeld (%1$d mm, 1-bit zoals afgedrukt):</string>
+    <string name="print_paper">Papier:</string>
+    <string name="print_copies">Kopieën:</string>
+    <string name="print_counter_start">Nr. begint bij %1$d</string>
+    <string name="print_label_progress">Label %1$d/%2$d</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Instellingen</string>
+    <string name="settings_printer">Printer</string>
+    <string name="status_disconnected">Niet verbonden</string>
+    <string name="status_connecting">Verbinden (poging %1$d/3) …</string>
+    <string name="status_ready">Verbonden: %1$s</string>
+    <string name="status_ready_battery">Verbonden: %1$s, batterij %2$d %%</string>
+    <string name="status_printing">Bezig met afdrukken (%1$d %%)</string>
+    <string name="status_error">Fout: %1$s</string>
+    <string name="settings_saved">Onthouden: %1$s (%2$s)</string>
+    <string name="info_model">Model: %1$s</string>
+    <string name="info_firmware">Firmware: %1$s</string>
+    <string name="info_serial">Serienummer: %1$s</string>
+    <string name="info_hardware">Hardware: %1$s</string>
+    <string name="settings_diagnostics">Diagnose</string>
+    <string name="settings_testtools">Testafdrukgereedschap (geometriepatroon)</string>
+    <string name="settings_experimental">Experimenteel</string>
+    <string name="settings_experimental_hint">Experimentele printeropdrachten, niet geverifieerd op de P15. Alleen met een verbonden printer; negeer bij twijfel.</string>
+    <string name="exp_learn_gap">Labelafstand kalibreren</string>
+    <string name="settings_about">Over</string>
+    <string name="about_text">LaBLEr %1$s\n\nOnafhankelijke FOSS-app voor de P15-labelprinter via Bluetooth LE. Het protocol is via reverse-engineering afgeleid uit BleWebler, een webversie voor Chrome-browsers die zonder installatie werkt. Er is geen code overgenomen.</string>
+    <string name="scan_title">Printer zoeken</string>
+    <string name="scan_show_all">Alle Bluetooth-apparaten tonen</string>
+    <string name="scan_empty">Niets gevonden. Staat de printer aan?</string>
+    <string name="scan_device_line">%1$s  (RSSI %2$d)</string>
+
+    <!-- Status chip -->
+    <string name="chip_no_printer">Geen printer</string>
+    <string name="chip_connecting">Verbinden (%1$d/3)</string>
+    <string name="chip_printing">Afdrukken %1$d %%</string>
+    <string name="chip_error">Fout</string>
+    <string name="chip_permission">BT-toestemming nodig</string>
+
+    <!-- Test print -->
+    <string name="testprint_title">Testafdruk</string>
+    <string name="testprint_geometry">Geometrie-testpatroon (40 mm)</string>
+    <string name="testprint_text_label">Tekstvoorbeeld</string>
+    <string name="testprint_show">Voorbeeld tonen</string>
+
+    <!-- History -->
+    <string name="history_title">Afdrukgeschiedenis</string>
+    <string name="history_empty">Nog niets afgedrukt.</string>
+    <string name="history_meta">%1$s · %2$d× · %3$d x %4$d mm</string>
+
+    <!-- Backend error messages -->
+    <string name="err_no_bluetooth">Dit apparaat heeft geen Bluetooth</string>
+    <string name="err_bt_off">Bluetooth staat uit</string>
+    <string name="err_no_printer_found">Geen printer gevonden. Staat hij aan en binnen bereik?</string>
+    <string name="err_connect_failed">Verbinding mislukt</string>
+    <string name="err_not_connected">Geen printer verbonden</string>
+    <string name="err_print_failed">Afdrukken mislukt</string>
+    <string name="about_description">LaBLEr is een labelprinter-app voor thermische labelprinters met Bluetooth Low Energy uit de Marklife-familie (P15, P12, L13). Ontwerp je eigen labels direct op je telefoon met tekst, symbolen en kaders, sla ze op als sjablonen en druk ze op elk moment opnieuw af.</string>
+    <string name="about_license">Licentie: GPL-3.0-or-later</string>
+    <string name="about_source">Broncode &amp; hulp</string>
+    <string name="about_thanks">Met dank aan de opensource-Chrome-webapp %1$s, die het P15-protocol toegankelijk maakte.</string>
+    <string name="about_version">Versie %1$s</string>
+    <string name="action_close">Sluiten</string>
+    <string name="add_barcode">Code</string>
+    <string name="add_image">Afbeelding</string>
+    <string name="app_language">Taal</string>
+    <string name="app_language_system">Systeem (automatisch)</string>
+    <string name="app_language_title">Taal</string>
+    <string name="backup">Back-up</string>
+    <string name="backup_add">Toevoegen</string>
+    <string name="backup_export">Exporteren</string>
+    <string name="backup_failed">Back-up mislukt.</string>
+    <string name="backup_import">Importeren</string>
+    <string name="backup_ok">Back-up voltooid.</string>
+    <string name="backup_replace">Vervangen</string>
+    <string name="backup_replace_message">Bestaande labels vervangen of de geïmporteerde toevoegen?</string>
+    <string name="backup_replace_title">Back-up importeren</string>
+    <string name="cd_info">Info</string>
+    <string name="default_label_name">Nieuw label</string>
+    <string name="duplicate_name">%1$s (kopie)</string>
+    <string name="err_file_invalid">Ongeldig bestand</string>
+    <string name="err_file_not_readable">Bestand niet leesbaar</string>
+    <string name="err_file_not_writable">Bestand niet beschrijfbaar</string>
+    <string name="err_no_scanner">BLE-scanner niet beschikbaar</string>
+    <string name="forget_message">%1$s wordt niet meer onthouden of automatisch verbonden.</string>
+    <string name="forget_title">Printer vergeten?</string>
+    <string name="group_scale">Schaal</string>
+    <string name="outline_canny">Foto</string>
+    <string name="outline_lines">Grafisch</string>
+    <string name="outline_smooth">Vloeiend</string>
+    <string name="print_need_printer">Er moet een printer verbonden zijn om af te drukken.</string>
+    <string name="perm_bluetooth_missing">Bluetooth-toestemming ontbreekt. Zonder deze kan er geen printer worden verbonden.</string>
+    <string name="print_printer_settings">Printerinstellingen</string>
+    <string name="prop_barcode_caption">Tekst tonen</string>
+    <string name="prop_barcode_data">Inhoud</string>
+    <string name="prop_barcode_type">Type</string>
+    <string name="prop_image_threshold">Drempel</string>
+    <string name="prop_invert">Omkeren</string>
+    <string name="prop_outline_style">Stijl</string>
+    <string name="qr_auth">Versleuteling</string>
+    <string name="qr_auth_none">Geen</string>
+    <string name="qr_content">QR-inhoud</string>
+    <string name="qr_email_addr">E-mailadres</string>
+    <string name="qr_hidden">Verborgen netwerk</string>
+    <string name="qr_password">Wachtwoord</string>
+    <string name="qr_password_hint">Optioneel. Wordt als platte tekst opgeslagen in de QR-code en de sjabloon.</string>
+    <string name="qr_phone">Telefoonnummer</string>
+    <string name="qr_show_password">Wachtwoord tonen</string>
+    <string name="qr_ssid">Netwerknaam (SSID)</string>
+    <string name="qr_subject">Onderwerp (optioneel)</string>
+    <string name="qr_type_contact">Contact</string>
+    <string name="qr_type_email">E-mail</string>
+    <string name="qr_type_link">Link</string>
+    <string name="qr_type_phone">Telefoon</string>
+    <string name="qr_type_text">Tekst</string>
+    <string name="qr_type_wifi">Wi-Fi</string>
+    <string name="qr_url">URL</string>
+    <string name="qr_wifi_pw_error_wep">5 of 13 tekens</string>
+    <string name="qr_wifi_pw_error_wpa">8 tot 63 tekens</string>
+</resources>

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LaBLEr</string>
+
+    <!-- Actions -->
+    <string name="action_cancel">Скасувати</string>
+    <string name="action_save">Зберегти</string>
+    <string name="action_create">Створити</string>
+    <string name="action_print">Друк</string>
+    <string name="action_connect">Підключити</string>
+    <string name="action_grant_permission">Надати дозвіл</string>
+    <string name="action_disconnect">Відключити</string>
+    <string name="action_forget">Забути</string>
+    <string name="action_clear">Очистити</string>
+    <string name="action_import_file">Або імпортувати з файлу …</string>
+    <string name="action_import">Імпорт</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">Назад</string>
+    <string name="cd_settings">Налаштування</string>
+    <string name="cd_history">Історія друку</string>
+    <string name="cd_new_label">Нова етикетка</string>
+    <string name="cd_favorite">Обране</string>
+    <string name="cd_menu">Меню</string>
+    <string name="cd_clear">Очистити</string>
+    <string name="cd_delete">Видалити</string>
+    <string name="cd_rotate">Повернути</string>
+    <string name="cd_print">Друк</string>
+    <string name="cd_undo">Скасувати</string>
+    <string name="cd_redo">Повторити</string>
+
+    <!-- Home -->
+    <string name="home_search_hint">Пошук</string>
+    <string name="home_empty">Етикеток ще немає.\nНатисніть +, щоб створити першу.</string>
+    <string name="home_no_results">Нічого не знайдено.</string>
+    <string name="template_size">%1$d x %2$d мм</string>
+    <string name="menu_edit">Редагувати</string>
+    <string name="menu_duplicate">Дублювати</string>
+    <string name="menu_export">Експорт</string>
+    <string name="menu_delete">Видалити</string>
+    <string name="toast_export_failed">Помилка експорту: %1$s</string>
+    <string name="toast_export_ok">Експортовано.</string>
+    <string name="toast_import_failed">Помилка імпорту: %1$s</string>
+    <string name="delete_title">Видалити етикетку?</string>
+    <string name="delete_message">%1$s буде видалено назавжди.</string>
+
+    <!-- Label dialog -->
+    <string name="dialog_new_title">Нова етикетка</string>
+    <string name="dialog_edit_title">Редагувати етикетку</string>
+    <string name="field_name">Назва</string>
+    <string name="size_hint">Розмір (ширина стрічки x довжина):</string>
+    <string name="preset_custom">Власний …</string>
+    <string name="field_tape_mm">Стрічка (мм)</string>
+    <string name="field_length_mm">Довжина (мм)</string>
+    <string name="media_die_cut">Висічена етикетка</string>
+    <string name="media_continuous">Безперервна</string>
+
+    <!-- Editor -->
+    <string name="group_add">Додати</string>
+    <string name="group_elements">Елементи</string>
+    <string name="add_text">Текст</string>
+    <string name="add_symbol">Символ</string>
+    <string name="add_frame">Рамка</string>
+    <string name="element_frame">Рамка</string>
+    <string name="editor_hint">Торкніться елемента на етикетці або додайте новий зверху. Вибрані елементи можна перетягувати; маркер унизу праворуч змінює розмір.</string>
+    <string name="group_format">Формат</string>
+    <string name="group_align">Вирівнювання</string>
+    <string name="group_variables">Змінні</string>
+    <string name="group_symbol">Вибрати символ</string>
+    <string name="group_raster">Растрування</string>
+    <string name="raster_hint">Видно лише для багатоколірних емодзі.</string>
+    <string name="prop_text">Текст</string>
+    <string name="prop_size">Розмір</string>
+    <string name="prop_bold">Жирний</string>
+    <string name="prop_italic">Курсив</string>
+    <string name="prop_underline">Підкреслений</string>
+    <string name="align_left">Ліворуч</string>
+    <string name="align_center">По центру</string>
+    <string name="align_right">Праворуч</string>
+    <string name="group_font">Шрифт</string>
+    <string name="font_sans">Sans</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_mono">Mono</string>
+    <string name="prop_symbol">Символ/емодзі</string>
+    <string name="dither_threshold">Поріг</string>
+    <string name="dither_fs">Floyd-Steinberg</string>
+    <string name="dither_atkinson">Atkinson</string>
+    <string name="dither_outline">Контур</string>
+    <string name="frame_rect">Рамка</string>
+    <string name="frame_round">Заокруглена</string>
+    <string name="frame_line_h">Лінія −</string>
+    <string name="frame_line_v">Лінія |</string>
+    <string name="prop_stroke">Товщина лінії</string>
+    <string name="prop_radius">Радіус кутів</string>
+    <string name="prop_contrast">Контраст</string>
+    <string name="prop_outline_detail">Чутливість</string>
+    <string name="prop_line_width">Товщина лінії</string>
+    <string name="prop_width">Ширина</string>
+    <string name="prop_height">Висота</string>
+    <string name="var_date">date</string>
+    <string name="var_time">time</string>
+    <string name="var_number">#</string>
+    <string name="var_var">var</string>
+    <string name="symbol_current">Поточний символ</string>
+    <string name="action_choose_symbol">Вибрати символ …</string>
+    <string name="symbol_field">Емодзі або символ</string>
+    <string name="symbol_keyboard_hint">Для емодзі скористайтеся клавішею емодзі на клавіатурі або виберіть символ нижче.</string>
+    <string name="action_done">Готово</string>
+    <string name="cat_arrows">Стрілки</string>
+    <string name="cat_shapes">Фігури</string>
+    <string name="cat_stars">Зірки</string>
+    <string name="cat_signs">Знаки</string>
+    <string name="cat_tech">Техніка й офіс</string>
+    <string name="cat_weather">Погода й природа</string>
+    <string name="cat_math">Математика</string>
+    <string name="cat_misc">Різне</string>
+    <string name="tab_symbols">Символи</string>
+    <string name="tab_emojis">Емодзі</string>
+    <string name="cat_smileys">Смайлики</string>
+    <string name="cat_animals">Тварини й природа</string>
+    <string name="cat_food">Їжа</string>
+    <string name="cat_activity">Активність і подорожі</string>
+    <string name="cat_objects">Об\'єкти</string>
+    <string name="cat_hearts">Серця й символи</string>
+
+    <!-- Print dialog -->
+    <string name="print_title">Друк: %1$s</string>
+    <string name="print_preview">Попередній перегляд (%1$d мм, 1 біт як надруковано):</string>
+    <string name="print_paper">Папір:</string>
+    <string name="print_copies">Копії:</string>
+    <string name="print_counter_start">№ починається з %1$d</string>
+    <string name="print_label_progress">Етикетка %1$d/%2$d</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Налаштування</string>
+    <string name="settings_printer">Принтер</string>
+    <string name="status_disconnected">Не підключено</string>
+    <string name="status_connecting">Підключення (спроба %1$d/3) …</string>
+    <string name="status_ready">Підключено: %1$s</string>
+    <string name="status_ready_battery">Підключено: %1$s, батарея %2$d %%</string>
+    <string name="status_printing">Друк (%1$d %%)</string>
+    <string name="status_error">Помилка: %1$s</string>
+    <string name="settings_saved">Збережено: %1$s (%2$s)</string>
+    <string name="info_model">Модель: %1$s</string>
+    <string name="info_firmware">Прошивка: %1$s</string>
+    <string name="info_serial">Серійний номер: %1$s</string>
+    <string name="info_hardware">Обладнання: %1$s</string>
+    <string name="settings_diagnostics">Діагностика</string>
+    <string name="settings_testtools">Інструменти тестового друку (геометричний шаблон)</string>
+    <string name="settings_experimental">Експериментально</string>
+    <string name="settings_experimental_hint">Експериментальні команди принтера, не перевірені на P15. Лише за підключеного принтера; якщо сумніваєтеся, просто проігноруйте.</string>
+    <string name="exp_learn_gap">Калібрувати проміжок етикеток</string>
+    <string name="settings_about">Про застосунок</string>
+    <string name="about_text">LaBLEr %1$s\n\nНезалежний застосунок FOSS для етикеткового принтера P15 через Bluetooth LE. Протокол отримано методом зворотної розробки з BleWebler, веб-версії для браузерів Chrome, що працює без встановлення. Жодного коду не запозичено.</string>
+    <string name="scan_title">Пошук принтера</string>
+    <string name="scan_show_all">Показати всі пристрої Bluetooth</string>
+    <string name="scan_empty">Нічого не знайдено. Принтер увімкнено?</string>
+    <string name="scan_device_line">%1$s  (RSSI %2$d)</string>
+
+    <!-- Status chip -->
+    <string name="chip_no_printer">Немає принтера</string>
+    <string name="chip_connecting">Підключення (%1$d/3)</string>
+    <string name="chip_printing">Друк %1$d %%</string>
+    <string name="chip_error">Помилка</string>
+    <string name="chip_permission">Немає дозволу BT</string>
+
+    <!-- Test print -->
+    <string name="testprint_title">Тестовий друк</string>
+    <string name="testprint_geometry">Тестовий геометричний шаблон (40 мм)</string>
+    <string name="testprint_text_label">Зразок тексту</string>
+    <string name="testprint_show">Показати перегляд</string>
+
+    <!-- History -->
+    <string name="history_title">Історія друку</string>
+    <string name="history_empty">Ще нічого не надруковано.</string>
+    <string name="history_meta">%1$s · %2$d× · %3$d x %4$d мм</string>
+
+    <!-- Backend error messages -->
+    <string name="err_no_bluetooth">На цьому пристрої немає Bluetooth</string>
+    <string name="err_bt_off">Bluetooth вимкнено</string>
+    <string name="err_no_printer_found">Принтер не знайдено. Він увімкнений і в зоні дії?</string>
+    <string name="err_connect_failed">Не вдалося підключитися</string>
+    <string name="err_not_connected">Принтер не підключено</string>
+    <string name="err_print_failed">Не вдалося надрукувати</string>
+
+    <!-- About -->
+    <string name="about_description">LaBLEr є застосунком для друку етикеток на термопринтерах Bluetooth Low Energy родини Marklife (P15, P12, L13). Створюйте власні етикетки просто на телефоні за допомогою тексту, символів і рамок, зберігайте їх як шаблони та друкуйте будь-коли.</string>
+    <string name="about_license">Ліцензія: GPL-3.0-or-later</string>
+    <string name="about_source">Вихідний код і довідка</string>
+    <string name="about_thanks">Дякуємо вебзастосунку Chrome з відкритим кодом %1$s, який зробив протокол P15 доступним.</string>
+    <string name="about_version">Версія %1$s</string>
+    <string name="action_close">Закрити</string>
+    <string name="add_barcode">Код</string>
+    <string name="add_image">Зображення</string>
+    <string name="app_language">Мова</string>
+    <string name="app_language_system">Системна (автоматично)</string>
+    <string name="app_language_title">Мова</string>
+    <string name="backup">Резервна копія</string>
+    <string name="backup_add">Додати</string>
+    <string name="backup_export">Експорт</string>
+    <string name="backup_failed">Не вдалося створити резервну копію.</string>
+    <string name="backup_import">Імпорт</string>
+    <string name="backup_ok">Резервну копію створено.</string>
+    <string name="backup_replace">Замінити</string>
+    <string name="backup_replace_message">Замінити наявні етикетки чи додати імпортовані?</string>
+    <string name="backup_replace_title">Імпорт резервної копії</string>
+    <string name="cd_info">Інформація</string>
+    <string name="default_label_name">Нова етикетка</string>
+    <string name="duplicate_name">%1$s (копія)</string>
+    <string name="err_file_invalid">Недійсний файл</string>
+    <string name="err_file_not_readable">Не вдалося прочитати файл</string>
+    <string name="err_file_not_writable">Не вдалося записати файл</string>
+    <string name="err_no_scanner">Сканер BLE недоступний</string>
+    <string name="forget_message">%1$s більше не запам\'ятовуватиметься та не підключатиметься автоматично.</string>
+    <string name="forget_title">Забути принтер?</string>
+    <string name="group_scale">Масштаб</string>
+    <string name="outline_canny">Фото</string>
+    <string name="outline_lines">Графіка</string>
+    <string name="outline_smooth">Згладжений</string>
+    <string name="print_need_printer">Для друку потрібно підключити принтер.</string>
+    <string name="perm_bluetooth_missing">Немає дозволу на Bluetooth. Без нього неможливо підключити принтер.</string>
+    <string name="print_printer_settings">Налаштування принтера</string>
+    <string name="prop_barcode_caption">Показати текст</string>
+    <string name="prop_barcode_data">Вміст</string>
+    <string name="prop_barcode_type">Тип</string>
+    <string name="prop_image_threshold">Поріг</string>
+    <string name="prop_invert">Інвертувати</string>
+    <string name="prop_outline_style">Стиль</string>
+    <string name="qr_auth">Шифрування</string>
+    <string name="qr_auth_none">Немає</string>
+    <string name="qr_content">Вміст QR</string>
+    <string name="qr_email_addr">Адреса електронної пошти</string>
+    <string name="qr_hidden">Прихована мережа</string>
+    <string name="qr_password">Пароль</string>
+    <string name="qr_password_hint">Необов\'язково. Зберігається у відкритому вигляді в QR-коді та шаблоні.</string>
+    <string name="qr_phone">Номер телефону</string>
+    <string name="qr_show_password">Показати пароль</string>
+    <string name="qr_ssid">Назва мережі (SSID)</string>
+    <string name="qr_subject">Тема (необов\'язково)</string>
+    <string name="qr_type_contact">Контакт</string>
+    <string name="qr_type_email">Електронна пошта</string>
+    <string name="qr_type_link">Посилання</string>
+    <string name="qr_type_phone">Телефон</string>
+    <string name="qr_type_text">Текст</string>
+    <string name="qr_type_wifi">Wi-Fi</string>
+    <string name="qr_url">URL</string>
+    <string name="qr_wifi_pw_error_wep">5 або 13 символів</string>
+    <string name="qr_wifi_pw_error_wpa">від 8 до 63 символів</string>
+</resources>

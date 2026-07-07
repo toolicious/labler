@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ab API 31 (dunkel): animiertes Splash-Icon (Label faehrt heraus) auf dem Teal-Kreis. -->
+<resources>
+    <style name="Theme.LaBLEr" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo_animated</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/ic_launcher_background</item>
+        <item name="android:windowSplashScreenAnimationDuration">450</item>
+    </style>
+</resources>

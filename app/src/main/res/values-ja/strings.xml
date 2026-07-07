@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LaBLEr</string>
+
+    <!-- Actions -->
+    <string name="action_cancel">キャンセル</string>
+    <string name="action_save">保存</string>
+    <string name="action_create">作成</string>
+    <string name="action_print">印刷</string>
+    <string name="action_connect">接続</string>
+    <string name="action_grant_permission">権限を許可</string>
+    <string name="action_disconnect">切断</string>
+    <string name="action_forget">登録解除</string>
+    <string name="action_clear">クリア</string>
+    <string name="action_import_file">またはファイルからインポート …</string>
+    <string name="action_import">インポート</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">戻る</string>
+    <string name="cd_settings">設定</string>
+    <string name="cd_history">印刷履歴</string>
+    <string name="cd_new_label">新しいラベル</string>
+    <string name="cd_favorite">お気に入り</string>
+    <string name="cd_menu">メニュー</string>
+    <string name="cd_clear">クリア</string>
+    <string name="cd_delete">削除</string>
+    <string name="cd_rotate">回転</string>
+    <string name="cd_print">印刷</string>
+    <string name="cd_undo">元に戻す</string>
+    <string name="cd_redo">やり直し</string>
+
+    <!-- Home -->
+    <string name="home_search_hint">検索</string>
+    <string name="home_empty">まだラベルがありません。\n+ をタップして最初のラベルを作成します。</string>
+    <string name="home_no_results">該当なし。</string>
+    <string name="template_size">%1$d x %2$d mm</string>
+    <string name="menu_edit">編集</string>
+    <string name="menu_duplicate">複製</string>
+    <string name="menu_export">エクスポート</string>
+    <string name="menu_delete">削除</string>
+    <string name="toast_export_failed">エクスポートに失敗しました: %1$s</string>
+    <string name="toast_export_ok">エクスポートしました。</string>
+    <string name="toast_import_failed">インポートに失敗しました: %1$s</string>
+    <string name="delete_title">ラベルを削除しますか？</string>
+    <string name="delete_message">%1$s は完全に削除されます。</string>
+
+    <!-- Label dialog -->
+    <string name="dialog_new_title">新しいラベル</string>
+    <string name="dialog_edit_title">ラベルを編集</string>
+    <string name="field_name">名前</string>
+    <string name="size_hint">サイズ (テープ幅 x 長さ):</string>
+    <string name="preset_custom">カスタム …</string>
+    <string name="field_tape_mm">テープ (mm)</string>
+    <string name="field_length_mm">長さ (mm)</string>
+    <string name="media_die_cut">ダイカットラベル</string>
+    <string name="media_continuous">連続</string>
+
+    <!-- Editor -->
+    <string name="group_add">追加</string>
+    <string name="group_elements">要素</string>
+    <string name="add_text">テキスト</string>
+    <string name="add_symbol">記号</string>
+    <string name="add_frame">枠</string>
+    <string name="element_frame">枠</string>
+    <string name="editor_hint">ラベル上の要素をタップするか、上から追加します。選択した要素はドラッグで移動でき、右下のハンドルでサイズを変更します。</string>
+    <string name="group_format">書式</string>
+    <string name="group_align">配置</string>
+    <string name="group_variables">変数</string>
+    <string name="group_symbol">記号を選ぶ</string>
+    <string name="group_raster">ディザリング</string>
+    <string name="raster_hint">多色絵文字のときのみ表示されます。</string>
+    <string name="prop_text">テキスト</string>
+    <string name="prop_size">サイズ</string>
+    <string name="prop_bold">太字</string>
+    <string name="prop_italic">斜体</string>
+    <string name="prop_underline">下線</string>
+    <string name="align_left">左</string>
+    <string name="align_center">中央</string>
+    <string name="align_right">右</string>
+    <string name="group_font">フォント</string>
+    <string name="font_sans">Sans</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_mono">Mono</string>
+    <string name="prop_symbol">記号/絵文字</string>
+    <string name="dither_threshold">しきい値</string>
+    <string name="dither_fs">Floyd-Steinberg</string>
+    <string name="dither_atkinson">Atkinson</string>
+    <string name="dither_outline">輪郭</string>
+    <string name="frame_rect">枠</string>
+    <string name="frame_round">角丸</string>
+    <string name="frame_line_h">線 −</string>
+    <string name="frame_line_v">線 |</string>
+    <string name="prop_stroke">線の太さ</string>
+    <string name="prop_radius">角の半径</string>
+    <string name="prop_contrast">コントラスト</string>
+    <string name="prop_outline_detail">感度</string>
+    <string name="prop_line_width">線の太さ</string>
+    <string name="prop_width">幅</string>
+    <string name="prop_height">高さ</string>
+    <string name="var_date">date</string>
+    <string name="var_time">time</string>
+    <string name="var_number">#</string>
+    <string name="var_var">var</string>
+    <string name="symbol_current">現在の記号</string>
+    <string name="action_choose_symbol">記号を選ぶ …</string>
+    <string name="symbol_field">絵文字または文字</string>
+    <string name="symbol_keyboard_hint">絵文字はキーボードの絵文字キーを使うか、下から記号を選びます。</string>
+    <string name="action_done">完了</string>
+    <string name="cat_arrows">矢印</string>
+    <string name="cat_shapes">図形</string>
+    <string name="cat_stars">星</string>
+    <string name="cat_signs">記号</string>
+    <string name="cat_tech">技術とオフィス</string>
+    <string name="cat_weather">天気と自然</string>
+    <string name="cat_math">数学</string>
+    <string name="cat_misc">その他</string>
+    <string name="tab_symbols">記号</string>
+    <string name="tab_emojis">絵文字</string>
+    <string name="cat_smileys">顔文字</string>
+    <string name="cat_animals">動物と自然</string>
+    <string name="cat_food">食べ物</string>
+    <string name="cat_activity">アクティビティと旅行</string>
+    <string name="cat_objects">物</string>
+    <string name="cat_hearts">ハートと記号</string>
+
+    <!-- Print dialog -->
+    <string name="print_title">印刷: %1$s</string>
+    <string name="print_preview">プレビュー (%1$d mm、印刷どおりの1ビット):</string>
+    <string name="print_paper">用紙:</string>
+    <string name="print_copies">部数:</string>
+    <string name="print_counter_start">番号は %1$d から開始</string>
+    <string name="print_label_progress">ラベル %1$d/%2$d</string>
+
+    <!-- Settings -->
+    <string name="settings_title">設定</string>
+    <string name="settings_printer">プリンター</string>
+    <string name="status_disconnected">未接続</string>
+    <string name="status_connecting">接続中 (試行 %1$d/3) …</string>
+    <string name="status_ready">接続済み: %1$s</string>
+    <string name="status_ready_battery">接続済み: %1$s、バッテリー %2$d %%</string>
+    <string name="status_printing">印刷中 (%1$d %%)</string>
+    <string name="status_error">エラー: %1$s</string>
+    <string name="settings_saved">記憶しました: %1$s (%2$s)</string>
+    <string name="info_model">モデル: %1$s</string>
+    <string name="info_firmware">ファームウェア: %1$s</string>
+    <string name="info_serial">シリアル番号: %1$s</string>
+    <string name="info_hardware">ハードウェア: %1$s</string>
+    <string name="settings_diagnostics">診断</string>
+    <string name="settings_testtools">テスト印刷ツール (ジオメトリパターン)</string>
+    <string name="settings_experimental">実験的</string>
+    <string name="settings_experimental_hint">実験的なプリンターコマンドで、P15では未検証です。プリンター接続時のみ。不明なら無視してください。</string>
+    <string name="exp_learn_gap">ラベル間隔を調整</string>
+    <string name="settings_about">このアプリについて</string>
+    <string name="about_text">LaBLEr %1$s\n\nBluetooth LE 経由の P15 ラベルプリンター用の独立した FOSS アプリです。プロトコルは、インストール不要で Chrome ブラウザーで動作するウェブ版 BleWebler からリバースエンジニアリングして得たものです。コードは一切流用していません。</string>
+    <string name="scan_title">プリンターを探す</string>
+    <string name="scan_show_all">すべての Bluetooth デバイスを表示</string>
+    <string name="scan_empty">見つかりませんでした。プリンターの電源は入っていますか？</string>
+    <string name="scan_device_line">%1$s  (RSSI %2$d)</string>
+
+    <!-- Status chip -->
+    <string name="chip_no_printer">プリンターなし</string>
+    <string name="chip_connecting">接続中 (%1$d/3)</string>
+    <string name="chip_printing">印刷中 %1$d %%</string>
+    <string name="chip_error">エラー</string>
+    <string name="chip_permission">BT 権限が必要</string>
+
+    <!-- Test print -->
+    <string name="testprint_title">テスト印刷</string>
+    <string name="testprint_geometry">ジオメトリテストパターン (40 mm)</string>
+    <string name="testprint_text_label">テキスト見本</string>
+    <string name="testprint_show">プレビューを表示</string>
+
+    <!-- History -->
+    <string name="history_title">印刷履歴</string>
+    <string name="history_empty">まだ何も印刷していません。</string>
+    <string name="history_meta">%1$s · %2$d× · %3$d x %4$d mm</string>
+
+    <!-- Backend error messages -->
+    <string name="err_no_bluetooth">このデバイスには Bluetooth がありません</string>
+    <string name="err_bt_off">Bluetooth がオフです</string>
+    <string name="err_no_printer_found">プリンターが見つかりません。電源が入っていて範囲内ですか？</string>
+    <string name="err_connect_failed">接続に失敗しました</string>
+    <string name="err_not_connected">プリンターが接続されていません</string>
+    <string name="err_print_failed">印刷に失敗しました</string>
+
+    <!-- About -->
+    <string name="about_description">LaBLEr は Marklife ファミリー (P15、P12、L13) の Bluetooth Low Energy サーマルラベルプリンター用のラベルプリンターアプリです。テキスト、記号、枠を使ってスマホ上で自分だけのラベルをデザインし、テンプレートとして保存して、いつでも再印刷できます。</string>
+    <string name="about_license">ライセンス: GPL-3.0-or-later</string>
+    <string name="about_source">ソースコードとヘルプ</string>
+    <string name="about_thanks">P15 プロトコルを利用可能にしたオープンソースの Chrome ウェブアプリ %1$s に感謝します。</string>
+    <string name="about_version">バージョン %1$s</string>
+    <string name="action_close">閉じる</string>
+    <string name="add_barcode">コード</string>
+    <string name="add_image">画像</string>
+    <string name="app_language">言語</string>
+    <string name="app_language_system">システム (自動)</string>
+    <string name="app_language_title">言語</string>
+    <string name="backup">バックアップ</string>
+    <string name="backup_add">追加</string>
+    <string name="backup_export">エクスポート</string>
+    <string name="backup_failed">バックアップに失敗しました。</string>
+    <string name="backup_import">インポート</string>
+    <string name="backup_ok">バックアップしました。</string>
+    <string name="backup_replace">置き換え</string>
+    <string name="backup_replace_message">既存のラベルを置き換えますか、それともインポートしたものを追加しますか？</string>
+    <string name="backup_replace_title">バックアップをインポート</string>
+    <string name="cd_info">情報</string>
+    <string name="default_label_name">新しいラベル</string>
+    <string name="duplicate_name">%1$s (コピー)</string>
+    <string name="err_file_invalid">無効なファイル</string>
+    <string name="err_file_not_readable">ファイルを読み取れません</string>
+    <string name="err_file_not_writable">ファイルに書き込めません</string>
+    <string name="err_no_scanner">BLE スキャナーを利用できません</string>
+    <string name="forget_message">%1$s は記憶されず、自動接続もされなくなります。</string>
+    <string name="forget_title">プリンターの登録を解除しますか？</string>
+    <string name="group_scale">拡大縮小</string>
+    <string name="outline_canny">写真</string>
+    <string name="outline_lines">グラフィック</string>
+    <string name="outline_smooth">なめらか</string>
+    <string name="print_need_printer">印刷するにはプリンターを接続する必要があります。</string>
+    <string name="perm_bluetooth_missing">Bluetooth の権限がありません。許可しないとプリンターに接続できません。</string>
+    <string name="print_printer_settings">プリンター設定</string>
+    <string name="prop_barcode_caption">テキストを表示</string>
+    <string name="prop_barcode_data">内容</string>
+    <string name="prop_barcode_type">種類</string>
+    <string name="prop_image_threshold">しきい値</string>
+    <string name="prop_invert">反転</string>
+    <string name="prop_outline_style">スタイル</string>
+    <string name="qr_auth">暗号化</string>
+    <string name="qr_auth_none">なし</string>
+    <string name="qr_content">QR の内容</string>
+    <string name="qr_email_addr">メールアドレス</string>
+    <string name="qr_hidden">非公開ネットワーク</string>
+    <string name="qr_password">パスワード</string>
+    <string name="qr_password_hint">省略可能。QR コードとテンプレートに平文で保存されます。</string>
+    <string name="qr_phone">電話番号</string>
+    <string name="qr_show_password">パスワードを表示</string>
+    <string name="qr_ssid">ネットワーク名 (SSID)</string>
+    <string name="qr_subject">件名 (省略可能)</string>
+    <string name="qr_type_contact">連絡先</string>
+    <string name="qr_type_email">メール</string>
+    <string name="qr_type_link">リンク</string>
+    <string name="qr_type_phone">電話</string>
+    <string name="qr_type_text">テキスト</string>
+    <string name="qr_type_wifi">Wi-Fi</string>
+    <string name="qr_url">URL</string>
+    <string name="qr_wifi_pw_error_wep">5 文字または 13 文字</string>
+    <string name="qr_wifi_pw_error_wpa">8 ～ 63 文字</string>
+</resources>
