@@ -1,0 +1,3 @@
+Erstes Release.
+
+Etiketten mit Text, Symbolen und Emoji, Rahmen, importierten Bildern sowie QR-Codes und Barcodes gestalten, als Vorlagen speichern und über Bluetooth LE drucken. Platzhalter, Druckverlauf, Einzel-Export und komplette Sammlungs-Sicherung. 13 Sprachen. Vollständig lokal, ohne Internet-Berechtigung.

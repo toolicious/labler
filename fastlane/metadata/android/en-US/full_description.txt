@@ -1,0 +1,14 @@
+LaBLEr is a label printer app for Bluetooth Low Energy thermal label printers of the Marklife family (P15, P12, L13). Design your own labels right on your phone, save them as templates, and print them again anytime. It talks to the printer directly over Bluetooth LE, with no account, no cloud, and no vendor app.
+
+Features:
+
+* Multi-line text (size, bold/italic/underline, alignment, several bundled fonts), symbols and emoji, frames, imported images, and QR codes and barcodes (Code 128, EAN-13, UPC-A, Code 39, ITF) with typed QR content for links, Wi-Fi, email, phone and contacts.
+* A direct-manipulation editor: pinch to zoom and pan, drag to move, resize and rotate, with snapping to the center, the edges and other elements. Graphics render for the 1-bit thermal head as a clean outline (region tracing or Canny edge detection, with a smooth pass and invert) or with a threshold, Floyd-Steinberg or Atkinson dithering.
+* Templates: save, rename, duplicate, favorite and search; export a single label as a JSON file, or back up and restore your whole library.
+* Placeholders for the date, the time, a running number, or a free-text value you are asked for at print time.
+* An exact 1-bit preview, a choice of copies and die-cut or continuous media, and a print history you can reproduce.
+* Reconnects to your saved printer automatically. Available in 13 languages, Material 3 design, light and dark following the system.
+
+Privacy: LaBLEr is a fully local app. It does not declare the INTERNET permission, so the process cannot open a network connection at all. No account, no cloud, no analytics, no tracking. Your templates, print history and settings live in the app's private storage and never leave the device.
+
+Only the P15 is verified on-device so far; the P12 and L13 use the same protocol and 12 mm (96-dot) print head.

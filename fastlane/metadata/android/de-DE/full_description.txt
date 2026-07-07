@@ -1,0 +1,14 @@
+LaBLEr ist eine App zum Bedrucken von Bluetooth-Low-Energy-Thermo-Etikettendruckern der Marklife-Familie (P15, P12, L13). Gestalte deine Etiketten direkt am Handy, speichere sie als Vorlagen und drucke sie jederzeit wieder. Die App spricht den Drucker direkt über Bluetooth LE an, ohne Konto, ohne Cloud, ohne Hersteller-App.
+
+Funktionen:
+
+* Mehrzeiliger Text (Größe, fett/kursiv/unterstrichen, Ausrichtung, mehrere mitgelieferte Schriften), Symbole und Emoji, Rahmen, importierte Bilder sowie QR-Codes und Barcodes (Code 128, EAN-13, UPC-A, Code 39, ITF) mit typisierten QR-Inhalten für Links, WLAN, E-Mail, Telefon und Kontakte.
+* Ein Editor mit direkter Bearbeitung: Pinch-Zoom und Verschieben, Ziehen, Skalieren und Drehen, mit Einrasten an Mitte, Kanten und anderen Elementen. Grafiken werden für den 1-Bit-Thermokopf als sauberer Umriss (Flächen-Nachzeichnung oder Canny-Kantenerkennung, mit Glätten und Invertieren) oder mit Schwellwert-, Floyd-Steinberg- oder Atkinson-Dithering gerendert.
+* Vorlagen: speichern, umbenennen, duplizieren, favorisieren und suchen; ein einzelnes Etikett als JSON exportieren oder die ganze Sammlung sichern und wiederherstellen.
+* Platzhalter für Datum, Uhrzeit, eine laufende Nummer oder einen Freitext, der beim Drucken abgefragt wird.
+* Eine exakte 1-Bit-Vorschau, Kopienzahl und Stanz- oder Endlosmedien sowie ein Druckverlauf zum erneuten Drucken.
+* Verbindet sich automatisch wieder mit dem gemerkten Drucker. Verfügbar in 13 Sprachen, Material-3-Design, hell und dunkel nach Systemvorgabe.
+
+Datenschutz: LaBLEr ist eine vollständig lokale App. Sie deklariert keine INTERNET-Berechtigung, der Prozess kann also gar keine Netzwerkverbindung öffnen. Kein Konto, keine Cloud, keine Analyse, kein Tracking. Vorlagen, Druckverlauf und Einstellungen bleiben im privaten Speicher der App und verlassen das Gerät nie.
+
+Bislang ist nur der P15 am Gerät verifiziert; P12 und L13 nutzen dasselbe Protokoll und denselben 12-mm-Druckkopf (96 Punkte).
