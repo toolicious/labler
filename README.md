@@ -83,6 +83,18 @@ The source is open, so you can verify.
 
 [GPLv3-or-later](./LICENSE) (GNU General Public License, version 3 or later). Fork freely; any modified version you distribute must stay under GPL and ship its source.
 
+### Bundled fonts
+
+The label fonts that ship with the app are unmodified originals from [Google Fonts](https://github.com/google/fonts), all licensed under the [SIL Open Font License 1.1](https://openfontlicense.org):
+
+- [Caveat](https://fonts.google.com/specimen/Caveat), copyright 2014 The Caveat Project Authors
+- [Comfortaa](https://fonts.google.com/specimen/Comfortaa), copyright 2011 The Comfortaa Project Authors
+- [Oswald](https://fonts.google.com/specimen/Oswald), copyright 2016 The Oswald Project Authors
+- [Pacifico](https://fonts.google.com/specimen/Pacifico), copyright 2018 The Pacifico Project Authors
+- [Zilla Slab](https://fonts.google.com/specimen/Zilla+Slab), copyright 2017 The Mozilla Foundation
+
+The full copyright notices and license texts ship inside the app in [`app/src/main/assets/licenses/fonts.txt`](app/src/main/assets/licenses/fonts.txt).
+
 ## Thanks
 
 With thanks to the open-source Chrome web app [BleWebler](https://github.com/josb25/BleWebler), which made the P15 protocol accessible.

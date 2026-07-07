@@ -1,5 +1,16 @@
-Gebuendelte Schriften in LaBLEr und ihre Lizenzen
-(SIL Open Font License 1.1). Quelle: github.com/google/fonts
+Fonts bundled with LaBLEr and their licenses.
+
+All five fonts are unmodified originals from the Google Fonts collection
+(https://github.com/google/fonts); only the file names were changed to fit
+Android resource naming. Each font is licensed under the SIL Open Font
+License, Version 1.1 (full text below each entry). Upstream files, verified
+byte-identical (SHA-256) against google/fonts main on 2026-07-07:
+
+  caveat.ttf     = ofl/caveat/Caveat[wght].ttf
+  comfortaa.ttf  = ofl/comfortaa/Comfortaa[wght].ttf
+  oswald.ttf     = ofl/oswald/Oswald[wght].ttf
+  pacifico.ttf   = ofl/pacifico/Pacifico-Regular.ttf
+  zilla_slab.ttf = ofl/zillaslab/ZillaSlab-Regular.ttf
 
 
 ===== oswald =====
