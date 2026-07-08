@@ -25,16 +25,13 @@ android {
         applicationId = "io.github.toolicious.labler"
         minSdk = 26
         targetSdk = 36
-        // Version derived from four fields (Luanti/Minetest-style positional versionCode): a release
-        // has build 0, so its code ends in "00"; test/beta builds count up 01..99 above it. Only the
-        // four vals below change when bumping the version.
-        val verMajor = 1
-        val verMinor = 1
-        val verPatch = 0
-        val verBuild = 0 // 0 = release; 1..99 = test/beta build made since this release
-        versionCode = verMajor * 1_000_000 + verMinor * 10_000 + verPatch * 100 + verBuild
-        versionName = "$verMajor.$verMinor.$verPatch" +
-            (if (verBuild > 0) "-dev" + verBuild.toString().padStart(2, '0') else "")
+        // Positional version (Luanti/Minetest-style): code = major*1_000_000 + minor*10_000 +
+        // patch*100 + build, where build 0 = release (code ends in "00") and 01..99 are test/beta
+        // builds above it; name is "major.minor.patch" (plus "-devNN" for a test build). Written as
+        // literals, not computed, so F-Droid can parse them for automatic update detection. Update
+        // both by hand when bumping. 1.1.0 = 1*1_000_000 + 1*10_000 + 0*100 + 0 = 1010000.
+        versionCode = 1010000
+        versionName = "1.1.0"
         manifestPlaceholders["appName"] = "LaBLEr"
     }
 
