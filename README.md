@@ -8,6 +8,16 @@ LaBLEr is a label printer app for Bluetooth Low Energy thermal label printers of
 
 It talks to the printer directly over Bluetooth LE, with no account, no cloud, and no vendor app.
 
+## Install
+
+[<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/io.github.toolicious.labler/)
+
+F-Droid is the recommended way to install LaBLEr. It builds the app from source, signs it, and keeps it up to date for you. LaBLEr has no update check of its own (it has no `INTERNET` permission), so a store or an updater is the only way to hear about a new version.
+
+New versions appear in the [latest GitHub release](https://github.com/toolicious/labler/releases/latest) first, a few days before F-Droid rebuilds them. If you prefer that APK directly, [Obtainium](https://github.com/ImranR98/Obtainium) can watch the releases and keep it updated for you.
+
+Pick one source and stay with it: the F-Droid build is signed with F-Droid's key and the GitHub APK with the project's own, so Android will not update one over the other. Switching sources means uninstalling first, so export your templates beforehand.
+
 ## Screenshots
 
 <p align="center">
