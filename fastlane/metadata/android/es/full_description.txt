@@ -1,0 +1,14 @@
+LaBLEr es una aplicación para imprimir en impresoras térmicas de etiquetas Bluetooth Low Energy de la familia Marklife (P15, P12, L13). Diseña tus propias etiquetas directamente en el teléfono, guárdalas como plantillas e imprímelas cuando quieras. Se comunica con la impresora directamente por Bluetooth LE, sin cuenta, sin nube y sin la app del fabricante.
+
+Funciones:
+
+* Texto de varias líneas (tamaño, negrita/cursiva/subrayado, alineación, varias fuentes incluidas), símbolos y emojis, marcos, imágenes importadas, y códigos QR y de barras (Code 128, EAN-13, UPC-A, Code 39, ITF) con contenido QR tipado para enlaces, Wi-Fi, correo, teléfono y contactos.
+* Un editor de manipulación directa: pellizca para hacer zoom y desplazar, arrastra para mover, cambia el tamaño y gira, con ajuste al centro, a los bordes y a otros elementos. Los gráficos se procesan para el cabezal térmico de 1 bit como un contorno limpio (trazado de regiones o detección de bordes Canny, con un pase de suavizado e inversión) o con tramado por umbral, Floyd-Steinberg o Atkinson.
+* Plantillas: guardar, renombrar, duplicar, marcar como favoritas y buscar; exporta una etiqueta como archivo JSON, o haz una copia de seguridad de toda la biblioteca y restáurala.
+* Marcadores de posición para la fecha, la hora, un número correlativo o un texto libre que se te pide al imprimir.
+* Una vista previa exacta de 1 bit, elección de copias y material troquelado o continuo, y un historial de impresión que puedes reproducir.
+* Se reconecta automáticamente a la impresora guardada. Disponible en 13 idiomas, diseño Material 3, claro y oscuro según el sistema.
+
+Privacidad: LaBLEr es una app totalmente local. No declara el permiso INTERNET, así que el proceso no puede abrir ninguna conexión de red. Sin cuenta, sin nube, sin analíticas, sin seguimiento. Tus plantillas, el historial de impresión y los ajustes permanecen en el almacenamiento privado de la app y nunca salen del dispositivo.
+
+Por ahora solo el P15 está verificado en dispositivo; el P12 y el L13 usan el mismo protocolo y el mismo cabezal de 12 mm (96 puntos).

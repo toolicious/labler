@@ -1,0 +1,14 @@
+LaBLEr is een app om af te drukken op Bluetooth Low Energy thermische labelprinters uit de Marklife-familie (P15, P12, L13). Ontwerp je eigen etiketten rechtstreeks op je telefoon, sla ze op als sjablonen en druk ze altijd opnieuw af. De app praat rechtstreeks via Bluetooth LE met de printer, zonder account, zonder cloud en zonder app van de fabrikant.
+
+Functies:
+
+* Tekst over meerdere regels (grootte, vet/cursief/onderstreept, uitlijning, meerdere meegeleverde lettertypen), symbolen en emoji, kaders, geïmporteerde afbeeldingen, en QR-codes en barcodes (Code 128, EAN-13, UPC-A, Code 39, ITF) met getypeerde QR-inhoud voor links, wifi, e-mail, telefoon en contacten.
+* Een editor met directe bewerking: knijp om te zoomen en te verschuiven, sleep om te verplaatsen, formaat te wijzigen en te draaien, met uitlijnen op het midden, de randen en andere elementen. Afbeeldingen worden voor de 1-bits thermische kop weergegeven als een strak contour (regio's natrekken of Canny-randdetectie, met een verzachtingsstap en omkeren) of met drempel-, Floyd-Steinberg- of Atkinson-dithering.
+* Sjablonen: opslaan, hernoemen, dupliceren, als favoriet markeren en zoeken; exporteer één etiket als JSON-bestand, of maak een back-up van je hele bibliotheek en zet die terug.
+* Plaatshouders voor de datum, de tijd, een oplopend nummer of een vrije tekst waar bij het afdrukken om wordt gevraagd.
+* Een exacte 1-bits voorbeeldweergave, een keuze uit aantal kopieën en gestanst of doorlopend materiaal, en een afdrukgeschiedenis die je opnieuw kunt afdrukken.
+* Maakt automatisch opnieuw verbinding met je opgeslagen printer. Beschikbaar in 13 talen, Material 3-ontwerp, licht en donker volgens het systeem.
+
+Privacy: LaBLEr is een volledig lokale app. Ze vraagt geen INTERNET-toestemming aan, dus het proces kan helemaal geen netwerkverbinding openen. Geen account, geen cloud, geen analyse, geen tracking. Je sjablonen, afdrukgeschiedenis en instellingen blijven in de privéopslag van de app en verlaten het apparaat nooit.
+
+Voorlopig is alleen de P15 op een apparaat geverifieerd; de P12 en L13 gebruiken hetzelfde protocol en dezelfde printkop van 12 mm (96 dots).

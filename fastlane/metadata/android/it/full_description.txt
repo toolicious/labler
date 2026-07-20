@@ -1,0 +1,14 @@
+LaBLEr è un'app per stampare su stampanti termiche di etichette Bluetooth Low Energy della famiglia Marklife (P15, P12, L13). Progetta le tue etichette direttamente sul telefono, salvale come modelli e ristampale quando vuoi. Comunica con la stampante direttamente via Bluetooth LE, senza account, senza cloud e senza l'app del produttore.
+
+Funzioni:
+
+* Testo su più righe (dimensione, grassetto/corsivo/sottolineato, allineamento, diversi font inclusi), simboli ed emoji, cornici, immagini importate e codici QR e a barre (Code 128, EAN-13, UPC-A, Code 39, ITF) con contenuti QR tipizzati per link, Wi-Fi, e-mail, telefono e contatti.
+* Un editor a manipolazione diretta: pizzica per ingrandire e scorrere, trascina per spostare, ridimensiona e ruota, con aggancio al centro, ai bordi e agli altri elementi. La grafica viene resa per la testina termica a 1 bit come un contorno pulito (tracciamento delle regioni o rilevamento dei bordi Canny, con una passata di smussatura e inversione) oppure con retinatura a soglia, Floyd-Steinberg o Atkinson.
+* Modelli: salva, rinomina, duplica, aggiungi ai preferiti e cerca; esporta una singola etichetta come file JSON, oppure esegui il backup e il ripristino dell'intera libreria.
+* Segnaposto per la data, l'ora, un numero progressivo o un testo libero che ti viene chiesto al momento della stampa.
+* Un'anteprima esatta a 1 bit, la scelta delle copie e del supporto fustellato o continuo, e una cronologia di stampa riproducibile.
+* Si riconnette automaticamente alla stampante salvata. Disponibile in 13 lingue, design Material 3, chiaro e scuro in base al sistema.
+
+Privacy: LaBLEr è un'app completamente locale. Non dichiara il permesso INTERNET, quindi il processo non può aprire alcuna connessione di rete. Nessun account, nessun cloud, nessuna analisi, nessun tracciamento. I tuoi modelli, la cronologia di stampa e le impostazioni restano nell'archivio privato dell'app e non lasciano mai il dispositivo.
+
+Per ora solo il P15 è verificato sul dispositivo; P12 e L13 usano lo stesso protocollo e la stessa testina di stampa da 12 mm (96 punti).

@@ -1,0 +1,14 @@
+LaBLEr, Marklife ailesinin (P15, P12, L13) Bluetooth Low Energy termal etiket yazıcılarında yazdırmak için bir uygulamadır. Kendi etiketlerinizi doğrudan telefonunuzda tasarlayın, şablon olarak kaydedin ve istediğiniz zaman yeniden yazdırın. Yazıcıyla doğrudan Bluetooth LE üzerinden konuşur; hesap yok, bulut yok, üretici uygulaması yok.
+
+Özellikler:
+
+* Çok satırlı metin (boyut, kalın/italik/altı çizili, hizalama, birlikte gelen çeşitli yazı tipleri), simgeler ve emoji, çerçeveler, içe aktarılan görseller ve QR kodları ile barkodlar (Code 128, EAN-13, UPC-A, Code 39, ITF); bağlantılar, Wi-Fi, e-posta, telefon ve kişiler için türlenmiş QR içeriğiyle.
+* Doğrudan işleme editörü: yakınlaştırmak ve kaydırmak için sıkıştırın, taşımak, yeniden boyutlandırmak ve döndürmek için sürükleyin; merkeze, kenarlara ve diğer öğelere yaslama ile. Grafikler 1 bitlik termal kafa için temiz bir dış çizgi (bölge izleme veya Canny kenar algılama, yumuşatma ve tersine çevirme ile) ya da eşik, Floyd-Steinberg veya Atkinson taramasıyla işlenir.
+* Şablonlar: kaydetme, yeniden adlandırma, çoğaltma, favorileme ve arama; tek bir etiketi JSON dosyası olarak dışa aktarın ya da tüm kitaplığınızı yedekleyip geri yükleyin.
+* Tarih, saat, artan bir numara veya yazdırma sırasında sorulan serbest metin için yer tutucular.
+* Tam 1 bitlik önizleme, kopya sayısı ve kalıpla kesilmiş veya sürekli ortam seçimi ve yeniden üretebileceğiniz bir yazdırma geçmişi.
+* Kayıtlı yazıcınıza otomatik olarak yeniden bağlanır. 13 dilde mevcut, Material 3 tasarımı, sisteme göre açık ve koyu.
+
+Gizlilik: LaBLEr tamamen yerel bir uygulamadır. INTERNET iznini bildirmez, bu yüzden işlem hiçbir ağ bağlantısı açamaz. Hesap yok, bulut yok, analiz yok, izleme yok. Şablonlarınız, yazdırma geçmişiniz ve ayarlarınız uygulamanın özel deposunda kalır ve cihazdan asla çıkmaz.
+
+Şimdilik yalnızca P15 cihazda doğrulanmıştır; P12 ve L13 aynı protokolü ve aynı 12 mm (96 nokta) yazıcı kafasını kullanır.

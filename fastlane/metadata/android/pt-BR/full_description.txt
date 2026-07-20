@@ -1,0 +1,14 @@
+O LaBLEr é um aplicativo para imprimir em impressoras térmicas de etiquetas Bluetooth Low Energy da família Marklife (P15, P12, L13). Crie suas próprias etiquetas diretamente no celular, salve-as como modelos e imprima novamente quando quiser. Ele se comunica com a impressora diretamente por Bluetooth LE, sem conta, sem nuvem e sem o aplicativo do fabricante.
+
+Recursos:
+
+* Texto de várias linhas (tamanho, negrito/itálico/sublinhado, alinhamento, várias fontes incluídas), símbolos e emojis, molduras, imagens importadas e códigos QR e de barras (Code 128, EAN-13, UPC-A, Code 39, ITF) com conteúdo QR tipado para links, Wi-Fi, e-mail, telefone e contatos.
+* Um editor de manipulação direta: pince para dar zoom e deslocar, arraste para mover, redimensione e gire, com encaixe no centro, nas bordas e em outros elementos. Os gráficos são renderizados para a cabeça térmica de 1 bit como um contorno limpo (traçado de regiões ou detecção de bordas Canny, com uma passagem de suavização e inversão) ou com pontilhado por limiar, Floyd-Steinberg ou Atkinson.
+* Modelos: salvar, renomear, duplicar, favoritar e pesquisar; exporte uma etiqueta como arquivo JSON ou faça backup e restaure toda a sua biblioteca.
+* Espaços reservados para a data, a hora, um número sequencial ou um texto livre solicitado na hora da impressão.
+* Uma pré-visualização exata de 1 bit, escolha de cópias e mídia troquelada ou contínua, e um histórico de impressão que você pode reproduzir.
+* Reconecta-se automaticamente à impressora salva. Disponível em 13 idiomas, design Material 3, claro e escuro conforme o sistema.
+
+Privacidade: o LaBLEr é um aplicativo totalmente local. Ele não declara a permissão INTERNET, então o processo não pode abrir nenhuma conexão de rede. Sem conta, sem nuvem, sem análises, sem rastreamento. Seus modelos, o histórico de impressão e as configurações ficam no armazenamento privado do aplicativo e nunca saem do dispositivo.
+
+Por enquanto, apenas o P15 foi verificado no dispositivo; o P12 e o L13 usam o mesmo protocolo e a mesma cabeça de impressão de 12 mm (96 pontos).

@@ -1,0 +1,14 @@
+LaBLEr est une application pour imprimer sur les imprimantes thermiques d'étiquettes Bluetooth Low Energy de la famille Marklife (P15, P12, L13). Concevez vos étiquettes directement sur votre téléphone, enregistrez-les comme modèles et réimprimez-les à tout moment. Elle communique avec l'imprimante directement en Bluetooth LE, sans compte, sans cloud et sans application du fabricant.
+
+Fonctions :
+
+* Texte multiligne (taille, gras/italique/souligné, alignement, plusieurs polices incluses), symboles et emojis, cadres, images importées, ainsi que codes QR et codes-barres (Code 128, EAN-13, UPC-A, Code 39, ITF) avec contenu QR typé pour liens, Wi-Fi, e-mail, téléphone et contacts.
+* Un éditeur à manipulation directe : pincez pour zoomer et vous déplacer, faites glisser pour déplacer, redimensionner et pivoter, avec accrochage au centre, aux bords et aux autres éléments. Les graphismes sont rendus pour la tête thermique 1 bit sous forme d'un contour net (traçage de régions ou détection de contours Canny, avec un lissage et une inversion) ou avec un tramage par seuil, Floyd-Steinberg ou Atkinson.
+* Modèles : enregistrer, renommer, dupliquer, mettre en favori et rechercher ; exportez une étiquette au format JSON, ou sauvegardez et restaurez toute votre bibliothèque.
+* Des variables pour la date, l'heure, un numéro incrémental ou un texte libre demandé au moment de l'impression.
+* Un aperçu 1 bit exact, un choix du nombre de copies et du support prédécoupé ou continu, et un historique d'impression reproductible.
+* Se reconnecte automatiquement à l'imprimante enregistrée. Disponible en 13 langues, design Material 3, clair et sombre selon le système.
+
+Confidentialité : LaBLEr est une application entièrement locale. Elle ne déclare pas la permission INTERNET, le processus ne peut donc ouvrir aucune connexion réseau. Sans compte, sans cloud, sans analyse, sans suivi. Vos modèles, l'historique d'impression et les réglages restent dans le stockage privé de l'application et ne quittent jamais l'appareil.
+
+Pour l'instant, seul le P15 est vérifié sur l'appareil ; les P12 et L13 utilisent le même protocole et la même tête d'impression de 12 mm (96 points).
