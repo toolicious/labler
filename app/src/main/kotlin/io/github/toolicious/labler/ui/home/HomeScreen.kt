@@ -486,7 +486,7 @@ internal fun LabelDialog(
         },
         confirmButton = {
             val submit = {
-                val width = widthText.toIntOrNull()?.coerceIn(10, 15) ?: 12
+                val width = widthText.toIntOrNull()?.coerceIn(10, 80) ?: 12
                 val length = lengthText.toIntOrNull()?.coerceIn(10, 500) ?: 40
                 val media = if (dieCut) MediaType.DIE_CUT else MediaType.CONTINUOUS
                 onConfirm(name, LabelSpec(width, length, media))
