@@ -28,6 +28,7 @@ data class LabelSpec(
             12 to 40,
             14 to 30, 14 to 40,
             15 to 30, 15 to 40,
+            53 to 105, 80 to 105,
         )
     }
 }
