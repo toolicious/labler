@@ -118,6 +118,10 @@
     <string name="cat_misc">その他</string>
     <string name="tab_symbols">記号</string>
     <string name="tab_emojis">絵文字</string>
+    <string name="tab_icons">アイコン</string>
+    <string name="icon_search_hint">アイコンを検索</string>
+    <string name="icon_recent_removed">最近使った項目から削除しました: %1$s</string>
+    <string name="icon_search_english">アイコンの名前とキーワードは英語です。</string>
     <string name="cat_smileys">顔文字</string>
     <string name="cat_animals">動物と自然</string>
     <string name="cat_food">食べ物</string>

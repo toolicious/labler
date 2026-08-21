@@ -114,6 +114,7 @@ import io.github.toolicious.labler.ui.components.ClearButton
 import io.github.toolicious.labler.ui.components.appDateFormat
 import io.github.toolicious.labler.ui.components.appTimeFormat
 import io.github.toolicious.labler.ui.components.systemLocale
+import io.github.toolicious.labler.ui.components.iconFontFamily
 import io.github.toolicious.labler.ui.components.labelFontFamily
 import io.github.toolicious.labler.ui.components.rememberBlePermissionRunner
 import io.github.toolicious.labler.ui.home.LabelDialog
@@ -415,7 +416,7 @@ private fun ElementChipLabel(element: LabelElement) {
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.widthIn(max = 96.dp),
         )
-        is IconElement -> Text(element.glyph, maxLines = 1)
+        is IconElement -> Text(element.glyph, fontFamily = iconFontFamily(element.iconFont), maxLines = 1)
         is FrameElement -> Box(
             Modifier
                 .size(width = 22.dp, height = 13.dp)
@@ -1243,7 +1244,7 @@ private fun IconProperties(element: IconElement, onUpdate: (LabelElement) -> Uni
             .clickable { showPicker = true },
         contentAlignment = Alignment.Center
     ) {
-        Text(element.glyph, fontSize = 40.sp)
+        Text(element.glyph, fontFamily = iconFontFamily(element.iconFont), fontSize = 40.sp)
     }
     Spacer(Modifier.height(8.dp))
     Stepper(
@@ -1319,15 +1320,18 @@ private fun IconProperties(element: IconElement, onUpdate: (LabelElement) -> Uni
 
     if (showPicker) {
         SymbolPickerSheet(
-            onPick = { glyph, isEmoji ->
-                // Set the default dither only on first assignment (still the placeholder glyph):
-                // emoji -> outline, single-color symbols -> threshold. On a later change the choice stays.
-                val newDither = if (element.glyph == "□") {
-                    if (isEmoji) DitherMode.OUTLINE else DitherMode.THRESHOLD
-                } else {
-                    element.dither
+            onPick = { glyph, iconFont, isEmoji ->
+                // An icon out of a font is a flat black shape, and outlining one leaves nothing but
+                // a hollow contour, so it always lands on threshold. For the rest the default is set
+                // only on first assignment (still the placeholder glyph), emoji to outline and the
+                // single-color symbols to threshold; on a later change the choice stays.
+                val newDither = when {
+                    iconFont != null -> DitherMode.THRESHOLD
+                    element.glyph != "□" -> element.dither
+                    isEmoji -> DitherMode.OUTLINE
+                    else -> DitherMode.THRESHOLD
                 }
-                onUpdate(element.copy(glyph = glyph, dither = newDither))
+                onUpdate(element.copy(glyph = glyph, iconFont = iconFont, dither = newDither))
                 showPicker = false
             },
             onDismiss = { showPicker = false }

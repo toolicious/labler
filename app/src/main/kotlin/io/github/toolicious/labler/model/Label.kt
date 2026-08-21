@@ -65,6 +65,11 @@ enum class LabelFont {
     OSWALD, ZILLA_SLAB, COMFORTAA, CAVEAT, PACIFICO,
 }
 
+/** Icon fonts bundled with the app, as stored in [IconElement.iconFont]. */
+object IconFonts {
+    const val MATERIAL = "material"
+}
+
 enum class FrameStyle { RECT, ROUND_RECT, LINE_H, LINE_V }
 
 enum class Symbology { QR_CODE, CODE_128, EAN_13, UPC_A, CODE_39, ITF }
@@ -114,8 +119,16 @@ data class IconElement(
     override val y: Float = 8f,
     override val rotation: Int = 0,
     val glyph: String = "□",
+    /**
+     * Icon font the glyph belongs to, or null for a plain Unicode symbol in the system font. An
+     * icon font keeps its glyphs in the private use area, where a codepoint means nothing without
+     * the font it came from, so the element has to remember which one that was. An unknown value
+     * falls back to the system font instead of failing, which keeps a template from a newer
+     * version readable.
+     */
+    val iconFont: String? = null,
     val sizePx: Float = 48f,
-    val dither: DitherMode = DitherMode.OUTLINE,
+    val dither: DitherMode = DitherMode.THRESHOLD,
     val contrast: Int = 0,
     val outlineSensitivity: Int = 88,
     val outlineThickness: Int = 1,

@@ -118,6 +118,10 @@
     <string name="cat_misc">Varie</string>
     <string name="tab_symbols">Simboli</string>
     <string name="tab_emojis">Emoji</string>
+    <string name="tab_icons">Icone</string>
+    <string name="icon_search_hint">Cerca icone</string>
+    <string name="icon_recent_removed">Rimosso dai recenti: %1$s</string>
+    <string name="icon_search_english">I nomi e le parole chiave delle icone sono in inglese.</string>
     <string name="cat_smileys">Faccine</string>
     <string name="cat_animals">Animali e natura</string>
     <string name="cat_food">Cibo</string>

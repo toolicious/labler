@@ -20,3 +20,17 @@ fun labelFontFamily(font: LabelFont = LabelFont.SANS, customFamily: String? = nu
         FontFamily(Typeface(FontRegistry.base(font, customFamily)))
     }
 }
+
+/**
+ * FontFamily for showing a glyph out of a bundled icon font, so the picker and the property panel
+ * display the icon itself instead of the empty box its private use codepoint would otherwise give.
+ * A [key] with no font behind it yields the default family.
+ *
+ * Unlike [labelFontFamily] this does not watch FontRegistry.revision, because the icon fonts are
+ * bundled and loaded while the application starts, before any of this is on screen. Were one ever
+ * to arrive late, this would keep handing out the default family for good.
+ */
+@Composable
+fun iconFontFamily(key: String?): FontFamily = remember(key) {
+    FontRegistry.iconFont(key)?.let { FontFamily(Typeface(it)) } ?: FontFamily.Default
+}

@@ -1,0 +1,3 @@
+# The icon catalog is a generated data file read line by line at runtime. Pin it to LF so it
+# is byte-identical in every checkout, whatever the platform does with line endings.
+app/src/main/assets/icons/*.txt text eol=lf

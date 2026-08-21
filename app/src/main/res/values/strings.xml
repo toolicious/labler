@@ -135,6 +135,10 @@
     <string name="cat_misc">Misc</string>
     <string name="tab_symbols">Symbols</string>
     <string name="tab_emojis">Emojis</string>
+    <string name="tab_icons">Icons</string>
+    <string name="icon_search_hint">Search icons</string>
+    <string name="icon_recent_removed">Removed from recents: %1$s</string>
+    <string name="icon_search_english">Icon names and keywords are in English.</string>
     <string name="cat_smileys">Smileys</string>
     <string name="cat_animals">Animals &amp; nature</string>
     <string name="cat_food">Food</string>

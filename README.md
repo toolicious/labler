@@ -36,7 +36,7 @@ Pick one source and stay with it: the F-Droid build is signed with F-Droid's key
 
 ## Features
 
-- **Design on your phone:** multi-line text (size, bold / italic / underline, alignment, several bundled fonts plus your own TTF and OTF files), symbols and emoji, frames (rectangle, rounded, horizontal or vertical lines), imported images, and **QR codes and barcodes** (Code 128, EAN-13, UPC-A, Code 39, ITF, each with an optional caption) with typed QR content for links, Wi-Fi, email, phone, and contacts.
+- **Design on your phone:** multi-line text (size, bold / italic / underline, alignment, several bundled fonts plus your own TTF and OTF files), symbols, emoji and over 2000 searchable icons, frames (rectangle, rounded, horizontal or vertical lines), imported images, and **QR codes and barcodes** (Code 128, EAN-13, UPC-A, Code 39, ITF, each with an optional caption) with typed QR content for links, Wi-Fi, email, phone, and contacts.
 - **Direct-manipulation editor:** pinch to zoom and pan, tap to select, drag to move, resize from the corner, and rotate, with snapping to the center, the edges, and other elements. Double tap and keep the second tap held to drag an element freely, without snapping, when you need pixel-exact placement. Symbols, emoji, and imported images are rendered for the 1-bit thermal head either as a clean **outline** or with dithering. The outline comes in two styles, **Graphic** (region tracing, best for logos and emoji) and **Photo** (Canny edge detection, best for photos), with an optional **Smooth** pass and an **Invert** toggle; the dithering alternatives are a hard threshold or Floyd-Steinberg / Atkinson, with adjustable sensitivity, line thickness, and contrast.
 - **Templates:** save, rename, duplicate, and delete; mark favorites; search; export or import a single label as a JSON file, or back up and restore the whole library at once (with a choice to replace or add on import).
 - **Placeholders:** drop in the date, the time, a running number, or a free-text value you are asked for at print time. The running number counts up per copy for serial labels.
@@ -104,6 +104,10 @@ The label fonts that ship with the app are unmodified originals from [Google Fon
 - [Zilla Slab](https://fonts.google.com/specimen/Zilla+Slab), copyright 2017 The Mozilla Foundation
 
 The full copyright notices and license texts ship inside the app in [`app/src/main/assets/licenses/fonts.txt`](app/src/main/assets/licenses/fonts.txt).
+
+### Bundled icons
+
+The icon tab of the symbol picker draws on the unmodified [Material Icons](https://github.com/google/material-design-icons) font by Google, licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). Its search runs on the icon names and keywords from Google's own [icon metadata](https://fonts.google.com/metadata/icons), which are English. Notice and license text ship inside the app in [`app/src/main/assets/licenses/icons.txt`](app/src/main/assets/licenses/icons.txt).
 
 Beyond those, you can add your own TTF and OTF files under Settings, Fonts. They are copied into the app's private storage and stay on the device, so backups and exported templates carry only the font name. A template whose font is not installed renders in a default font and picks its own font back up as soon as you add it again.
 

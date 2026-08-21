@@ -13,6 +13,12 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
 
 data class SavedPrinter(val address: String, val name: String)
 
+/**
+ * More than fit on a row, a tablet in landscape included, so that removing one always has
+ * something left to slide up into its place.
+ */
+private const val MAX_RECENT_ICONS = 32
+
 class SettingsRepository(private val context: Context) {
 
     private object Keys {
@@ -24,6 +30,7 @@ class SettingsRepository(private val context: Context) {
         val LAST_SYMBOL_TAB = intPreferencesKey("last_symbol_tab")
         val PRINT_DENSITY = intPreferencesKey("print_density")
         val CUSTOM_FONTS = stringPreferencesKey("custom_fonts")
+        val RECENT_ICONS = stringPreferencesKey("recent_icons")
     }
 
     val savedPrinter: Flow<SavedPrinter?> = context.dataStore.data.map { prefs ->
@@ -57,12 +64,40 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
-    /** Last used tab in the symbol/emoji dialog (0 = symbols, 1 = emojis). */
-    val lastSymbolTab: Flow<Int> = context.dataStore.data.map { it[Keys.LAST_SYMBOL_TAB] ?: 0 }
+    /**
+     * Last used tab in the symbol picker. The numbers are identities, not positions, see
+     * SymbolPickerSheet; 2 is the icon tab, which is where the picker opens until a choice is made.
+     */
+    val lastSymbolTab: Flow<Int> = context.dataStore.data.map { it[Keys.LAST_SYMBOL_TAB] ?: 2 }
 
     suspend fun saveLastSymbolTab(tab: Int) {
         context.dataStore.edit { it[Keys.LAST_SYMBOL_TAB] = tab }
     }
+
+    /**
+     * Icons picked most recently, newest first. Stored as one comma-separated line, which is safe
+     * because an icon name is only lower case letters, digits and underscores. Rather more are kept
+     * than fit on the row, so that removing one reveals the next instead of leaving a gap.
+     */
+    val recentIcons: Flow<List<String>> = context.dataStore.data.map { splitIcons(it[Keys.RECENT_ICONS]) }
+
+    suspend fun addRecentIcon(name: String) {
+        context.dataStore.edit { prefs ->
+            val kept = splitIcons(prefs[Keys.RECENT_ICONS]).filter { it != name }
+            prefs[Keys.RECENT_ICONS] = (listOf(name) + kept).take(MAX_RECENT_ICONS).joinToString(",")
+        }
+    }
+
+    suspend fun removeRecentIcon(name: String) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.RECENT_ICONS] = splitIcons(prefs[Keys.RECENT_ICONS])
+                .filter { it != name }
+                .joinToString(",")
+        }
+    }
+
+    private fun splitIcons(raw: String?): List<String> =
+        raw.orEmpty().split(',').filter { it.isNotEmpty() }
 
     /**
      * Experimental 0x1F print density: 0 = off (default protocol, print path unchanged),

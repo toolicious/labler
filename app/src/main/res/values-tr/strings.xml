@@ -118,6 +118,10 @@
     <string name="cat_misc">Çeşitli</string>
     <string name="tab_symbols">Simgeler</string>
     <string name="tab_emojis">Emojiler</string>
+    <string name="tab_icons">İkonlar</string>
+    <string name="icon_search_hint">İkon ara</string>
+    <string name="icon_recent_removed">Son kullanılanlardan kaldırıldı: %1$s</string>
+    <string name="icon_search_english">İkon adları ve anahtar kelimeler İngilizcedir.</string>
     <string name="cat_smileys">İfadeler</string>
     <string name="cat_animals">Hayvanlar ve doğa</string>
     <string name="cat_food">Yiyecek</string>

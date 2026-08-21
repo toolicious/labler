@@ -118,6 +118,10 @@
     <string name="cat_misc">Разное</string>
     <string name="tab_symbols">Символы</string>
     <string name="tab_emojis">Эмодзи</string>
+    <string name="tab_icons">Иконки</string>
+    <string name="icon_search_hint">Поиск иконок</string>
+    <string name="icon_recent_removed">Удалено из недавних: %1$s</string>
+    <string name="icon_search_english">Названия и ключевые слова иконок на английском.</string>
     <string name="cat_smileys">Смайлики</string>
     <string name="cat_animals">Животные и природа</string>
     <string name="cat_food">Еда</string>

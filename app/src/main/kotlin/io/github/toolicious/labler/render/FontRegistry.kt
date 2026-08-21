@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.res.ResourcesCompat
 import io.github.toolicious.labler.R
+import io.github.toolicious.labler.model.IconFonts
 import io.github.toolicious.labler.model.LabelFont
 import java.util.concurrent.ConcurrentHashMap
 
@@ -22,6 +23,9 @@ import java.util.concurrent.ConcurrentHashMap
 object FontRegistry {
 
     private val bundled = mutableMapOf<LabelFont, Typeface>()
+
+    /** Bundled icon fonts, keyed by the name that icon elements reference. */
+    private val iconFonts = mutableMapOf<String, Typeface>()
 
     /** Fonts the user added, keyed by the family name that templates reference. */
     private val custom = ConcurrentHashMap<String, Typeface>()
@@ -43,7 +47,16 @@ object FontRegistry {
         load(LabelFont.COMFORTAA, R.font.comfortaa)
         load(LabelFont.CAVEAT, R.font.caveat)
         load(LabelFont.PACIFICO, R.font.pacifico)
+        runCatching { ResourcesCompat.getFont(context, R.font.material_icons) }.getOrNull()
+            ?.let { iconFonts[IconFonts.MATERIAL] = it }
     }
+
+    /**
+     * Typeface an icon element needs, or null when its glyph is plain Unicode and the system font
+     * is the right one. An unknown key yields null as well, so an element written by a newer
+     * version draws a placeholder glyph rather than bringing the render down.
+     */
+    fun iconFont(key: String?): Typeface? = key?.let { iconFonts[it] }
 
     /**
      * Replaces the custom fonts. Called from CustomFontRepository on the main dispatcher,

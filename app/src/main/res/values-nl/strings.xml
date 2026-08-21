@@ -118,6 +118,10 @@
     <string name="cat_misc">Diversen</string>
     <string name="tab_symbols">Symbolen</string>
     <string name="tab_emojis">Emoji</string>
+    <string name="tab_icons">Iconen</string>
+    <string name="icon_search_hint">Iconen zoeken</string>
+    <string name="icon_recent_removed">Verwijderd uit recent gebruikt: %1$s</string>
+    <string name="icon_search_english">Namen en trefwoorden van iconen zijn Engels.</string>
     <string name="cat_smileys">Smileys</string>
     <string name="cat_animals">Dieren &amp; natuur</string>
     <string name="cat_food">Eten</string>

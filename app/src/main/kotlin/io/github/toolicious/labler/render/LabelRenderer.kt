@@ -257,6 +257,7 @@ object LabelRenderer {
             isAntiAlias = true
             color = Color.BLACK
             textSize = size * 0.85f
+            FontRegistry.iconFont(e.iconFont)?.let { typeface = it }
         }
         val layout = StaticLayout.Builder
             .obtain(e.glyph, 0, e.glyph.length, paint, size)

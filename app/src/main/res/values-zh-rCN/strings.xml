@@ -118,6 +118,10 @@
     <string name="cat_misc">其他</string>
     <string name="tab_symbols">符号</string>
     <string name="tab_emojis">表情符号</string>
+    <string name="tab_icons">图标</string>
+    <string name="icon_search_hint">搜索图标</string>
+    <string name="icon_recent_removed">已从最近使用中移除：%1$s</string>
+    <string name="icon_search_english">图标名称和关键词均为英文。</string>
     <string name="cat_smileys">笑脸</string>
     <string name="cat_animals">动物与自然</string>
     <string name="cat_food">食物</string>
