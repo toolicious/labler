@@ -650,6 +650,9 @@ private fun SectionActionButton(text: String, onClick: () -> Unit, modifier: Mod
     )
 }
 
+/** What minimumInteractiveComponentSize reserves around a chip, and what the chip fills out. */
+private val TOUCH_TARGET = 48.dp
+
 /**
  * Compact selectable chip: less horizontal padding than the stock FilterChip, so more fit per row.
  *
@@ -701,6 +704,11 @@ private fun ChoiceChip(
                     hapticFeedbackEnabled = false,
                 )
                 .heightIn(min = 30.dp)
+                // The chip fills the touch target reserved around it instead of floating in the
+                // middle of it. A short label like "#" otherwise leaves ten empty pixels on either
+                // side that belong to the chip and read as spacing, which makes the gaps in a row
+                // look uneven. It costs nothing in layout, that width was already taken.
+                .widthIn(min = TOUCH_TARGET)
                 .padding(horizontal = 8.dp, vertical = 5.dp),
             contentAlignment = Alignment.Center,
         ) {
