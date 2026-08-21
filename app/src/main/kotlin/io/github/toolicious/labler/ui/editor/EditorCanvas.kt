@@ -32,12 +32,20 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.toolicious.labler.model.FrameElement
+import io.github.toolicious.labler.R
 import io.github.toolicious.labler.model.FrameStyle
 import io.github.toolicious.labler.model.LabelElement
 import io.github.toolicious.labler.model.LabelSpec
 import io.github.toolicious.labler.model.LabelTextAlign
+import io.github.toolicious.labler.model.LengthMode
 import io.github.toolicious.labler.model.TextElement
 import io.github.toolicious.labler.printer.MediaType
 import io.github.toolicious.labler.render.LabelRenderer
@@ -49,8 +57,22 @@ import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
 
+/**
+ * The two edges of a manual length label. Each is a dashed line beside the tape carrying a flag
+ * below it, which points inwards and names the edge. In dp, because a finger is the same size
+ * whatever the screen density is.
+ */
+private val EDGE_LINE_GRAB = 7.dp   // half the band around a line that still counts as the line
+private val EDGE_LINE_WIDTH = 3.dp  // in dp, so the line does not thin out on a dense screen
+private val EDGE_DASH_ON = 7.dp
+private val EDGE_DASH_OFF = 5.dp
+private val EDGE_FLAG_HEIGHT = 22.dp
+private val EDGE_FLAG_PAD = 9.dp
+private val EDGE_FLAG_TEXT = 12.sp
+private val EDGE_FLAG_ARROW_GAP = 5.dp  // between the word and the arrow beside it
+
 /** Axis-aligned bounding box of an element rotated by an arbitrary angle. */
-private fun elementBounds(el: LabelElement): Rect {
+internal fun elementBounds(el: LabelElement): Rect {
     val s = LabelRenderer.measure(el)
     val cx = el.x + s.width / 2f
     val cy = el.y + s.height / 2f
@@ -67,6 +89,10 @@ private fun elementBounds(el: LabelElement): Rect {
  * border is dark gray. Tapping selects an element, dragging moves it, and the
  * round handle at the bottom right scales it. Dragging out of a double tap moves
  * without snapping. Element coordinates are label pixels.
+ *
+ * A manual length label additionally gets a handle for each of its two edges, sitting in the gray
+ * border next to the tape: dragging one moves that edge, double tapping it pulls the edge up to
+ * the content.
  *
  * The label is shown print accurate: everything but the selected element is rendered
  * through the real print pipeline and magnified without interpolation, so the editor
@@ -85,6 +111,10 @@ fun EditorCanvas(
     onResizeStart: (String) -> Unit,
     onResizeBy: (Offset) -> Unit,
     onResizeEnd: () -> Unit,
+    onEdgeDragStart: (LabelEdge) -> Unit = {},
+    onEdgeDragBy: (Float) -> Unit = {},
+    onEdgeDragEnd: () -> Unit = {},
+    onEdgeFit: (LabelEdge) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
@@ -104,12 +134,31 @@ fun EditorCanvas(
     // Fixed size (die-cut label) = rounded corners, continuous = hard corners.
     val isDieCut = spec.media == MediaType.DIE_CUT
     val cornerR = 12f // label pixels (~1.5 mm)
+    // Only a manual length label has edges to drag. Its handles sit next to the tape and need gray
+    // border to sit in, so the tape is fitted into a narrower box then. The other modes are laid
+    // out exactly as before.
+    val isManual = spec.lengthMode == LengthMode.MANUAL
+    val density = LocalDensity.current
+    val grabPx = with(density) { EDGE_LINE_GRAB.toPx() }
+    val flagHeight = with(density) { EDGE_FLAG_HEIGHT.toPx() }
+    val flagPad = with(density) { EDGE_FLAG_PAD.toPx() }
+    val flagTextPx = with(density) { EDGE_FLAG_TEXT.toPx() }
+    val edgeLineWidth = with(density) { EDGE_LINE_WIDTH.toPx() }
+    val edgeDash = with(density) { floatArrayOf(EDGE_DASH_ON.toPx(), EDGE_DASH_OFF.toPx()) }
+    val arrowStroke = with(density) { 2.dp.toPx() }
+    // The strip the flags hang in is taken out of the height the tape is fitted into, and it is
+    // taken in every mode, not just where they are drawn. Reserving it only for the manual mode
+    // would rescale the tape on every switch, and the label has to look the same in all three.
+    val bottomRoom = flagHeight
     val total = if (boxSize.width > 0 && boxSize.height > 0) {
-        min(boxSize.width / labelW, boxSize.height / labelH) * 0.96f
+        min(
+            boxSize.width / labelW,
+            (boxSize.height - bottomRoom).coerceAtLeast(1f) / labelH,
+        ) * 0.96f
     } else 1f
     val contentTL = Offset(
         (boxSize.width - labelW * total) / 2f,
-        (boxSize.height - labelH * total) / 2f,
+        (boxSize.height - bottomRoom - labelH * total) / 2f,
     )
 
     // The label as the printer sees it: 1 px per dot, 1 bit, same pipeline as the print preview.
@@ -138,20 +187,76 @@ fun EditorCanvas(
     val totalState = rememberUpdatedState(total)
     val tlState = rememberUpdatedState(contentTL)
     val offsetState = rememberUpdatedState(offsetPx)
+    val labelWState = rememberUpdatedState(labelW)
+    val manualState = rememberUpdatedState(isManual)
 
     val background = Color(0xFF3A3A3A)
     val selectionColor = Color(0xFFE53935)
     val guideColor = Color(0xFF2979FF)
     val handleRadiusLabel = 18f
 
+    val edgeColor = MaterialTheme.colorScheme.primary
+    val edgeTextColor = MaterialTheme.colorScheme.onPrimary
+    val startText = stringResource(R.string.edge_start)
+    val endText = stringResource(R.string.edge_end)
+    val flagPaint = remember(flagTextPx, edgeTextColor) {
+        android.graphics.Paint().apply {
+            isAntiAlias = true
+            textSize = flagTextPx
+            color = edgeTextColor.toArgb()
+            textAlign = android.graphics.Paint.Align.LEFT
+        }
+    }
+    // The arrow is drawn rather than typed: as a character it comes out at the size of the text,
+    // which is far too small to read as a hint, and turns into a colour emoji on some devices.
+    val arrowHalf = flagHeight * 0.26f
+    val arrowGap = with(density) { EDGE_FLAG_ARROW_GAP.toPx() }
+    val startTextW = remember(startText, flagPaint) { flagPaint.measureText(startText) }
+    val endTextW = remember(endText, flagPaint) { flagPaint.measureText(endText) }
+    val startFlagW = startTextW + arrowGap + 2f * arrowHalf + 2f * flagPad
+    val endFlagW = endTextW + arrowGap + 2f * arrowHalf + 2f * flagPad
+
+    // The two flags in screen coordinates, hanging flush under the tape: the left one grows to the
+    // right of its line and the right one to the left of its, so both point inwards. Taken as
+    // arguments rather than read from the state, so the drawing can pass its own values and the
+    // gestures the live ones.
+    fun edgeFlags(scale: Float, topLeft: Offset, widthPx: Float): Pair<Rect, Rect> {
+        val top = topLeft.y + labelH * scale
+        val rightX = topLeft.x + widthPx * scale
+        return Rect(topLeft.x, top, topLeft.x + startFlagW, top + flagHeight) to
+            Rect(rightX - endFlagW, top, rightX, top + flagHeight)
+    }
+
+    /** The edge a touch at [pos] (screen coordinates) means, or null for anything else. */
+    fun edgeHandleAt(pos: Offset): LabelEdge? {
+        if (!manualState.value) return null
+        val scale = totalState.value
+        val topLeft = tlState.value
+        val width = labelWState.value
+        val (leftFlag, rightFlag) = edgeFlags(scale, topLeft, width)
+        // The flags are tested first: they are the roomy target and they overlap nothing. The band
+        // around a line stays narrow, because every pixel of it lies over the tape and is one the
+        // elements at that edge no longer get.
+        fun onLine(x: Float): Boolean =
+            abs(pos.x - x) < grabPx && pos.y > topLeft.y - grabPx && pos.y < leftFlag.top
+        return when {
+            leftFlag.contains(pos) -> LabelEdge.LEFT
+            rightFlag.contains(pos) -> LabelEdge.RIGHT
+            onLine(topLeft.x) -> LabelEdge.LEFT
+            onLine(topLeft.x + width * scale) -> LabelEdge.RIGHT
+            else -> null
+        }
+    }
+
     Box(
         modifier
             .clipToBounds()
             .onSizeChanged { boxSize = it }
             .pointerInput(Unit) {
-                var mode = 0 // 0 = nothing, 1 = move, 2 = scale
+                var mode = 0 // 0 = nothing, 1 = move, 2 = scale, 3 = label edge
                 detectDragGesturesWithDoubleTap(
                     onStart = { pos, snapFree ->
+                        val edge = edgeHandleAt(pos)
                         val sc = totalState.value
                         val lp = (pos - tlState.value) / sc - Offset(offsetState.value, 0f)
                         val sel = elementsState.value.find { it.id == selectedIdState.value }
@@ -160,6 +265,12 @@ fun EditorCanvas(
                             (lp - Offset(b.right, b.bottom)).getDistance() < handleRadiusLabel
                         }
                         when {
+                            // The label edges come first: they lie outside the tape, where there is
+                            // no element that could be meant instead.
+                            edge != null -> {
+                                mode = 3
+                                onEdgeDragStart(edge)
+                            }
                             onHandle && sel != null -> {
                                 mode = 2
                                 onResizeStart(sel.id)
@@ -191,17 +302,26 @@ fun EditorCanvas(
                         when (mode) {
                             1 -> onDragBy(d)
                             2 -> onResizeBy(d)
+                            3 -> onEdgeDragBy(d.x)
                         }
                     },
                     onEnd = {
-                        if (mode == 1) onDragEnd() else if (mode == 2) onResizeEnd()
+                        when (mode) {
+                            1 -> onDragEnd()
+                            2 -> onResizeEnd()
+                            3 -> onEdgeDragEnd()
+                        }
                         mode = 0
                         snapFreeDrag = false
                     },
+                    onDoubleTap = { pos -> edgeHandleAt(pos)?.let(onEdgeFit) },
                 )
             }
             .pointerInput(Unit) {
                 detectTapGestures { pos ->
+                    // A tap on an edge handle belongs to the drag detector and must not clear the
+                    // selection that happens to lie behind it.
+                    if (edgeHandleAt(pos) != null) return@detectTapGestures
                     val lp = (pos - tlState.value) / totalState.value - Offset(offsetState.value, 0f)
                     onSelect(elementsState.value.lastOrNull { hitTest(lp, it) }?.id)
                 }
@@ -305,6 +425,69 @@ fun EditorCanvas(
                 drawCircle(frameColor, radius = 13f, center = handle, style = Stroke(width = 2.5f))
                 drawCircle(frameColor, radius = 4.5f, center = handle)
             }
+
+            // The two edges of a manual length label: a dashed line down each side of the tape,
+            // ending in a flag that hangs off its bottom corner and names it. The flag is the
+            // comfortable grip, it points inwards, away from the screen edge where the back gesture
+            // waits, and it is finger sized; the line is there for anyone who aims at the edge.
+            if (isManual) {
+                val (leftFlag, rightFlag) = edgeFlags(total, contentTL, labelW)
+                val dashed = PathEffect.dashPathEffect(edgeDash)
+
+                /** Double headed arrow around [cx], saying that this edge moves sideways. */
+                fun arrow(cx: Float, cy: Float) {
+                    val head = arrowHalf * 0.52f
+                    drawLine(
+                        color = edgeTextColor,
+                        start = Offset(cx - arrowHalf, cy),
+                        end = Offset(cx + arrowHalf, cy),
+                        strokeWidth = arrowStroke,
+                        cap = StrokeCap.Round,
+                    )
+                    listOf(-1f, 1f).forEach { side ->
+                        val tip = Offset(cx + side * arrowHalf, cy)
+                        listOf(-1f, 1f).forEach { updown ->
+                            drawLine(
+                                color = edgeTextColor,
+                                start = tip,
+                                end = Offset(tip.x - side * head, cy + updown * head),
+                                strokeWidth = arrowStroke,
+                                cap = StrokeCap.Round,
+                            )
+                        }
+                    }
+                }
+
+                listOf(leftFlag.left to leftFlag, rightFlag.right to rightFlag).forEach { (lineX, flag) ->
+                    drawLine(
+                        color = edgeColor,
+                        start = Offset(lineX, contentTL.y),
+                        end = Offset(lineX, flag.top),
+                        strokeWidth = edgeLineWidth,
+                        pathEffect = dashed,
+                    )
+                    drawRoundRect(
+                        color = edgeColor,
+                        topLeft = flag.topLeft,
+                        size = flag.size,
+                        cornerRadius = CornerRadius(5f, 5f),
+                    )
+                }
+                // Word first on the leading edge, arrow first on the trailing one, so the arrow of
+                // each flag sits on the side the flag points to.
+                val baseline = leftFlag.center.y - (flagPaint.descent() + flagPaint.ascent()) / 2f
+                drawIntoCanvas { c ->
+                    c.nativeCanvas.drawText(startText, leftFlag.left + flagPad, baseline, flagPaint)
+                    c.nativeCanvas.drawText(
+                        endText,
+                        rightFlag.left + flagPad + 2f * arrowHalf + arrowGap,
+                        baseline,
+                        flagPaint,
+                    )
+                }
+                arrow(leftFlag.right - flagPad - arrowHalf, leftFlag.center.y)
+                arrow(rightFlag.left + flagPad + arrowHalf, rightFlag.center.y)
+            }
         }
     }
 }
@@ -314,11 +497,16 @@ fun EditorCanvas(
  * within the double tap timeout, the drag is reported with snapFree = true. The tap itself stays
  * with the separate tap detector, which selects the element, so this one only has to notice that
  * a second down followed. [onDrag] receives the raw screen delta, like detectDragGestures does.
+ *
+ * A double tap that goes nowhere is reported through [onDoubleTap] instead. That is done here and
+ * not with an onDoubleTap on the tap detector, because that one would hold back every single tap
+ * in the editor for the length of the double tap timeout.
  */
 private suspend fun PointerInputScope.detectDragGesturesWithDoubleTap(
     onStart: (Offset, Boolean) -> Unit,
     onDrag: (Offset) -> Unit,
     onEnd: () -> Unit,
+    onDoubleTap: (Offset) -> Unit,
 ) = awaitEachGesture {
     // The tap detector sits further in and consumes the down, hence requireUnconsumed = false.
     val first = awaitFirstDown(requireUnconsumed = false)
@@ -339,8 +527,12 @@ private suspend fun PointerInputScope.detectDragGesturesWithDoubleTap(
             overSlop = over
         }
     }
-    // A plain double tap without any movement: nothing to drag.
-    val dragStart = slop ?: return@awaitEachGesture
+    // A plain double tap without any movement: nothing to drag, but the spot it happened on is
+    // passed on, so a double tap on one of the label edge handles can act on it.
+    val dragStart = slop ?: run {
+        if (snapFree) onDoubleTap(start.position)
+        return@awaitEachGesture
+    }
 
     onStart(start.position, snapFree)
     if (overSlop != Offset.Zero) onDrag(overSlop)

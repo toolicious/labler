@@ -236,6 +236,10 @@ fun EditorScreen(
                 onResizeStart = vm::beginResize,
                 onResizeBy = vm::resizeSelectedBy,
                 onResizeEnd = vm::endResize,
+                onEdgeDragStart = vm::beginEdgeDrag,
+                onEdgeDragBy = vm::dragEdgeBy,
+                onEdgeDragEnd = vm::endEdgeDrag,
+                onEdgeFit = vm::fitEdge,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -383,6 +387,8 @@ fun EditorScreen(
                 showMetaDialog = false
             },
             onImport = null,
+            currentLengthMm = LabelRenderer.effectiveLengthMm(t.spec, t.elements),
+            currentLeadingMm = LabelRenderer.leadingMmFor(t.spec, t.elements),
         )
     }
 }

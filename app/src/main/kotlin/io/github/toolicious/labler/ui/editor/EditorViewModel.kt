@@ -16,8 +16,10 @@ import io.github.toolicious.labler.model.LabelElement
 import io.github.toolicious.labler.model.LabelSpec
 import io.github.toolicious.labler.model.LabelTemplate
 import io.github.toolicious.labler.model.LabelTextAlign
+import io.github.toolicious.labler.model.LengthMode
 import io.github.toolicious.labler.model.Symbology
 import io.github.toolicious.labler.model.TextElement
+import io.github.toolicious.labler.printer.Protocol
 import io.github.toolicious.labler.render.LabelRenderer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -28,13 +30,24 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 /** Active snap guide lines during dragging, as label coordinates (null = no guide on that axis). */
 data class SnapGuides(val xLine: Float? = null, val yLine: Float? = null)
 
+/**
+ * The two ends of a manual length label, as they are grabbed in the editor. LEFT is the leading
+ * edge (the blank tape in front of the content), RIGHT is the end of the label.
+ */
+enum class LabelEdge { LEFT, RIGHT }
+
 private const val LABEL_SNAP_TOL = 4f // label center and borders
 private const val ELEM_SNAP_TOL = 3f  // small zone for aligning to other elements
+
+/** Blank tape an edge keeps to the content when it is fitted to it (double tap on its handle). */
+private const val FIT_GAP_MM = 1
 
 class EditorViewModel(app: Application, private val templateId: String) : AndroidViewModel(app) {
 
@@ -183,7 +196,13 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
 
     /** Updates name and dimensions together (from the editor title), applied immediately. */
     fun updateMeta(name: String, spec: LabelSpec) =
-        mutate(null) { it.copy(name = name.ifBlank { it.name }, spec = spec) }
+        mutate(null) {
+            it.copy(
+                name = name.ifBlank { it.name },
+                spec = spec,
+                elements = LabelRenderer.rebasedForMode(it.spec, it.elements, spec),
+            )
+        }
 
     fun moveSelected(dx: Float, dy: Float) {
         val element = selectedElement.value ?: return
@@ -378,6 +397,128 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         val updated = t.copy(elements = t.elements.map { if (it.id == element.id) element else it })
         _template.value = updated
         scheduleSave(updated)
+    }
+
+    // ----- Label edges (manual length only) -----
+
+    private var edgeDrag: LabelEdge? = null
+    // Raw movement since the drag started, in label px. The spec only knows whole millimetres, so
+    // the fractional remainder has to live here instead of being rounded away every frame.
+    private var edgeRawPx = 0f
+    private var edgeStartLeadingMm = 0
+    private var edgeStartLengthMm = 0
+
+    /**
+     * Whole millimetres the elements take up between the two edges, rounded up so a rounding step
+     * can never cut content off. Uses the same bounding box the canvas draws around a selected
+     * element, which is where the rotation of an element is accounted for.
+     */
+    private fun contentSpanMm(elements: List<LabelElement>): Int {
+        if (elements.isEmpty()) return 0
+        val left = elements.minOf { elementBounds(it).left }
+        val right = elements.maxOf { elementBounds(it).right }
+        return ceil((right - left) / Protocol.DOTS_PER_MM).toInt().coerceAtLeast(0)
+    }
+
+    /**
+     * Moves the leading edge to [mm], the blank tape in front of the content. The elements keep
+     * their coordinates, so the length carries the same change and the content stays where it is.
+     */
+    fun setLeadingMm(mm: Int) {
+        val t = _template.value ?: return
+        applyEdges(withLeadingMm(t.spec, mm), history = true)
+    }
+
+    /** Moves the trailing edge, which is the length of the label. */
+    fun setLengthMm(mm: Int) {
+        val t = _template.value ?: return
+        applyEdges(withLengthMm(t.spec, mm), history = true)
+    }
+
+    /** Grabs one of the two edges. Only a manual length label has edges to grab. */
+    fun beginEdgeDrag(edge: LabelEdge) {
+        val t = _template.value ?: return
+        if (t.spec.lengthMode != LengthMode.MANUAL) return
+        pushHistory(null)
+        edgeDrag = edge
+        edgeRawPx = 0f
+        edgeStartLeadingMm = t.spec.leadingMm
+        edgeStartLengthMm = t.spec.lengthMm
+    }
+
+    /**
+     * Moves the grabbed edge by [dxPx] label pixels. The result is always computed from the values
+     * the drag started with, so the rounding to whole millimetres cannot drift over a long drag.
+     */
+    fun dragEdgeBy(dxPx: Float) {
+        val edge = edgeDrag ?: return
+        val t = _template.value ?: return
+        edgeRawPx += dxPx
+        val mm = (edgeRawPx / Protocol.DOTS_PER_MM).roundToInt()
+        val spec = when (edge) {
+            // Moving the leading edge to the left (negative) grows the label in front of the content.
+            LabelEdge.LEFT -> withLeadingMm(t.spec, edgeStartLeadingMm - mm)
+            LabelEdge.RIGHT -> withLengthMm(t.spec, edgeStartLengthMm + mm)
+        }
+        applyEdges(spec, history = false)
+    }
+
+    fun endEdgeDrag() {
+        edgeDrag = null
+        edgeRawPx = 0f
+    }
+
+    /** Double tap on an edge handle: pulls that edge up to [FIT_GAP_MM] in front of the content. */
+    fun fitEdge(edge: LabelEdge) {
+        val t = _template.value ?: return
+        when (edge) {
+            LabelEdge.LEFT -> setLeadingMm(FIT_GAP_MM)
+            LabelEdge.RIGHT -> setLengthMm(t.spec.leadingMm + contentSpanMm(t.elements) + FIT_GAP_MM)
+        }
+    }
+
+    /**
+     * [spec] with the leading edge at [mm]. As much as the length clamp allows is what the edge
+     * really moves, so the gap in front of the content matches the length change in every case.
+     *
+     * [mm] may be negative, which puts the leading edge inside the content and prints it cut off
+     * at the front, the same way the trailing edge cuts it off at the back. What stops the edge is
+     * the shortest label the printer takes, not the content.
+     */
+    private fun withLeadingMm(spec: LabelSpec, mm: Int): LabelSpec {
+        val lengthMm = (spec.lengthMm + (mm - spec.leadingMm))
+            .coerceIn(LabelSpec.MIN_LENGTH_MM, LabelSpec.MAX_LENGTH_MM)
+        return spec.copy(
+            leadingMm = spec.leadingMm + (lengthMm - spec.lengthMm),
+            lengthMm = lengthMm,
+        )
+    }
+
+    /**
+     * [spec] with the trailing edge at [mm]. The edge is free to move in past the content, which
+     * then prints cut off at the label edge. Nothing is lost by that: the elements keep their
+     * coordinates and come back into view as soon as the edge is pulled out again.
+     */
+    private fun withLengthMm(spec: LabelSpec, mm: Int): LabelSpec = spec.copy(
+        lengthMm = mm.coerceIn(LabelSpec.MIN_LENGTH_MM, LabelSpec.MAX_LENGTH_MM),
+    )
+
+    /**
+     * Writes an edge change back. [history] is off while dragging, which takes its one snapshot at
+     * the start of the drag instead of on every frame. The single write path of the whole section,
+     * so this is where the other two length modes are kept out: a variable label derives its length
+     * from the content and a fixed one gets it typed in, neither has edges to move.
+     */
+    private fun applyEdges(spec: LabelSpec, history: Boolean) {
+        val t = _template.value ?: return
+        if (t.spec.lengthMode != LengthMode.MANUAL || spec == t.spec) return
+        if (history) {
+            updateSpec(spec)
+        } else {
+            val updated = t.copy(spec = spec)
+            _template.value = updated
+            scheduleSave(updated)
+        }
     }
 
     // ----- Persistence -----

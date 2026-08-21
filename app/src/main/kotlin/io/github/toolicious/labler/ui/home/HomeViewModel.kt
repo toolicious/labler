@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import io.github.toolicious.labler.App
 import io.github.toolicious.labler.R
 import io.github.toolicious.labler.model.LabelSpec
+import io.github.toolicious.labler.render.LabelRenderer
 import io.github.toolicious.labler.model.LabelTemplate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,7 +62,13 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
     fun updateMeta(id: String, name: String, spec: LabelSpec) {
         viewModelScope.launch {
             val current = repo.get(id) ?: return@launch
-            repo.save(current.copy(name = name.ifBlank { current.name }, spec = spec))
+            repo.save(
+                current.copy(
+                    name = name.ifBlank { current.name },
+                    spec = spec,
+                    elements = LabelRenderer.rebasedForMode(current.spec, current.elements, spec),
+                )
+            )
         }
     }
 

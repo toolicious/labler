@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import io.github.toolicious.labler.App
 import io.github.toolicious.labler.R
 import io.github.toolicious.labler.model.LabelTemplate
+import io.github.toolicious.labler.model.LengthMode
 import io.github.toolicious.labler.model.Placeholders
 import io.github.toolicious.labler.printer.MediaType
 import io.github.toolicious.labler.render.LabelRenderer
@@ -67,17 +68,21 @@ class TemplatePrintViewModel(app: Application) : AndroidViewModel(app) {
                     templateRepo.setCounter(template.id, template.counterValue + copies)
                 }
                 val printedSpec = template.spec.copy(media = media)
+                val printed = reanchored.first()
+                // A history entry is a snapshot of what actually came out: reprinting it has to
+                // reproduce that label rather than recompute one. So it stores the printed length
+                // instead of the minimum and pins the mode to FIXED. The shift the other two modes
+                // draw their content with has to be baked into the coordinates for the same reason,
+                // because a fixed label draws them where they stand and would otherwise lose the
+                // blank tape that was in front of the content.
+                val printedOffset = LabelRenderer.contentOffsetPx(printedSpec, printed)
                 historyRepo.record(
                     templateId = template.id,
                     templateName = template.name,
-                    // A history entry is a snapshot of what actually came out, so it stores the
-                    // printed length instead of the minimum and drops the auto flag: reprinting it
-                    // must reproduce that label, not recompute a new length.
-                    spec = printedSpec.copy(
-                        lengthMm = LabelRenderer.effectiveLengthMm(printedSpec, reanchored.first()),
-                        autoLength = false,
-                    ),
-                    resolvedElements = reanchored.first(),
+                    spec = printedSpec
+                        .copy(lengthMm = LabelRenderer.effectiveLengthMm(printedSpec, printed))
+                        .withLengthMode(LengthMode.FIXED),
+                    resolvedElements = printed.map { it.moved(printedOffset, 0f) },
                     copies = copies,
                 )
                 _done.value = true

@@ -128,6 +128,42 @@ object LabelRenderer {
     }
 
     /**
+     * The blank tape in front of the content as the label stands right now, in whole millimetres.
+     *
+     * This is what [LabelSpec.leadingMm] has to become when a label is switched to MANUAL, so that
+     * changing the mode on its own does not move anything: a fixed label reports where its leftmost
+     * element sits, a variable one the margin it is laid out with. Without it a fixed label whose
+     * content starts well into the tape would snap flush to the tape start.
+     *
+     * Negative where the content already starts off the front of the tape, which a fixed label can
+     * do and the manual mode carries on doing.
+     */
+    fun leadingMmFor(spec: LabelSpec, elements: List<LabelElement>): Int =
+        ((contentOffsetPx(spec, elements) + contentLeft(elements)) / Protocol.DOTS_PER_MM)
+            .roundToInt()
+
+    /**
+     * The elements to keep when a label changes its length mode.
+     *
+     * A fixed label draws its elements where they stand; the other two anchor them to an edge and
+     * draw them shifted. Leaving one of those for fixed therefore has to bake that shift into the
+     * coordinates, or the content would jump the moment the mode changed.
+     *
+     * There is no such trick for the other direction. The variable mode puts the content on its
+     * front margin by definition, so a gap in front of it cannot survive the switch; keeping one is
+     * what the manual mode is for.
+     */
+    fun rebasedForMode(
+        old: LabelSpec,
+        elements: List<LabelElement>,
+        new: LabelSpec,
+    ): List<LabelElement> {
+        if (new.lengthMode != LengthMode.FIXED || old.lengthMode == LengthMode.FIXED) return elements
+        val offset = contentOffsetPx(old, elements)
+        return if (offset == 0f) elements else elements.map { it.moved(offset, 0f) }
+    }
+
+    /**
      * @param lengthPx overrides the length instead of deriving it from [elements]. Needed when the
      *   caller renders a subset (the editor omits the selected element and draws it on top), where
      *   deriving would give a shorter label than the one the subset belongs to.

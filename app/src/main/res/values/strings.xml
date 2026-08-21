@@ -67,6 +67,12 @@
     <string name="field_length">Length</string>
     <string name="length_variable">Variable</string>
     <string name="length_fixed">Fixed</string>
+    <string name="length_manual">Manual</string>
+    <string name="length_hint_variable">Automatically grows with the content, but never shorter than this value.</string>
+    <string name="length_hint_manual">Drag the edges in the editor, double tap fits them to the content.</string>
+    <string name="length_hint_fixed">Always exactly this length, regardless of the content.</string>
+    <string name="edge_start">Start</string>
+    <string name="edge_end">End</string>
     <string name="field_min_length_mm">Minimum length (mm)</string>
 
     <!-- Editor -->

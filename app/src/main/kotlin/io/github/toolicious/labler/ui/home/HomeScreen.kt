@@ -80,6 +80,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.toolicious.labler.R
 import io.github.toolicious.labler.model.LabelSpec
 import io.github.toolicious.labler.model.LabelTemplate
+import io.github.toolicious.labler.model.LengthMode
 import io.github.toolicious.labler.printer.MediaType
 import io.github.toolicious.labler.printer.Protocol
 import io.github.toolicious.labler.render.FontRegistry
@@ -300,7 +301,9 @@ fun HomeScreen(
                 vm.updateMeta(target.id, name, spec)
                 editTarget = null
             },
-            onImport = null
+            onImport = null,
+            currentLengthMm = LabelRenderer.effectiveLengthMm(target.spec, target.elements),
+            currentLeadingMm = LabelRenderer.leadingMmFor(target.spec, target.elements),
         )
     }
 
@@ -448,6 +451,17 @@ private fun TemplateCard(
     }
 }
 
+/**
+ * Name and paper of a label, for both the new and the edit case.
+ *
+ * @param currentLengthMm length the label reaches right now, which the dialog cannot work out on
+ *   its own because it never sees the elements. It pre-fills the length field when the user leaves
+ *   the variable mode, so that picking another mode keeps the label as long as it already is.
+ *   Null where there is nothing to measure yet, and then the minimum has to do.
+ * @param currentLeadingMm blank tape in front of the content right now, measured the same way and
+ *   for the same reason. Switching to the manual mode adopts it as the leading edge, so the mode
+ *   change alone leaves the content exactly where it was.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun LabelDialog(
@@ -457,6 +471,8 @@ internal fun LabelDialog(
     onDismiss: () -> Unit,
     onConfirm: (String, LabelSpec) -> Unit,
     onImport: (() -> Unit)?,
+    currentLengthMm: Int? = null,
+    currentLeadingMm: Int? = null,
     autofocusName: Boolean = false,
 ) {
     val isPresetSize = LabelSpec.PRESETS.any { it.first == initialSpec.tapeWidthMm && it.second == initialSpec.lengthMm }
@@ -471,7 +487,18 @@ internal fun LabelDialog(
     var widthText by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.tapeWidthMm.toString()) }
     var lengthText by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.lengthMm.toString()) }
     var dieCut by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.media == MediaType.DIE_CUT) }
-    var autoLength by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.lengthIsAuto) }
+    var lengthMode by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.lengthMode) }
+    // Picking a mode leaves the label exactly as long as it is now. In the variable mode the
+    // number is a lower bound rather than the length, so leaving it hands the field the length the
+    // label actually reaches; every other switch keeps the number that is already there. Going back
+    // to variable therefore raises the minimum to the current length, which is the price of the
+    // label not changing under the user, and one keystroke to undo.
+    val selectLengthMode = { mode: LengthMode ->
+        if (mode != lengthMode) {
+            if (lengthMode == LengthMode.VARIABLE) currentLengthMm?.let { lengthText = it.toString() }
+            lengthMode = mode
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -514,7 +541,7 @@ internal fun LabelDialog(
                             // continuous tape is for. An already-continuous label keeps its choice.
                             if (dieCut) {
                                 dieCut = false
-                                autoLength = true
+                                lengthMode = LengthMode.VARIABLE
                             }
                         },
                         label = { Text(stringResource(R.string.media_continuous), maxLines = 1, softWrap = false) }
@@ -595,28 +622,58 @@ internal fun LabelDialog(
                     }
                     Spacer(Modifier.height(12.dp))
                     Text(stringResource(R.string.field_length), style = MaterialTheme.typography.bodySmall)
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    // Where the length comes from: the content, the edges dragged in the editor,
+                    // or the number below. The dialog is wide enough for the three side by side.
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         FilterChip(
-                            selected = autoLength,
-                            onClick = { autoLength = true },
+                            selected = lengthMode == LengthMode.VARIABLE,
+                            onClick = { selectLengthMode(LengthMode.VARIABLE) },
                             label = { Text(stringResource(R.string.length_variable), maxLines = 1, softWrap = false) }
                         )
                         FilterChip(
-                            selected = !autoLength,
-                            onClick = { autoLength = false },
+                            selected = lengthMode == LengthMode.MANUAL,
+                            onClick = { selectLengthMode(LengthMode.MANUAL) },
+                            label = { Text(stringResource(R.string.length_manual), maxLines = 1, softWrap = false) }
+                        )
+                        FilterChip(
+                            selected = lengthMode == LengthMode.FIXED,
+                            onClick = { selectLengthMode(LengthMode.FIXED) },
                             label = { Text(stringResource(R.string.length_fixed), maxLines = 1, softWrap = false) }
                         )
                     }
                     Spacer(Modifier.height(8.dp))
-                    // One field either way; only its meaning changes, from exact to lower bound.
+                    // One field in every mode; only its meaning changes, from exact to lower
+                    // bound. In the manual mode it is the same number the edges carry, so typing
+                    // one moves the trailing edge, which is the one the length belongs to.
                     MmField(
                         value = lengthText,
                         onValueChange = { lengthText = it },
                         label = stringResource(
-                            if (autoLength) R.string.field_min_length_mm else R.string.field_length_mm
+                            if (lengthMode == LengthMode.VARIABLE) R.string.field_min_length_mm
+                            else R.string.field_length_mm
                         ),
                         maxDigits = 3,
                         modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    // Spells out what the selected mode does, since the chip labels alone leave the
+                    // difference between a minimum and a fixed length to guesswork. Always shown,
+                    // for the same reason the field is.
+                    Text(
+                        stringResource(
+                            when (lengthMode) {
+                                LengthMode.VARIABLE -> R.string.length_hint_variable
+                                LengthMode.MANUAL -> R.string.length_hint_manual
+                                LengthMode.FIXED -> R.string.length_hint_fixed
+                            }
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        // Two of the three hints wrap at the width of the dialog and one does not,
+                        // so the room for both lines is held whatever is selected. Otherwise the
+                        // buttons below would jump on every switch, which is what the line being
+                        // always present was meant to prevent in the first place.
+                        minLines = 2,
                     )
                 }
             }
@@ -628,8 +685,18 @@ internal fun LabelDialog(
                 val length = lengthText.toIntOrNull()
                     ?.coerceIn(LabelSpec.MIN_LENGTH_MM, LabelSpec.MAX_LENGTH_MM) ?: 40
                 val media = if (dieCut) MediaType.DIE_CUT else MediaType.CONTINUOUS
-                // Never store the flag on a die-cut label, its length belongs to the stock.
-                onConfirm(name, LabelSpec(width, length, media, autoLength = !dieCut && autoLength))
+                val mode = if (dieCut) LengthMode.FIXED else lengthMode
+                // A label that was already manual keeps the gap that was dragged in front of its
+                // content. One that becomes manual here starts from the gap it happens to have, so
+                // that picking the mode does not shift the content by itself; the other two modes
+                // ignore the value and so may as well carry it.
+                val leading = if (mode == LengthMode.MANUAL && initialSpec.lengthMode != LengthMode.MANUAL) {
+                    currentLeadingMm ?: initialSpec.leadingMm
+                } else {
+                    initialSpec.leadingMm
+                }
+                // A die-cut label is always fixed, its length belongs to the stock.
+                onConfirm(name, LabelSpec(width, length, media, leadingMm = leading).withLengthMode(mode))
             }
             if (onImport != null) {
                 Row(
