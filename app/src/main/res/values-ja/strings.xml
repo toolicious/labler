@@ -102,6 +102,7 @@
     <string name="var_time">time</string>
     <string name="var_number">#</string>
     <string name="var_var">var</string>
+    <string name="var_format_hint">長押しで他の形式</string>
     <string name="symbol_current">現在の記号</string>
     <string name="action_choose_symbol">記号を選ぶ …</string>
     <string name="symbol_field">絵文字または文字</string>

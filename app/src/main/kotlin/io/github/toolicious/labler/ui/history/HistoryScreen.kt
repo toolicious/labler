@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,11 +46,10 @@ import io.github.toolicious.labler.model.LabelSpec
 import io.github.toolicious.labler.printer.MonoImage
 import io.github.toolicious.labler.render.FontRegistry
 import io.github.toolicious.labler.render.LabelRenderer
+import io.github.toolicious.labler.ui.components.appDateTimeFormat
 import io.github.toolicious.labler.ui.components.rememberBlePermissionRunner
 import io.github.toolicious.labler.ui.print.PrintSheet
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -140,8 +140,9 @@ private fun HistoryCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(entry.templateName, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
-                    val dateText = remember(entry.id) {
-                        SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.GERMANY).format(Date(entry.printedAt))
+                    val context = LocalContext.current
+                    val dateText = remember(entry.id, context) {
+                        appDateTimeFormat(context).format(Date(entry.printedAt))
                     }
                     Text(
                         stringResource(

@@ -4,6 +4,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.Calendar
+import java.util.GregorianCalendar
+import java.util.Locale
 
 class PlaceholdersTest {
 
@@ -12,6 +15,13 @@ class PlaceholdersTest {
         timeText = "21:30",
         counter = 7,
         answers = mapOf("Name" to "Kiste A"),
+    )
+
+    // Built in the default time zone, so formatting it back yields these wall clock values wherever
+    // the test runs. Locale.US pins the month and weekday names that MMM and EEE produce.
+    private val stamped = ctx.copy(
+        now = GregorianCalendar(2026, Calendar.JULY, 2, 21, 30, 0).time,
+        locale = Locale.US,
     )
 
     @Test
@@ -33,6 +43,24 @@ class PlaceholdersTest {
     @Test
     fun `number with width gets leading zeros`() {
         assertEquals("007", Placeholders.resolveText("{#:3}", ctx))
+    }
+
+    @Test
+    fun `date and time take a format of their own`() {
+        assertEquals("2026-07-02", Placeholders.resolveText("{date:yyyy-MM-dd}", stamped))
+        assertEquals("2 Jul 2026", Placeholders.resolveText("{date:d MMM yyyy}", stamped))
+        assertEquals("21:30:00", Placeholders.resolveText("{time:HH:mm:ss}", stamped))
+    }
+
+    @Test
+    fun `an empty format means the device format`() {
+        assertEquals("02.07.2026", Placeholders.resolveText("{date:}", stamped))
+        assertEquals("21:30", Placeholders.resolveText("{time:}", stamped))
+    }
+
+    @Test
+    fun `an unusable format stays on the label`() {
+        assertEquals("{date:not a format}", Placeholders.resolveText("{date:not a format}", stamped))
     }
 
     @Test

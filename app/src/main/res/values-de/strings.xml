@@ -116,6 +116,7 @@
     <string name="var_time">time</string>
     <string name="var_number">#</string>
     <string name="var_var">var</string>
+    <string name="var_format_hint">Lange drücken für andere Formate</string>
     <string name="symbol_current">Aktuelles Symbol</string>
     <string name="action_choose_symbol">Symbol wählen …</string>
     <string name="symbol_field">Emoji oder Zeichen</string>

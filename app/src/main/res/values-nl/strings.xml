@@ -102,6 +102,7 @@
     <string name="var_time">time</string>
     <string name="var_number">#</string>
     <string name="var_var">var</string>
+    <string name="var_format_hint">Lang indrukken voor andere formaten</string>
     <string name="symbol_current">Huidig symbool</string>
     <string name="action_choose_symbol">Symbool kiezen …</string>
     <string name="symbol_field">Emoji of teken</string>

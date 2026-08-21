@@ -102,6 +102,7 @@
     <string name="var_time">time</string>
     <string name="var_number">#</string>
     <string name="var_var">var</string>
+    <string name="var_format_hint">Утримуйте для інших форматів</string>
     <string name="symbol_current">Поточний символ</string>
     <string name="action_choose_symbol">Вибрати символ …</string>
     <string name="symbol_field">Емодзі або символ</string>

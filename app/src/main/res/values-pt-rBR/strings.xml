@@ -102,6 +102,7 @@
     <string name="var_time">time</string>
     <string name="var_number">#</string>
     <string name="var_var">var</string>
+    <string name="var_format_hint">Toque e segure para outros formatos</string>
     <string name="symbol_current">Símbolo atual</string>
     <string name="action_choose_symbol">Escolher símbolo …</string>
     <string name="symbol_field">Emoji ou caractere</string>

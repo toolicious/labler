@@ -1,11 +1,13 @@
 package io.github.toolicious.labler.ui.editor
 
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -39,12 +41,15 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ProvideTextStyle
@@ -67,10 +72,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -103,6 +111,9 @@ import io.github.toolicious.labler.printer.dither.OutlineMethod
 import io.github.toolicious.labler.render.FontRegistry
 import io.github.toolicious.labler.render.LabelRenderer
 import io.github.toolicious.labler.ui.components.ClearButton
+import io.github.toolicious.labler.ui.components.appDateFormat
+import io.github.toolicious.labler.ui.components.appTimeFormat
+import io.github.toolicious.labler.ui.components.systemLocale
 import io.github.toolicious.labler.ui.components.labelFontFamily
 import io.github.toolicious.labler.ui.components.rememberBlePermissionRunner
 import io.github.toolicious.labler.ui.home.LabelDialog
@@ -112,6 +123,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 import io.github.toolicious.labler.ui.print.TemplatePrintSheet
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -631,16 +644,26 @@ private fun SectionActionButton(text: String, onClick: () -> Unit, modifier: Mod
     )
 }
 
-/** Compact selectable chip: less horizontal padding than the stock FilterChip, so more fit per row. */
+/**
+ * Compact selectable chip: less horizontal padding than the stock FilterChip, so more fit per row.
+ *
+ * Every chip takes the same path, whether or not it has an [onLongClick], because two paths differed
+ * in their geometry once already: the clickable Surface reserves the 48 dp touch target and the
+ * plain one does not, which left the chips of one row sitting at different sizes. So the Surface is
+ * always the plain one, the touch target is stated here, and the gesture sits on the content, which
+ * the Surface clips to its shape so the ripple keeps to the rounded corners.
+ */
 @Composable
 private fun ChoiceChip(
     selected: Boolean,
     onClick: () -> Unit,
     error: Boolean = false,
+    onLongClick: (() -> Unit)? = null,
     label: @Composable () -> Unit,
 ) {
+    val haptics = LocalHapticFeedback.current
     Surface(
-        onClick = onClick,
+        modifier = Modifier.minimumInteractiveComponentSize(),
         shape = RoundedCornerShape(8.dp),
         color = when {
             error -> MaterialTheme.colorScheme.errorContainer
@@ -659,7 +682,20 @@ private fun ChoiceChip(
         },
     ) {
         Box(
-            modifier = Modifier.heightIn(min = 30.dp).padding(horizontal = 8.dp, vertical = 5.dp),
+            modifier = Modifier
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick?.let {
+                        {
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            it()
+                        }
+                    },
+                    role = Role.Button,
+                    hapticFeedbackEnabled = false,
+                )
+                .heightIn(min = 30.dp)
+                .padding(horizontal = 8.dp, vertical = 5.dp),
             contentAlignment = Alignment.Center,
         ) {
             ProvideTextStyle(MaterialTheme.typography.labelLarge, label)
@@ -1123,19 +1159,74 @@ private fun TextProperties(
 
     Spacer(Modifier.height(6.dp))
     GroupLabel(stringResource(R.string.group_variables))
-    val tokens = listOf(
-        stringResource(R.string.var_date) to "{date}",
-        stringResource(R.string.var_time) to "{time}",
-        stringResource(R.string.var_number) to "{#}",
-        stringResource(R.string.var_var) to "{var:Text}",
-    )
+    val append: (String) -> Unit = { token -> onUpdate(element.copy(text = element.text + token)) }
     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        tokens.forEach { (label, token) ->
-            ChoiceChip(
-                selected = false,
-                onClick = { onUpdate(element.copy(text = element.text + token)) },
-                label = { Text(label) }
-            )
+        StampChip(stringResource(R.string.var_date), "date", DATE_PATTERNS, append)
+        StampChip(stringResource(R.string.var_time), "time", TIME_PATTERNS, append)
+        ChoiceChip(
+            selected = false,
+            onClick = { append("{#}") },
+            label = { Text(stringResource(R.string.var_number)) },
+        )
+        ChoiceChip(
+            selected = false,
+            onClick = { append("{var:Text}") },
+            label = { Text(stringResource(R.string.var_var)) },
+        )
+    }
+}
+
+// An empty entry stands for the plain token, which prints in the format of the device.
+private val DATE_PATTERNS = listOf("", "dd.MM.yyyy", "yyyy-MM-dd", "MM/dd/yyyy", "d MMM yyyy", "EEE dd.MM.")
+private val TIME_PATTERNS = listOf("", "HH:mm", "HH:mm:ss", "h:mm a")
+
+/**
+ * Inserts {date} or {time}. A tap inserts the plain token, which is what nearly everyone wants and
+ * what the chip did before the formats existed; a long press opens them. Each entry shows today in
+ * its format, so nobody has to know what yyyy or EEE stand for, and spells out the token it
+ * inserts, which is what someone needs in order to type a format of their own later.
+ */
+@Composable
+private fun StampChip(label: String, token: String, patterns: List<String>, onPick: (String) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val now = remember { Date() }
+    val hint = stringResource(R.string.var_format_hint)
+    Box {
+        ChoiceChip(
+            selected = false,
+            // Nothing about the chip reveals that the formats are there, so the tap says it.
+            onClick = {
+                onPick("{$token}")
+                Toast.makeText(context, hint, Toast.LENGTH_SHORT).show()
+            },
+            onLongClick = { open = true },
+            label = { Text(label) },
+        )
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            patterns.forEach { pattern ->
+                val inserted = if (pattern.isEmpty()) "{$token}" else "{$token:$pattern}"
+                val example = remember(pattern, context) {
+                    when {
+                        pattern.isNotEmpty() ->
+                            runCatching { SimpleDateFormat(pattern, systemLocale(context)).format(now) }
+                                .getOrDefault(pattern)
+                        token == "date" -> appDateFormat(context).format(now)
+                        else -> appTimeFormat(context).format(now)
+                    }
+                }
+                DropdownMenuItem(
+                    text = { Text(example) },
+                    trailingIcon = {
+                        Text(
+                            inserted,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    onClick = { open = false; onPick(inserted) },
+                )
+            }
         }
     }
 }

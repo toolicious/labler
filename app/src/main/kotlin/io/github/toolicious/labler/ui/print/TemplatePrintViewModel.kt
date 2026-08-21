@@ -13,9 +13,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class TemplatePrintViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -40,7 +37,11 @@ class TemplatePrintViewModel(app: Application) : AndroidViewModel(app) {
     private val _done = MutableStateFlow(false)
     val done = _done.asStateFlow()
 
-    fun print(template: LabelTemplate, media: MediaType, copies: Int, answers: Map<String, String>) {
+    /**
+     * [placeholders] carries the date, time and answers as they were the moment the user pressed
+     * print; only the counter moves on from copy to copy.
+     */
+    fun print(template: LabelTemplate, media: MediaType, copies: Int, placeholders: Placeholders.Context) {
         if (_working.value) return
         _working.value = true
         _error.value = null
@@ -48,19 +49,10 @@ class TemplatePrintViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             try {
                 val hasCounter = Placeholders.containsCounter(template.elements)
-                val now = Date()
-                val dateText = SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(now)
-                val timeText = SimpleDateFormat("HH:mm", Locale.GERMANY).format(now)
-
                 val resolvedPerCopy = List(copies) { index ->
                     Placeholders.resolve(
                         template.elements,
-                        Placeholders.Context(
-                            dateText = dateText,
-                            timeText = timeText,
-                            counter = template.counterValue + index,
-                            answers = answers,
-                        )
+                        placeholders.copy(counter = template.counterValue + index)
                     )
                 }
                 val reanchored = resolvedPerCopy.map { LabelRenderer.reanchor(template.elements, it) }

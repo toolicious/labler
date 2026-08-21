@@ -102,6 +102,7 @@
     <string name="var_time">time</string>
     <string name="var_number">#</string>
     <string name="var_var">var</string>
+    <string name="var_format_hint">长按可选择其他格式</string>
     <string name="symbol_current">当前符号</string>
     <string name="action_choose_symbol">选择符号 …</string>
     <string name="symbol_field">表情符号或字符</string>

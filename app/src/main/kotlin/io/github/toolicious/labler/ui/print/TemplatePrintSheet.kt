@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -49,9 +50,7 @@ import io.github.toolicious.labler.render.FontRegistry
 import io.github.toolicious.labler.render.LabelRenderer
 import io.github.toolicious.labler.render.MonoConverter
 import io.github.toolicious.labler.ui.components.ClearButton
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import io.github.toolicious.labler.ui.components.placeholderContext
 
 /**
  * Print dialog for templates: resolves placeholders (with input fields for
@@ -82,15 +81,10 @@ fun TemplatePrintSheet(
     // Resolved elements drive both the preview and its stated length: on an auto-length tape the
     // length only becomes real once the placeholders carry their actual values, so this is where
     // the user finally sees what will come out of the printer.
-    val resolvedElements = remember(template, answers, FontRegistry.revision) {
-        val now = Date()
-        val context = Placeholders.Context(
-            dateText = SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(now),
-            timeText = SimpleDateFormat("HH:mm", Locale.GERMANY).format(now),
-            counter = template.counterValue,
-            answers = answers,
-        )
-        LabelRenderer.reanchor(template.elements, Placeholders.resolve(template.elements, context))
+    val context = LocalContext.current
+    val resolvedElements = remember(template, answers, context, FontRegistry.revision) {
+        val placeholders = placeholderContext(context, template.counterValue, answers)
+        LabelRenderer.reanchor(template.elements, Placeholders.resolve(template.elements, placeholders))
     }
     val previewImage = remember(resolvedElements) {
         LabelRenderer.renderMono(template.spec, resolvedElements)
@@ -233,7 +227,10 @@ fun TemplatePrintSheet(
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(
-                    onClick = { vm.print(template, media, copies, answers) },
+                    onClick = {
+                        val placeholders = placeholderContext(context, template.counterValue, answers)
+                        vm.print(template, media, copies, placeholders)
+                    },
                     enabled = !working && printerState is PrinterState.Ready
                 ) { Text(stringResource(R.string.action_print)) }
                 OutlinedButton(onClick = onDismiss, enabled = !working) { Text(stringResource(R.string.action_cancel)) }
