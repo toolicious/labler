@@ -362,7 +362,14 @@ object LabelRenderer {
         val side = minOf(e.widthPx, e.heightPx)
         val codeW = (if (isQr) side else e.widthPx).toInt().coerceAtLeast(8)
         val codeH = (if (isQr) side else e.heightPx - barcodeCaptionHeight(e)).toInt().coerceAtLeast(8)
-        val hints = mapOf(EncodeHintType.MARGIN to if (isQr) 1 else 2)
+        val hints = buildMap<EncodeHintType, Any> {
+            put(EncodeHintType.MARGIN, if (isQr) 1 else 2)
+            // Without this hint ZXing encodes in ISO-8859-1 and silently turns every character it
+            // cannot map into a literal '?', which is what the scanner then reads back. UTF-8 is
+            // requested only when the content needs it: ZXing adds an ECI marker for it, and pure
+            // ASCII codes keep the exact module pattern they had before.
+            if (isQr && e.data.any { it.code > 127 }) put(EncodeHintType.CHARACTER_SET, "UTF-8")
+        }
         val matrix = try {
             if (isQr) QRCodeWriter().encode(e.data, format, codeW, codeH, hints)
             else MultiFormatWriter().encode(e.data, format, codeW, codeH, hints)
