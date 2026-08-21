@@ -23,6 +23,7 @@ import io.github.toolicious.labler.model.IconElement
 import io.github.toolicious.labler.model.ImageElement
 import io.github.toolicious.labler.model.LabelElement
 import io.github.toolicious.labler.model.LabelSpec
+import io.github.toolicious.labler.model.LengthMode
 import io.github.toolicious.labler.model.LabelTextAlign
 import io.github.toolicious.labler.model.Symbology
 import io.github.toolicious.labler.model.TextElement
@@ -36,6 +37,7 @@ import io.github.toolicious.labler.printer.dither.Ditherer
 import io.github.toolicious.labler.printer.dither.Outline
 import kotlin.math.abs
 import kotlin.math.ceil
+import kotlin.math.roundToInt
 import kotlin.math.cos
 import kotlin.math.round
 import kotlin.math.sin
@@ -86,8 +88,8 @@ object LabelRenderer {
      */
     fun effectiveLengthPx(spec: LabelSpec, elements: List<LabelElement>): Int {
         if (!spec.lengthIsAuto) return spec.lengthPx
-        val content = elements.maxOfOrNull { rightEdge(it) } ?: 0f
-        val contentMm = ceil((content + AUTO_LENGTH_MARGIN_PX) / Protocol.DOTS_PER_MM).toInt()
+        val span = (elements.maxOfOrNull { rightEdge(it) } ?: 0f) - contentLeft(elements)
+        val contentMm = ceil((span + 2 * AUTO_LENGTH_MARGIN_PX) / Protocol.DOTS_PER_MM).toInt()
         // coerceAtMost rather than coerceIn, so an out-of-range minimum from hand-edited JSON
         // caps out instead of throwing.
         return maxOf(spec.lengthMm, contentMm)
@@ -98,6 +100,33 @@ object LabelRenderer {
     fun effectiveLengthMm(spec: LabelSpec, elements: List<LabelElement>): Int =
         effectiveLengthPx(spec, elements) / Protocol.DOTS_PER_MM
 
+    /** Leftmost point any element reaches, mirroring [rightEdge]. Zero on an empty label. */
+    private fun contentLeft(elements: List<LabelElement>): Float =
+        elements.minOfOrNull { leftEdge(it) } ?: 0f
+
+    private fun leftEdge(element: LabelElement): Float {
+        val size = measure(element)
+        if (element.rotation == 0) return element.x
+        val rad = Math.toRadians(element.rotation.toDouble())
+        val halfWidth = (abs(cos(rad)) * size.width + abs(sin(rad)) * size.height) / 2.0
+        return element.x + size.width / 2f - halfWidth.toFloat()
+    }
+
+    /**
+     * How far every element moves when the label is drawn.
+     *
+     * A fixed label keeps its coordinates, the tape starting at x = 0. The other two anchor the
+     * content instead: VARIABLE puts the leftmost element on the margin, MANUAL on the leading edge
+     * that was dragged there. That is what lets something be placed in front of everything else
+     * without having to move everything else out of the way first. Whole pixels, so the dot grid
+     * the drawing snaps to stays intact.
+     */
+    fun contentOffsetPx(spec: LabelSpec, elements: List<LabelElement>): Float = when (spec.lengthMode) {
+        LengthMode.FIXED -> 0f
+        LengthMode.VARIABLE -> (AUTO_LENGTH_MARGIN_PX - contentLeft(elements)).roundToInt().toFloat()
+        LengthMode.MANUAL -> (spec.leadingPx - contentLeft(elements)).roundToInt().toFloat()
+    }
+
     /**
      * @param lengthPx overrides the length instead of deriving it from [elements]. Needed when the
      *   caller renders a subset (the editor omits the selected element and draws it on top), where
@@ -107,9 +136,10 @@ object LabelRenderer {
         spec: LabelSpec,
         elements: List<LabelElement>,
         lengthPx: Int = effectiveLengthPx(spec, elements),
+        offsetPx: Float = contentOffsetPx(spec, elements),
     ): Bitmap {
         val bmp = Bitmap.createBitmap(lengthPx, LabelSpec.PRINT_HEIGHT_PX, Bitmap.Config.ARGB_8888)
-        drawInto(Canvas(bmp), spec, elements)
+        drawInto(Canvas(bmp), spec, elements, offsetPx)
         return bmp
     }
 
@@ -117,17 +147,26 @@ object LabelRenderer {
         spec: LabelSpec,
         elements: List<LabelElement>,
         lengthPx: Int = effectiveLengthPx(spec, elements),
+        offsetPx: Float = contentOffsetPx(spec, elements),
     ): MonoImage {
-        val bmp = render(spec, elements, lengthPx)
+        val bmp = render(spec, elements, lengthPx, offsetPx)
         val mono = MonoConverter.convert(bmp)
         bmp.recycle()
         return mono
     }
 
     /** Draws onto an arbitrary Canvas in label pixel coordinates (for the editor). */
-    fun drawInto(canvas: Canvas, spec: LabelSpec, elements: List<LabelElement>) {
+    fun drawInto(
+        canvas: Canvas,
+        spec: LabelSpec,
+        elements: List<LabelElement>,
+        offsetPx: Float = contentOffsetPx(spec, elements),
+    ) {
         canvas.drawColor(Color.WHITE)
+        val save = canvas.save()
+        canvas.translate(offsetPx, 0f)
         elements.forEach { drawElementInto(canvas, it) }
+        canvas.restoreToCount(save)
     }
 
     fun measure(element: LabelElement): ElementSize = when (element) {

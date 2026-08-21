@@ -245,12 +245,12 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
             val centerX = spec.lengthPx / 2f
             val centerY = LabelSpec.PRINT_HEIGHT_PX / 2f
 
-            // Label center + borders, then the cached lines of the other elements. On an
-            // auto-length tape the right edge follows whatever is being dragged, so it and the
-            // center derived from it are circular targets and are left out; the left edge and
-            // the other elements' lines still hold.
-            val xTargets = if (spec.lengthIsAuto) {
-                listOf(SnapTarget(0f, false, LABEL_SNAP_TOL)) + dragXTargets
+            // Label center + borders, then the cached lines of the other elements. A label laid
+            // out from its content has no fixed edge on either side, both follow whatever is being
+            // dragged, so all three targets derived from the frame would chase themselves and are
+            // left out. The lines of the other elements still hold.
+            val xTargets = if (spec.contentIsAnchored) {
+                dragXTargets
             } else {
                 listOf(
                     SnapTarget(centerX, true, LABEL_SNAP_TOL),
@@ -273,10 +273,13 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         }
 
         // Keep at least 8 px grabbable. This is placement, not snapping, so it always applies.
-        // An auto-length tape has no right edge to stop at, it grows with the element, so the
-        // only bound there is the largest length the printer and the UI accept.
-        val maxX = if (spec.lengthIsAuto) LabelSpec.MAX_LENGTH_PX.toFloat() else spec.lengthPx.toFloat()
-        nx = nx.coerceIn(8f - size.width, maxX - 8f)
+        // A label laid out from its content has no edge to stop at in either direction, it moves
+        // along with whatever is dragged, so the only bound there is the largest length the printer
+        // and the UI accept. That is what lets an element be put in front of all the others.
+        val bound = LabelSpec.MAX_LENGTH_PX.toFloat()
+        val minX = if (spec.contentIsAnchored) -bound else 8f - size.width
+        val maxX = if (spec.contentIsAnchored) bound else spec.lengthPx.toFloat()
+        nx = nx.coerceIn(minX, maxX - 8f)
         ny = ny.coerceIn(8f - size.height, LabelSpec.PRINT_HEIGHT_PX - 8f)
 
         applyWithoutHistory(el.moved(nx - el.x, ny - el.y))

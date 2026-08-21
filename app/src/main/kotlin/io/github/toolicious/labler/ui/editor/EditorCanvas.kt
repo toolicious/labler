@@ -96,6 +96,10 @@ fun EditorCanvas(
     // grows while typing. The editor holds the unresolved placeholders, so this is the design
     // length; the true printed length is shown in the print sheet, which resolves them.
     val labelW = LabelRenderer.effectiveLengthPx(spec, elements).toFloat()
+    // Anchored modes lay the label out from its content, not from x = 0, so everything that maps
+    // element coordinates onto the canvas has to carry this. Taken from the full element list, not
+    // from the subset the raster is built from, or the two would drift apart while dragging.
+    val offsetPx = LabelRenderer.contentOffsetPx(spec, elements)
     val labelH = LabelSpec.PRINT_HEIGHT_PX.toFloat()
     // Fixed size (die-cut label) = rounded corners, continuous = hard corners.
     val isDieCut = spec.media == MediaType.DIE_CUT
@@ -118,8 +122,8 @@ fun EditorCanvas(
     // The length is pinned to the canvas: `others` omits the selected element, so letting the
     // renderer derive it would give a shorter raster than the canvas whenever the selected element
     // is the one defining the length, and it would then be drawn stretched.
-    val base = remember(spec, others, labelW, FontRegistry.revision) {
-        MonoConverter.toBitmap(LabelRenderer.renderMono(spec, others, labelW.toInt()))
+    val base = remember(spec, others, labelW, offsetPx, FontRegistry.revision) {
+        MonoConverter.toBitmap(LabelRenderer.renderMono(spec, others, labelW.toInt(), offsetPx))
     }
     // Nearest neighbor while magnifying (the normal case) shows the real dot pattern. A label may be
     // up to 500 mm = 4000 dots long and then no longer fits the canvas width; when shrinking, nearest
@@ -133,6 +137,7 @@ fun EditorCanvas(
     val selectedIdState = rememberUpdatedState(selectedId)
     val totalState = rememberUpdatedState(total)
     val tlState = rememberUpdatedState(contentTL)
+    val offsetState = rememberUpdatedState(offsetPx)
 
     val background = Color(0xFF3A3A3A)
     val selectionColor = Color(0xFFE53935)
@@ -148,7 +153,7 @@ fun EditorCanvas(
                 detectDragGesturesWithDoubleTap(
                     onStart = { pos, snapFree ->
                         val sc = totalState.value
-                        val lp = (pos - tlState.value) / sc
+                        val lp = (pos - tlState.value) / sc - Offset(offsetState.value, 0f)
                         val sel = elementsState.value.find { it.id == selectedIdState.value }
                         val onHandle = sel != null && run {
                             val b = elementBounds(sel)
@@ -197,7 +202,7 @@ fun EditorCanvas(
             }
             .pointerInput(Unit) {
                 detectTapGestures { pos ->
-                    val lp = (pos - tlState.value) / totalState.value
+                    val lp = (pos - tlState.value) / totalState.value - Offset(offsetState.value, 0f)
                     onSelect(elementsState.value.lastOrNull { hitTest(lp, it) }?.id)
                 }
             }
@@ -222,7 +227,12 @@ fun EditorCanvas(
                 nc.drawBitmap(base, 0f, 0f, basePaint)
                 // Drawn last, so a selected element moves to the front while it is selected and
                 // drops back into its place in the stack when it is deselected.
-                elements.find { it.id == selectedId }?.let { LabelRenderer.drawElementInto(nc, it) }
+                elements.find { it.id == selectedId }?.let {
+                    val inner = nc.save()
+                    nc.translate(offsetPx, 0f)
+                    LabelRenderer.drawElementInto(nc, it)
+                    nc.restoreToCount(inner)
+                }
                 nc.restoreToCount(save)
             }
             // Frame around the label: fixed size rounded, continuous hard.
@@ -243,13 +253,17 @@ fun EditorCanvas(
                 )
             }
 
+            // Label frame coordinates, where 0 is the left edge of the tape.
             fun toScreen(lx: Float, ly: Float) = contentTL + Offset(lx * total, ly * total)
+
+            // Element coordinates, which the anchored modes shift against the frame.
+            fun elToScreen(lx: Float, ly: Float) = toScreen(lx + offsetPx, ly)
 
             // Snap guide lines
             val dash = PathEffect.dashPathEffect(floatArrayOf(9f, 6f))
             guides.xLine?.let { gx ->
                 drawLine(
-                    guideColor, toScreen(gx, 0f), toScreen(gx, labelH),
+                    guideColor, elToScreen(gx, 0f), elToScreen(gx, labelH),
                     strokeWidth = 2f, pathEffect = dash
                 )
             }
@@ -268,7 +282,7 @@ fun EditorCanvas(
                 val b = elementBounds(sel)
                 drawRect(
                     color = frameColor,
-                    topLeft = toScreen(b.left, b.top),
+                    topLeft = elToScreen(b.left, b.top),
                     size = Size(b.width * total, b.height * total),
                     style = Stroke(width = 3f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 6f))),
                 )
@@ -281,12 +295,12 @@ fun EditorCanvas(
                     }
                     drawLine(
                         color = Color(0xFF2ECC71),
-                        start = toScreen(ax, b.top),
-                        end = toScreen(ax, b.bottom),
+                        start = elToScreen(ax, b.top),
+                        end = elToScreen(ax, b.bottom),
                         strokeWidth = 3f,
                     )
                 }
-                val handle = toScreen(b.right, b.bottom)
+                val handle = elToScreen(b.right, b.bottom)
                 drawCircle(Color.White, radius = 13f, center = handle)
                 drawCircle(frameColor, radius = 13f, center = handle, style = Stroke(width = 2.5f))
                 drawCircle(frameColor, radius = 4.5f, center = handle)

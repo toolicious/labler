@@ -27,6 +27,11 @@ data class TemplateEntity(
      */
     @ColumnInfo(defaultValue = "0")
     val autoLength: Boolean = false,
+    /** Manual mode plus the blank tape in front of the content; see LabelSpec. */
+    @ColumnInfo(defaultValue = "0")
+    val manualEdges: Boolean = false,
+    @ColumnInfo(defaultValue = "0")
+    val leadingMm: Int = 0,
     val elementsJson: String,
     val schemaVersion: Int,
     val favorite: Boolean,
@@ -126,9 +131,17 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
+/** Manually placed label edges (issue #2). Existing templates are on one of the other two modes. */
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `templates` ADD COLUMN `manualEdges` INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE `templates` ADD COLUMN `leadingMm` INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
 @Database(
     entities = [TemplateEntity::class, PrintHistoryEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {

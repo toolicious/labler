@@ -18,21 +18,40 @@ data class LabelSpec(
     val lengthMm: Int = 40,
     val media: MediaType = MediaType.DIE_CUT,
     /**
-     * Continuous tape only: the label grows with its content, and [lengthMm] then acts as the
-     * minimum length instead of the exact one. Die-cut labels cannot do this, because their
-     * length is dictated by the physical gap the form feed advances to.
-     *
-     * Defaults to false so templates written before this existed keep their exact length.
+     * Two flags rather than one [LengthMode] field, so that a template or a backup written before
+     * the manual mode existed still reads correctly: an old file carries autoLength and nothing
+     * else, and both defaults land it on the mode it had. Read [lengthMode], never these.
      */
     val autoLength: Boolean = false,
+    val manualEdges: Boolean = false,
+    /** MANUAL only: blank tape in front of the leftmost element. */
+    val leadingMm: Int = 0,
 ) {
     val lengthPx: Int get() = lengthMm * Protocol.DOTS_PER_MM
+    val leadingPx: Int get() = leadingMm * Protocol.DOTS_PER_MM
 
     /**
-     * Whether the length follows the content. Checks the media as well, so a die-cut spec that
-     * somehow carries the flag (hand-edited JSON, media switched later) still prints fixed.
+     * How the length of this label comes about. Die-cut is always FIXED whatever the flags say,
+     * because its length is the physical label, dictated by the gap the form feed advances to.
      */
-    val lengthIsAuto: Boolean get() = autoLength && media == MediaType.CONTINUOUS
+    val lengthMode: LengthMode
+        get() = when {
+            media != MediaType.CONTINUOUS -> LengthMode.FIXED
+            autoLength -> LengthMode.VARIABLE
+            manualEdges -> LengthMode.MANUAL
+            else -> LengthMode.FIXED
+        }
+
+    /** Whether the length follows the content. */
+    val lengthIsAuto: Boolean get() = lengthMode == LengthMode.VARIABLE
+
+    /** Whether the label is laid out from its content rather than from the tape start. */
+    val contentIsAnchored: Boolean get() = lengthMode != LengthMode.FIXED
+
+    fun withLengthMode(mode: LengthMode): LabelSpec = copy(
+        autoLength = mode == LengthMode.VARIABLE,
+        manualEdges = mode == LengthMode.MANUAL,
+    )
 
     companion object {
         const val PRINT_HEIGHT_PX = Protocol.HEAD_DOTS
@@ -69,6 +88,12 @@ enum class LabelFont {
 object IconFonts {
     const val MATERIAL = "material"
 }
+
+/**
+ * Where the length of a continuous label comes from: from its content, from the edges the user
+ * dragged, or from a number typed in.
+ */
+enum class LengthMode { VARIABLE, MANUAL, FIXED }
 
 enum class FrameStyle { RECT, ROUND_RECT, LINE_H, LINE_V }
 
