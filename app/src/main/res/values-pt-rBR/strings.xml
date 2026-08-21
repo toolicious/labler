@@ -38,6 +38,7 @@
     <string name="menu_duplicate">Duplicar</string>
     <string name="menu_export">Exportar</string>
     <string name="menu_delete">Excluir</string>
+    <string name="menu_delete_prefix">Excluir:</string>
     <string name="toast_export_failed">Falha ao exportar: %1$s</string>
     <string name="toast_export_ok">Exportado.</string>
     <string name="toast_import_failed">Falha ao importar: %1$s</string>

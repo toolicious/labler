@@ -38,6 +38,7 @@
     <string name="menu_duplicate">复制</string>
     <string name="menu_export">导出</string>
     <string name="menu_delete">删除</string>
+    <string name="menu_delete_prefix">删除：</string>
     <string name="toast_export_failed">导出失败：%1$s</string>
     <string name="toast_export_ok">已导出。</string>
     <string name="toast_import_failed">导入失败：%1$s</string>

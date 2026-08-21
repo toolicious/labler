@@ -47,6 +47,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.minimumInteractiveComponentSize
@@ -420,7 +421,7 @@ private fun ElementChipLabel(element: LabelElement) {
         is FrameElement -> Box(
             Modifier
                 .size(width = 22.dp, height = 13.dp)
-                .border(1.5.dp, MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(2.dp))
+                .border(1.5.dp, LocalContentColor.current, RoundedCornerShape(2.dp))
         )
         is BarcodeElement -> Text(
             if (element.symbology == Symbology.QR_CODE) "QR" else "▊▎▊",
@@ -504,7 +505,11 @@ private fun PropertiesPanel(
                 modifier = Modifier.size(18.dp)
             )
             Spacer(Modifier.width(6.dp))
-            Text(stringResource(R.string.menu_delete))
+            Text(stringResource(R.string.menu_delete_prefix))
+            Spacer(Modifier.width(4.dp))
+            // The very preview the element carries in its chip above, so what is about to go is
+            // named rather than left to be remembered.
+            ElementChipLabel(element)
         }
     }
 }

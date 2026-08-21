@@ -38,6 +38,7 @@
     <string name="menu_duplicate">Dupliceren</string>
     <string name="menu_export">Exporteren</string>
     <string name="menu_delete">Verwijderen</string>
+    <string name="menu_delete_prefix">Verwijderen:</string>
     <string name="toast_export_failed">Exporteren mislukt: %1$s</string>
     <string name="toast_export_ok">Geëxporteerd.</string>
     <string name="toast_import_failed">Importeren mislukt: %1$s</string>

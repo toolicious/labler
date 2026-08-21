@@ -38,6 +38,7 @@
     <string name="menu_duplicate">Дублировать</string>
     <string name="menu_export">Экспорт</string>
     <string name="menu_delete">Удалить</string>
+    <string name="menu_delete_prefix">Удалить:</string>
     <string name="toast_export_failed">Ошибка экспорта: %1$s</string>
     <string name="toast_export_ok">Экспортировано.</string>
     <string name="toast_import_failed">Ошибка импорта: %1$s</string>
