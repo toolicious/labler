@@ -55,6 +55,18 @@
     <string name="field_length_mm">Lunghezza (mm)</string>
     <string name="media_die_cut">Etichetta fustellata</string>
     <string name="media_continuous">Continuo</string>
+    <string name="field_media">Carta</string>
+    <string name="field_tape_width">Larghezza nastro (altezza)</string>
+    <string name="field_length">Lunghezza</string>
+    <string name="length_variable">Variabile</string>
+    <string name="length_fixed">Fissa</string>
+    <string name="length_manual">Manuale</string>
+    <string name="length_hint_variable">Si allunga automaticamente con il contenuto, ma non è mai più corta di questo valore.</string>
+    <string name="length_hint_manual">Trascina i bordi nell\'editor, un doppio tocco li adatta al contenuto.</string>
+    <string name="length_hint_fixed">Sempre esattamente questa lunghezza, indipendentemente dal contenuto.</string>
+    <string name="edge_start">Inizio</string>
+    <string name="edge_end">Fine</string>
+    <string name="field_min_length_mm">Lunghezza minima (mm)</string>
 
     <!-- Editor -->
     <string name="group_add">Aggiungi</string>
@@ -133,6 +145,7 @@
     <!-- Print dialog -->
     <string name="print_title">Stampa: %1$s</string>
     <string name="print_preview">Anteprima (%1$d mm, 1 bit come stampato):</string>
+    <string name="print_preview_auto">Anteprima (%1$d mm variabile, 1 bit come stampato):</string>
     <string name="print_paper">Carta:</string>
     <string name="print_copies">Copie:</string>
     <string name="print_counter_start">N. inizia da %1$d</string>

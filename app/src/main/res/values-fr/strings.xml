@@ -55,6 +55,18 @@
     <string name="field_length_mm">Longueur (mm)</string>
     <string name="media_die_cut">Étiquette prédécoupée</string>
     <string name="media_continuous">Continu</string>
+    <string name="field_media">Papier</string>
+    <string name="field_tape_width">Largeur de bande (hauteur)</string>
+    <string name="field_length">Longueur</string>
+    <string name="length_variable">Variable</string>
+    <string name="length_fixed">Fixe</string>
+    <string name="length_manual">Manuel</string>
+    <string name="length_hint_variable">S\'allonge automatiquement avec le contenu, mais jamais plus courte que cette valeur.</string>
+    <string name="length_hint_manual">Faites glisser les bords dans l\'éditeur, un double appui les ajuste au contenu.</string>
+    <string name="length_hint_fixed">Toujours exactement cette longueur, quel que soit le contenu.</string>
+    <string name="edge_start">Début</string>
+    <string name="edge_end">Fin</string>
+    <string name="field_min_length_mm">Longueur minimale (mm)</string>
 
     <!-- Editor -->
     <string name="group_add">Ajouter</string>
@@ -133,6 +145,7 @@
     <!-- Print dialog -->
     <string name="print_title">Imprimer : %1$s</string>
     <string name="print_preview">Aperçu (%1$d mm, 1 bit tel qu\'imprimé) :</string>
+    <string name="print_preview_auto">Aperçu (%1$d mm variable, 1 bit tel qu\'imprimé) :</string>
     <string name="print_paper">Papier :</string>
     <string name="print_copies">Copies :</string>
     <string name="print_counter_start">N° commence à %1$d</string>

@@ -64,6 +64,12 @@
     <string name="field_length">लंबाई</string>
     <string name="length_variable">परिवर्तनशील</string>
     <string name="length_fixed">निश्चित</string>
+    <string name="length_manual">मैनुअल</string>
+    <string name="length_hint_variable">सामग्री के साथ अपने आप बढ़ती है, पर इस मान से कम नहीं होती।</string>
+    <string name="length_hint_manual">संपादक में किनारों को खिसकाएँ, दो बार टैप करने पर वे सामग्री से सट जाते हैं।</string>
+    <string name="length_hint_fixed">सामग्री चाहे जो भी हो, लंबाई हमेशा यही रहती है।</string>
+    <string name="edge_start">शुरुआत</string>
+    <string name="edge_end">अंत</string>
     <string name="field_min_length_mm">न्यूनतम लंबाई (mm)</string>
 
     <!-- संपादक -->

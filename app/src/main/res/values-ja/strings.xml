@@ -55,6 +55,18 @@
     <string name="field_length_mm">長さ (mm)</string>
     <string name="media_die_cut">ダイカットラベル</string>
     <string name="media_continuous">連続</string>
+    <string name="field_media">用紙</string>
+    <string name="field_tape_width">テープ幅 (高さ)</string>
+    <string name="field_length">長さ</string>
+    <string name="length_variable">可変</string>
+    <string name="length_fixed">固定</string>
+    <string name="length_manual">手動</string>
+    <string name="length_hint_variable">内容に合わせて自動的に伸びますが、この値より短くはなりません。</string>
+    <string name="length_hint_manual">編集画面で端をドラッグします。ダブルタップすると内容に合わせて揃います。</string>
+    <string name="length_hint_fixed">内容に関係なく、常にちょうどこの長さになります。</string>
+    <string name="edge_start">開始</string>
+    <string name="edge_end">終了</string>
+    <string name="field_min_length_mm">最小の長さ (mm)</string>
 
     <!-- Editor -->
     <string name="group_add">追加</string>
@@ -133,6 +145,7 @@
     <!-- Print dialog -->
     <string name="print_title">印刷: %1$s</string>
     <string name="print_preview">プレビュー (%1$d mm、印刷どおりの1ビット):</string>
+    <string name="print_preview_auto">プレビュー (%1$d mm 可変、印刷どおりの1ビット):</string>
     <string name="print_paper">用紙:</string>
     <string name="print_copies">部数:</string>
     <string name="print_counter_start">番号は %1$d から開始</string>

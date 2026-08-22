@@ -55,6 +55,18 @@
     <string name="field_length_mm">长度 (mm)</string>
     <string name="media_die_cut">模切标签</string>
     <string name="media_continuous">连续</string>
+    <string name="field_media">纸张</string>
+    <string name="field_tape_width">标签带宽度（高度）</string>
+    <string name="field_length">长度</string>
+    <string name="length_variable">可变</string>
+    <string name="length_fixed">固定</string>
+    <string name="length_manual">手动</string>
+    <string name="length_hint_variable">随内容自动加长，但不会短于此数值。</string>
+    <string name="length_hint_manual">在编辑器中拖动边缘，双击可让边缘贴合内容。</string>
+    <string name="length_hint_fixed">始终为此长度，与内容无关。</string>
+    <string name="edge_start">起点</string>
+    <string name="edge_end">终点</string>
+    <string name="field_min_length_mm">最小长度（mm）</string>
 
     <!-- Editor -->
     <string name="group_add">添加</string>
@@ -133,6 +145,7 @@
     <!-- Print dialog -->
     <string name="print_title">打印：%1$s</string>
     <string name="print_preview">预览（%1$d mm，按打印效果的 1 位）：</string>
+    <string name="print_preview_auto">预览（%1$d mm 可变，按打印效果的 1 位）：</string>
     <string name="print_paper">纸张：</string>
     <string name="print_copies">份数：</string>
     <string name="print_counter_start">编号从 %1$d 开始</string>

@@ -64,6 +64,12 @@
     <string name="field_length">Länge</string>
     <string name="length_variable">Variabel</string>
     <string name="length_fixed">Fest</string>
+    <string name="length_manual">Manuell</string>
+    <string name="length_hint_variable">Wächst automatisch mit dem Inhalt, nie kürzer als dieser Wert.</string>
+    <string name="length_hint_manual">Ränder im Editor ziehen, Doppeltipp legt sie an den Inhalt.</string>
+    <string name="length_hint_fixed">Immer genau diese Länge, unabhängig vom Inhalt.</string>
+    <string name="edge_start">Start</string>
+    <string name="edge_end">Ende</string>
     <string name="field_min_length_mm">Mindestlänge (mm)</string>
 
     <!-- Editor -->

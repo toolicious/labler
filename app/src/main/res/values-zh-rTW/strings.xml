@@ -64,6 +64,12 @@
     <string name="field_length">長度</string>
     <string name="length_variable">可變</string>
     <string name="length_fixed">固定</string>
+    <string name="length_manual">手動</string>
+    <string name="length_hint_variable">隨內容自動加長，但不會短於此數值。</string>
+    <string name="length_hint_manual">在編輯器中拖曳邊緣，連按兩下可讓邊緣貼合內容。</string>
+    <string name="length_hint_fixed">一律為此長度，與內容無關。</string>
+    <string name="edge_start">起點</string>
+    <string name="edge_end">終點</string>
     <string name="field_min_length_mm">最小長度 (mm)</string>
 
     <!-- 編輯器 -->

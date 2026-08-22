@@ -55,6 +55,18 @@
     <string name="field_length_mm">Lengte (mm)</string>
     <string name="media_die_cut">Gestanst label</string>
     <string name="media_continuous">Doorlopend</string>
+    <string name="field_media">Papier</string>
+    <string name="field_tape_width">Tapebreedte (hoogte)</string>
+    <string name="field_length">Lengte</string>
+    <string name="length_variable">Variabel</string>
+    <string name="length_fixed">Vast</string>
+    <string name="length_manual">Handmatig</string>
+    <string name="length_hint_variable">Groeit automatisch mee met de inhoud, maar nooit korter dan deze waarde.</string>
+    <string name="length_hint_manual">Sleep de randen in de editor, twee keer tikken past ze aan de inhoud aan.</string>
+    <string name="length_hint_fixed">Altijd precies deze lengte, ongeacht de inhoud.</string>
+    <string name="edge_start">Begin</string>
+    <string name="edge_end">Einde</string>
+    <string name="field_min_length_mm">Minimale lengte (mm)</string>
 
     <!-- Editor -->
     <string name="group_add">Toevoegen</string>
@@ -133,6 +145,7 @@
     <!-- Print dialog -->
     <string name="print_title">Afdrukken: %1$s</string>
     <string name="print_preview">Voorbeeld (%1$d mm, 1-bit zoals afgedrukt):</string>
+    <string name="print_preview_auto">Voorbeeld (%1$d mm variabel, 1-bit zoals afgedrukt):</string>
     <string name="print_paper">Papier:</string>
     <string name="print_copies">Kopieën:</string>
     <string name="print_counter_start">Nr. begint bij %1$d</string>

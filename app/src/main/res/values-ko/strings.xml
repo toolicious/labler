@@ -64,6 +64,12 @@
     <string name="field_length">길이</string>
     <string name="length_variable">가변</string>
     <string name="length_fixed">고정</string>
+    <string name="length_manual">수동</string>
+    <string name="length_hint_variable">내용에 맞춰 자동으로 늘어나며, 이 값보다 짧아지지 않습니다.</string>
+    <string name="length_hint_manual">편집기에서 가장자리를 끌어 조절하고, 두 번 탭하면 내용에 맞춰집니다.</string>
+    <string name="length_hint_fixed">내용과 상관없이 항상 이 길이입니다.</string>
+    <string name="edge_start">시작</string>
+    <string name="edge_end">끝</string>
     <string name="field_min_length_mm">최소 길이 (mm)</string>
 
     <!-- 편집기 -->

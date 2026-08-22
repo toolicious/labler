@@ -69,6 +69,12 @@
     <string name="field_length">Panjang</string>
     <string name="length_variable">Variabel</string>
     <string name="length_fixed">Tetap</string>
+    <string name="length_manual">Manual</string>
+    <string name="length_hint_variable">Otomatis memanjang mengikuti isi, tetapi tidak pernah lebih pendek dari nilai ini.</string>
+    <string name="length_hint_manual">Geser tepi di editor, ketuk dua kali untuk menempelkannya ke isi.</string>
+    <string name="length_hint_fixed">Selalu tepat sepanjang ini, terlepas dari isinya.</string>
+    <string name="edge_start">Awal</string>
+    <string name="edge_end">Akhir</string>
     <string name="field_min_length_mm">Panjang minimum (mm)</string>
 
     <!-- Editor -->

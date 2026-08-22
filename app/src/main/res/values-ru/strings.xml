@@ -55,6 +55,18 @@
     <string name="field_length_mm">Длина (мм)</string>
     <string name="media_die_cut">Высеченная этикетка</string>
     <string name="media_continuous">Непрерывная</string>
+    <string name="field_media">Бумага</string>
+    <string name="field_tape_width">Ширина ленты (высота)</string>
+    <string name="field_length">Длина</string>
+    <string name="length_variable">Переменная</string>
+    <string name="length_fixed">Фиксированная</string>
+    <string name="length_manual">Ручная</string>
+    <string name="length_hint_variable">Растёт автоматически вместе с содержимым, но никогда не короче этого значения.</string>
+    <string name="length_hint_manual">Перетаскивайте края в редакторе, двойное касание подгоняет их под содержимое.</string>
+    <string name="length_hint_fixed">Всегда ровно эта длина, независимо от содержимого.</string>
+    <string name="edge_start">Начало</string>
+    <string name="edge_end">Конец</string>
+    <string name="field_min_length_mm">Минимальная длина (мм)</string>
 
     <!-- Editor -->
     <string name="group_add">Добавить</string>
@@ -133,6 +145,7 @@
     <!-- Print dialog -->
     <string name="print_title">Печать: %1$s</string>
     <string name="print_preview">Предпросмотр (%1$d мм, 1 бит как при печати):</string>
+    <string name="print_preview_auto">Предпросмотр (%1$d мм переменная, 1 бит как при печати):</string>
     <string name="print_paper">Бумага:</string>
     <string name="print_copies">Копии:</string>
     <string name="print_counter_start">№ начинается с %1$d</string>

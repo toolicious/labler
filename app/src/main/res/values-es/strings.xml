@@ -55,6 +55,18 @@
     <string name="field_length_mm">Longitud (mm)</string>
     <string name="media_die_cut">Etiqueta troquelada</string>
     <string name="media_continuous">Continuo</string>
+    <string name="field_media">Papel</string>
+    <string name="field_tape_width">Ancho de cinta (altura)</string>
+    <string name="field_length">Longitud</string>
+    <string name="length_variable">Variable</string>
+    <string name="length_fixed">Fija</string>
+    <string name="length_manual">Manual</string>
+    <string name="length_hint_variable">Crece automáticamente con el contenido, pero nunca es más corta que este valor.</string>
+    <string name="length_hint_manual">Arrastra los bordes en el editor, con dos toques se ajustan al contenido.</string>
+    <string name="length_hint_fixed">Siempre exactamente esta longitud, independientemente del contenido.</string>
+    <string name="edge_start">Inicio</string>
+    <string name="edge_end">Fin</string>
+    <string name="field_min_length_mm">Longitud mínima (mm)</string>
 
     <!-- Editor -->
     <string name="group_add">Añadir</string>
@@ -133,6 +145,7 @@
     <!-- Print dialog -->
     <string name="print_title">Imprimir: %1$s</string>
     <string name="print_preview">Vista previa (%1$d mm, 1 bit tal como se imprime):</string>
+    <string name="print_preview_auto">Vista previa (%1$d mm variable, 1 bit tal como se imprime):</string>
     <string name="print_paper">Papel:</string>
     <string name="print_copies">Copias:</string>
     <string name="print_counter_start">N.º empieza en %1$d</string>
