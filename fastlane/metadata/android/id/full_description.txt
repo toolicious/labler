@@ -1,0 +1,14 @@
+LaBLEr adalah aplikasi pencetak label untuk printer label termal Bluetooth Low Energy keluarga Marklife (P15, P12, L13). Rancang label Anda sendiri langsung di ponsel, simpan sebagai templat, dan cetak lagi kapan saja. Aplikasi ini berbicara langsung dengan printer melalui Bluetooth LE, tanpa akun, tanpa cloud, dan tanpa aplikasi pabrikan.
+
+Fitur:
+
+* Teks banyak baris (ukuran, tebal/miring/garis bawah, perataan, beberapa font bawaan serta berkas TTF dan OTF milik Anda), simbol dan emoji, bingkai, gambar yang diimpor, serta kode QR dan barcode (Code 128, EAN-13, UPC-A, Code 39, ITF) dengan konten QR bertipe untuk tautan, Wi-Fi, email, telepon, dan kontak.
+* Editor manipulasi langsung: cubit untuk zoom dan geser, seret untuk memindahkan, ubah ukuran dan putar, dengan penjajaran ke tengah, ke tepi, dan ke elemen lain. Grafik dirender untuk kepala termal 1-bit sebagai garis luar yang bersih (penelusuran wilayah atau deteksi tepi Canny, dengan penghalusan dan pembalikan) atau dengan ambang, dithering Floyd-Steinberg maupun Atkinson.
+* Templat: simpan, ganti nama, duplikat, jadikan favorit, dan cari; ekspor satu label sebagai berkas JSON, atau cadangkan dan pulihkan seluruh koleksi Anda.
+* Placeholder untuk tanggal, waktu, nomor urut, atau nilai teks bebas yang ditanyakan saat mencetak.
+* Pratinjau 1-bit yang akurat, pilihan jumlah salinan dan media die-cut atau menerus, serta riwayat cetak yang dapat dicetak ulang.
+* Menyambung kembali ke printer tersimpan Anda secara otomatis. Tersedia dalam 17 bahasa, desain Material 3, terang dan gelap mengikuti sistem.
+
+Privasi: LaBLEr adalah aplikasi yang sepenuhnya lokal. Aplikasi ini tidak mendeklarasikan izin INTERNET, sehingga prosesnya sama sekali tidak dapat membuka koneksi jaringan. Tanpa akun, tanpa cloud, tanpa analitik, tanpa pelacakan. Templat, riwayat cetak, dan setelan Anda tersimpan di penyimpanan privat aplikasi dan tidak pernah meninggalkan perangkat.
+
+Sejauh ini baru P15 yang diverifikasi pada perangkat; P12 dan L13 memakai protokol yang sama dan kepala cetak 12 mm (96 dot).

@@ -31,7 +31,12 @@ private const val PREFS = "labler_prefs"
 private const val KEY_LANG = "app_language"
 
 /**
- * In-app languages. The tags must match the values-* resource qualifiers.
+ * In-app languages. The tags must match the values-* resource qualifiers, with one exception:
+ * Indonesian is tagged "id" here but lives in values-in, because Java maps the ISO 639-1 code
+ * "id" to the legacy code "in" and Android resolves the resources by that legacy code. The tag
+ * has to stay "id" because currentAppLanguageTag reads it back via Locale.toLanguageTag(), which
+ * returns the modern code. Lint reports UnusedTranslation for this pair, comparing the folder
+ * code against the tag without reconciling the two; that warning is expected here.
  * Labels are the native names of the languages. Model: Compressed.
  */
 val APP_LANGUAGES = listOf(
@@ -48,6 +53,10 @@ val APP_LANGUAGES = listOf(
     "uk" to "Українська",
     "zh-CN" to "简体中文",
     "ja" to "日本語",
+    "ko" to "한국어",
+    "zh-TW" to "繁體中文",
+    "hi" to "हिन्दी",
+    "id" to "Bahasa Indonesia",
 )
 
 /** Only before Android 13: apply the stored app language to the base context. */
@@ -142,10 +151,19 @@ fun LanguagePickerDialog(onDismiss: () -> Unit) {
                     onClick = { setAppLanguage(context, null); onDismiss() }
                 )
                 val uiLocale = LocalConfiguration.current.locales.get(0)
+                // Base languages listed more than once, currently only Chinese. Their language name
+                // alone reads the same on every such row, so those rows show the country instead.
+                val ambiguous = APP_LANGUAGES
+                    .groupingBy { Locale.forLanguageTag(it.first).language }
+                    .eachCount()
+                    .filterValues { it > 1 }
+                    .keys
                 APP_LANGUAGES.forEach { (tag, name) ->
                     // Native name plus, in parentheses, the name in the current app language,
                     // omitted when both are the same.
-                    val localized = Locale.forLanguageTag(tag).getDisplayLanguage(uiLocale)
+                    val locale = Locale.forLanguageTag(tag)
+                    val localized = (if (locale.language in ambiguous) locale.getDisplayCountry(uiLocale)
+                        else locale.getDisplayLanguage(uiLocale))
                         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(uiLocale) else it.toString() }
                     val label = if (localized.isNotBlank() && !localized.equals(name, ignoreCase = true)) {
                         "$name ($localized)"

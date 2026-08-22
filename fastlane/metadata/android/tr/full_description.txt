@@ -7,7 +7,7 @@ LaBLEr, Marklife ailesinin (P15, P12, L13) Bluetooth Low Energy termal etiket ya
 * Şablonlar: kaydetme, yeniden adlandırma, çoğaltma, favorileme ve arama; tek bir etiketi JSON dosyası olarak dışa aktarın ya da tüm kitaplığınızı yedekleyip geri yükleyin.
 * Tarih, saat, artan bir numara veya yazdırma sırasında sorulan serbest metin için yer tutucular.
 * Tam 1 bitlik önizleme, kopya sayısı ve kalıpla kesilmiş veya sürekli ortam seçimi ve yeniden üretebileceğiniz bir yazdırma geçmişi.
-* Kayıtlı yazıcınıza otomatik olarak yeniden bağlanır. 13 dilde mevcut, Material 3 tasarımı, sisteme göre açık ve koyu.
+* Kayıtlı yazıcınıza otomatik olarak yeniden bağlanır. 17 dilde mevcut, Material 3 tasarımı, sisteme göre açık ve koyu.
 
 Gizlilik: LaBLEr tamamen yerel bir uygulamadır. INTERNET iznini bildirmez, bu yüzden işlem hiçbir ağ bağlantısı açamaz. Hesap yok, bulut yok, analiz yok, izleme yok. Şablonlarınız, yazdırma geçmişiniz ve ayarlarınız uygulamanın özel deposunda kalır ve cihazdan asla çıkmaz.
 

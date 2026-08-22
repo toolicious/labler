@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Indonesian. The folder is values-in, not values-id: Java maps the ISO 639-1 code "id" to the
+     legacy code "in", and Android resolves the resources by that legacy code. The platform itself
+     ships its Indonesian strings in values-in on every API level, and aapt2 keeps values-id and
+     values-in apart instead of normalizing them, so values-id would simply never be resolved.
+     The language tag stays "id" in locales_config.xml and in APP_LANGUAGES. -->
+<resources>
+    <string name="app_name">LaBLEr</string>
+
+    <!-- Tindakan -->
+    <string name="action_cancel">Batal</string>
+    <string name="action_save">Simpan</string>
+    <string name="action_create">Buat</string>
+    <string name="action_print">Cetak</string>
+    <string name="action_connect">Sambungkan</string>
+    <string name="action_grant_permission">Beri izin</string>
+    <string name="action_disconnect">Putuskan</string>
+    <string name="action_forget">Lupakan</string>
+    <string name="forget_title">Lupakan printer?</string>
+    <string name="forget_message">%1$s tidak akan diingat atau disambungkan otomatis lagi.</string>
+    <string name="action_clear">Bersihkan</string>
+    <string name="action_import_file">Atau impor dari berkas …</string>
+    <string name="action_import">Impor</string>
+
+    <!-- Deskripsi konten -->
+    <string name="cd_back">Kembali</string>
+    <string name="cd_settings">Setelan</string>
+    <string name="cd_history">Riwayat cetak</string>
+    <string name="cd_new_label">Label baru</string>
+    <string name="cd_favorite">Favorit</string>
+    <string name="cd_menu">Menu</string>
+    <string name="cd_clear">Bersihkan</string>
+    <string name="cd_delete">Hapus</string>
+    <string name="cd_rotate">Putar</string>
+    <string name="cd_print">Cetak</string>
+    <string name="cd_undo">Urungkan</string>
+    <string name="cd_redo">Ulangi</string>
+
+    <!-- Beranda -->
+    <string name="home_search_hint">Cari</string>
+    <string name="home_empty">Belum ada label.\nKetuk + untuk membuat yang pertama.</string>
+    <string name="home_no_results">Tidak ada yang cocok.</string>
+    <string name="template_size">%1$d x %2$d mm</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_duplicate">Duplikat</string>
+    <string name="menu_export">Ekspor</string>
+    <string name="menu_delete">Hapus</string>
+    <string name="menu_delete_prefix">Hapus:</string>
+    <string name="default_label_name">Label baru</string>
+    <string name="duplicate_name">%1$s (Salinan)</string>
+    <string name="toast_export_failed">Ekspor gagal: %1$s</string>
+    <string name="toast_export_ok">Diekspor.</string>
+    <string name="toast_import_failed">Impor gagal: %1$s</string>
+    <string name="delete_title">Hapus label?</string>
+    <string name="delete_message">%1$s akan dihapus permanen.</string>
+
+    <!-- Dialog label -->
+    <string name="dialog_new_title">Label baru</string>
+    <string name="dialog_edit_title">Edit label</string>
+    <string name="field_name">Nama</string>
+    <string name="size_hint">Ukuran (lebar pita x panjang):</string>
+    <string name="preset_custom">Khusus …</string>
+    <string name="field_tape_mm">Pita (mm)</string>
+    <string name="field_length_mm">Panjang (mm)</string>
+    <string name="media_die_cut">Label die-cut</string>
+    <string name="media_continuous">Menerus</string>
+    <string name="field_media">Kertas</string>
+    <string name="field_tape_width">Lebar pita (tinggi)</string>
+    <string name="field_length">Panjang</string>
+    <string name="length_variable">Variabel</string>
+    <string name="length_fixed">Tetap</string>
+    <string name="field_min_length_mm">Panjang minimum (mm)</string>
+
+    <!-- Editor -->
+    <string name="group_add">Tambah</string>
+    <string name="group_elements">Elemen</string>
+    <string name="add_text">Teks</string>
+    <string name="add_symbol">Simbol</string>
+    <string name="add_frame">Bingkai</string>
+    <string name="element_frame">Bingkai</string>
+    <string name="editor_hint">Tambahkan elemen ke label, pilih langsung atau dari daftar, geser untuk memindahkan, dan ubah ukurannya dari sudut.</string>
+    <string name="editor_hint_free_move">Ketuk dua kali lalu tahan ketukan kedua untuk memindahkan secara bebas, tanpa penjajaran otomatis.</string>
+    <string name="group_format">Format</string>
+    <string name="group_align">Perataan</string>
+    <string name="group_variables">Variabel</string>
+    <string name="group_symbol">Pilih simbol</string>
+    <string name="group_raster">Dithering</string>
+    <string name="raster_hint">Hanya terlihat untuk emoji berwarna.</string>
+    <string name="prop_text">Teks</string>
+    <string name="prop_size">Ukuran</string>
+    <string name="prop_bold">Tebal</string>
+    <string name="prop_italic">Miring</string>
+    <string name="prop_underline">Garis bawah</string>
+    <string name="align_left">Kiri</string>
+    <string name="align_center">Tengah</string>
+    <string name="align_right">Kanan</string>
+    <string name="group_font">Font</string>
+    <string name="font_sans">Sans</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_mono">Mono</string>
+    <string name="prop_symbol">Simbol/emoji</string>
+    <string name="dither_threshold">Ambang</string>
+    <string name="dither_fs">Floyd-Steinberg</string>
+    <string name="dither_atkinson">Atkinson</string>
+    <string name="dither_outline">Garis luar</string>
+    <string name="frame_rect">Bingkai</string>
+    <string name="frame_round">Sudut membulat</string>
+    <string name="frame_line_h">Garis −</string>
+    <string name="frame_line_v">Garis |</string>
+    <string name="prop_stroke">Tebal garis</string>
+    <string name="prop_radius">Radius sudut</string>
+    <string name="prop_contrast">Kontras</string>
+    <string name="prop_outline_detail">Sensitivitas</string>
+    <string name="prop_line_width">Ketebalan garis</string>
+    <string name="prop_outline_style">Gaya</string>
+    <string name="outline_lines">Grafik</string>
+    <string name="outline_canny">Foto</string>
+    <string name="outline_smooth">Halus</string>
+    <string name="prop_width">Lebar</string>
+    <string name="prop_height">Tinggi</string>
+    <string name="var_date">date</string>
+    <string name="var_time">time</string>
+    <string name="var_number">#</string>
+    <string name="var_var">var</string>
+    <string name="var_format_hint">Tekan lama untuk format lain</string>
+    <string name="symbol_current">Simbol saat ini</string>
+    <string name="action_choose_symbol">Pilih simbol …</string>
+    <string name="symbol_field">Emoji atau karakter</string>
+    <string name="symbol_keyboard_hint">Untuk emoji, gunakan tombol emoji pada papan ketik Anda, atau pilih simbol di bawah.</string>
+    <string name="action_done">Selesai</string>
+    <string name="cat_arrows">Panah</string>
+    <string name="cat_shapes">Bentuk</string>
+    <string name="cat_stars">Bintang</string>
+    <string name="cat_signs">Tanda</string>
+    <string name="cat_tech">Teknologi dan kantor</string>
+    <string name="cat_weather">Cuaca dan alam</string>
+    <string name="cat_math">Matematika</string>
+    <string name="cat_misc">Lain-lain</string>
+    <string name="tab_symbols">Simbol</string>
+    <string name="tab_emojis">Emoji</string>
+    <string name="tab_icons">Ikon</string>
+    <string name="icon_search_hint">Cari ikon</string>
+    <string name="icon_recent_removed">Dihapus dari terbaru: %1$s</string>
+    <string name="icon_search_english">Nama dan kata kunci ikon dalam bahasa Inggris.</string>
+    <string name="cat_smileys">Smiley</string>
+    <string name="cat_animals">Hewan dan alam</string>
+    <string name="cat_food">Makanan</string>
+    <string name="cat_activity">Aktivitas dan perjalanan</string>
+    <string name="cat_objects">Objek</string>
+    <string name="cat_hearts">Hati dan simbol</string>
+
+    <!-- Dialog cetak -->
+    <string name="print_title">Cetak: %1$s</string>
+    <string name="print_preview">Pratinjau (%1$d mm, 1-bit seperti hasil cetak):</string>
+    <string name="print_preview_auto">Pratinjau (%1$d mm variabel, 1-bit seperti hasil cetak):</string>
+    <string name="print_paper">Kertas:</string>
+    <string name="print_copies">Salinan:</string>
+    <string name="print_counter_start">Nomor dimulai dari %1$d</string>
+    <string name="print_need_printer">Printer harus tersambung untuk mencetak.</string>
+    <string name="perm_bluetooth_missing">Izin Bluetooth tidak ada. Tanpa izin itu, printer tidak dapat tersambung.</string>
+    <string name="print_printer_settings">Setelan printer</string>
+    <string name="print_label_progress">Label %1$d/%2$d</string>
+
+    <!-- Setelan -->
+    <string name="settings_title">Setelan</string>
+    <string name="settings_printer">Printer</string>
+    <string name="status_disconnected">Tidak tersambung</string>
+    <string name="status_connecting">Menyambungkan (percobaan %1$d/3) …</string>
+    <string name="status_ready">Tersambung: %1$s</string>
+    <string name="status_ready_battery">Tersambung: %1$s, baterai %2$d %%</string>
+    <string name="status_printing">Mencetak (%1$d %%)</string>
+    <string name="status_error">Kesalahan: %1$s</string>
+    <string name="settings_saved">Disimpan: %1$s (%2$s)</string>
+    <string name="info_model">Model: %1$s</string>
+    <string name="info_firmware">Firmware: %1$s</string>
+    <string name="info_serial">Nomor seri: %1$s</string>
+    <string name="info_hardware">Perangkat keras: %1$s</string>
+
+    <!-- Font -->
+    <string name="settings_fonts">Font</string>
+    <string name="fonts_manage">Kelola font khusus</string>
+    <string name="fonts_title">Kelola font</string>
+    <string name="fonts_add">Tambah font</string>
+    <string name="fonts_empty">Belum ada font khusus. Gunakan \"+\" di atas untuk menambahkan berkas TTF atau OTF dari perangkat Anda.</string>
+    <string name="fonts_source">Berkas: %1$s</string>
+    <string name="fonts_rename">Ganti nama</string>
+    <string name="fonts_rename_title">Nama tampilan</string>
+    <string name="fonts_rename_hint">Kosongkan untuk memakai lagi nama dari berkas font.</string>
+    <string name="fonts_replace">Ganti berkas</string>
+    <string name="fonts_delete">Hapus</string>
+    <string name="fonts_delete_title">Hapus \"%1$s\"?</string>
+    <string name="fonts_delete_message">Templat menyimpan referensinya dan akan menampilkan font itu lagi setelah ditambahkan kembali.</string>
+    <string name="fonts_missing_hint">Font \"%1$s\" tidak ada, font bawaan ditampilkan sebagai gantinya.</string>
+    <string name="toast_font_added">%1$s ditambahkan</string>
+    <string name="toast_fonts_added">%1$d font ditambahkan</string>
+    <string name="toast_fonts_added_partial">%1$d dari %2$d font ditambahkan</string>
+    <string name="err_font_invalid">Bukan berkas font yang valid</string>
+    <string name="err_font_too_large">Berkas font terlalu besar (maks. 32 MB)</string>
+    <string name="err_font_duplicate">\"%1$s\" sudah ditambahkan</string>
+
+    <string name="settings_diagnostics">Diagnostik</string>
+    <string name="settings_testtools">Alat cetak uji (pola geometri)</string>
+    <string name="settings_experimental">Eksperimental</string>
+    <string name="settings_experimental_hint">Perintah printer eksperimental, belum diverifikasi pada P15. Hanya dengan printer yang tersambung; abaikan jika ragu.</string>
+    <string name="exp_learn_gap">Kalibrasi celah label</string>
+    <string name="exp_density_value">Kepekatan cetak: %1$s</string>
+    <string name="exp_density_off">mati</string>
+    <string name="exp_density_hint">Menguji apakah P15 menerima perintah kepekatan 0x1F. 0 = mati (pencetakan standar tidak berubah), 1 sampai 15 = lebih pekat. Berlaku pada pencetakan berikutnya.</string>
+    <string name="settings_about">Tentang</string>
+    <string name="about_text">LaBLEr %1$s\n\nAplikasi FOSS independen untuk printer label P15 melalui Bluetooth LE. Protokolnya direkayasa balik dari BleWebler, versi web untuk peramban Chrome yang berjalan tanpa pemasangan. Tidak ada kode yang diambil.</string>
+    <string name="scan_title">Cari printer</string>
+    <string name="scan_show_all">Tampilkan semua perangkat Bluetooth</string>
+    <string name="scan_empty">Tidak ada yang ditemukan. Apakah printer menyala?</string>
+    <string name="scan_device_line">%1$s  (RSSI %2$d)</string>
+
+    <!-- Chip status -->
+    <string name="chip_no_printer">Tidak ada printer</string>
+    <string name="chip_connecting">Menyambungkan (%1$d/3)</string>
+    <string name="chip_printing">Mencetak %1$d %%</string>
+    <string name="chip_error">Kesalahan</string>
+    <string name="chip_permission">Perlu izin BT</string>
+
+    <!-- Cetak uji -->
+    <string name="testprint_title">Cetak uji</string>
+    <string name="testprint_geometry">Pola uji geometri (40 mm)</string>
+    <string name="testprint_text_label">Contoh teks</string>
+    <string name="testprint_show">Tampilkan pratinjau</string>
+
+    <!-- Riwayat -->
+    <string name="history_title">Riwayat cetak</string>
+    <string name="history_empty">Belum ada yang dicetak.</string>
+    <string name="history_meta">%1$s · %2$d× · %3$d x %4$d mm</string>
+
+    <!-- Dialog info / bahasa aplikasi -->
+    <string name="cd_info">Info</string>
+    <string name="action_close">Tutup</string>
+    <string name="about_version">Versi %1$s</string>
+    <string name="about_description">LaBLEr adalah aplikasi pencetak label untuk printer label termal Bluetooth Low Energy keluarga Marklife (P15, P12, L13). Rancang label Anda sendiri langsung di ponsel dengan teks, simbol, dan bingkai, simpan sebagai templat, dan cetak lagi kapan saja.</string>
+    <string name="about_source">Kode sumber dan bantuan</string>
+    <string name="about_thanks">Terima kasih kepada aplikasi web Chrome sumber terbuka %1$s, yang membuat protokol P15 dapat diakses.</string>
+    <string name="about_license">Lisensi: GPL-3.0-or-later</string>
+    <string name="app_language">Bahasa</string>
+    <string name="app_language_title">Bahasa</string>
+    <string name="app_language_system">Sistem (otomatis)</string>
+
+    <!-- Pesan kesalahan backend -->
+    <string name="err_no_bluetooth">Perangkat ini tidak memiliki Bluetooth</string>
+    <string name="err_bt_off">Bluetooth mati</string>
+    <string name="err_no_printer_found">Printer tidak ditemukan. Apakah menyala dan dalam jangkauan?</string>
+    <string name="err_connect_failed">Gagal menyambung</string>
+    <string name="err_not_connected">Tidak ada printer yang tersambung</string>
+    <string name="err_print_failed">Gagal mencetak</string>
+    <string name="err_file_not_writable">Berkas tidak dapat ditulis</string>
+    <string name="err_file_not_readable">Berkas tidak dapat dibaca</string>
+    <string name="err_file_invalid">Berkas tidak valid</string>
+    <string name="err_no_scanner">Pemindai BLE tidak tersedia</string>
+    <!-- Barcode / QR -->
+    <string name="add_barcode">Kode</string>
+    <string name="prop_barcode_data">Konten</string>
+    <string name="prop_barcode_type">Jenis</string>
+    <string name="prop_barcode_caption">Tampilkan teks</string>
+
+    <!-- Konten QR -->
+    <string name="qr_content">Konten QR</string>
+    <string name="qr_type_text">Teks</string>
+    <string name="qr_type_link">Tautan</string>
+    <string name="qr_type_wifi">Wi-Fi</string>
+    <string name="qr_type_email">Email</string>
+    <string name="qr_type_phone">Telepon</string>
+    <string name="qr_type_contact">Kontak</string>
+    <string name="qr_url">URL</string>
+    <string name="qr_ssid">Nama jaringan (SSID)</string>
+    <string name="qr_password">Kata sandi</string>
+    <string name="qr_password_hint">Opsional. Disimpan sebagai teks biasa di kode QR dan templat.</string>
+    <string name="qr_show_password">Tampilkan kata sandi</string>
+    <string name="qr_auth">Enkripsi</string>
+    <string name="qr_auth_none">Tidak ada</string>
+    <string name="qr_hidden">Jaringan tersembunyi</string>
+    <string name="qr_email_addr">Alamat email</string>
+    <string name="qr_subject">Subjek (opsional)</string>
+    <string name="qr_phone">Nomor telepon</string>
+    <string name="qr_wifi_pw_error_wpa">8 sampai 63 karakter</string>
+    <string name="qr_wifi_pw_error_wep">5 atau 13 karakter</string>
+
+    <!-- Gambar -->
+    <string name="add_image">Gambar</string>
+    <string name="prop_invert">Balikkan</string>
+    <string name="prop_image_threshold">Ambang</string>
+    <string name="group_scale">Skala</string>
+
+    <!-- Cadangan -->
+    <string name="backup">Cadangan</string>
+    <string name="backup_export">Ekspor</string>
+    <string name="backup_import">Impor</string>
+    <string name="backup_replace_title">Impor cadangan</string>
+    <string name="backup_replace_message">Ganti label yang ada atau tambahkan yang diimpor?</string>
+    <string name="backup_replace">Ganti</string>
+    <string name="backup_add">Tambah</string>
+    <string name="backup_ok">Pencadangan selesai.</string>
+    <string name="backup_failed">Pencadangan gagal.</string>
+</resources>

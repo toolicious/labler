@@ -7,7 +7,7 @@ Funzioni:
 * Modelli: salva, rinomina, duplica, aggiungi ai preferiti e cerca; esporta una singola etichetta come file JSON, oppure esegui il backup e il ripristino dell'intera libreria.
 * Segnaposto per la data, l'ora, un numero progressivo o un testo libero che ti viene chiesto al momento della stampa.
 * Un'anteprima esatta a 1 bit, la scelta delle copie e del supporto fustellato o continuo, e una cronologia di stampa riproducibile.
-* Si riconnette automaticamente alla stampante salvata. Disponibile in 13 lingue, design Material 3, chiaro e scuro in base al sistema.
+* Si riconnette automaticamente alla stampante salvata. Disponibile in 17 lingue, design Material 3, chiaro e scuro in base al sistema.
 
 Privacy: LaBLEr è un'app completamente locale. Non dichiara il permesso INTERNET, quindi il processo non può aprire alcuna connessione di rete. Nessun account, nessun cloud, nessuna analisi, nessun tracciamento. I tuoi modelli, la cronologia di stampa e le impostazioni restano nell'archivio privato dell'app e non lasciano mai il dispositivo.
 

@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LaBLEr</string>
+
+    <!-- 動作 -->
+    <string name="action_cancel">取消</string>
+    <string name="action_save">儲存</string>
+    <string name="action_create">建立</string>
+    <string name="action_print">列印</string>
+    <string name="action_connect">連線</string>
+    <string name="action_grant_permission">授予權限</string>
+    <string name="action_disconnect">中斷連線</string>
+    <string name="action_forget">移除</string>
+    <string name="forget_title">要移除印表機嗎？</string>
+    <string name="forget_message">將不再記住 %1$s，也不再自動連線。</string>
+    <string name="action_clear">清除</string>
+    <string name="action_import_file">或從檔案匯入 …</string>
+    <string name="action_import">匯入</string>
+
+    <!-- 內容描述 -->
+    <string name="cd_back">返回</string>
+    <string name="cd_settings">設定</string>
+    <string name="cd_history">列印記錄</string>
+    <string name="cd_new_label">新增標籤</string>
+    <string name="cd_favorite">我的最愛</string>
+    <string name="cd_menu">選單</string>
+    <string name="cd_clear">清除</string>
+    <string name="cd_delete">刪除</string>
+    <string name="cd_rotate">旋轉</string>
+    <string name="cd_print">列印</string>
+    <string name="cd_undo">復原</string>
+    <string name="cd_redo">重做</string>
+
+    <!-- 主畫面 -->
+    <string name="home_search_hint">搜尋</string>
+    <string name="home_empty">還沒有標籤。\n輕觸 + 建立第一個。</string>
+    <string name="home_no_results">沒有相符的結果。</string>
+    <string name="template_size">%1$d x %2$d mm</string>
+    <string name="menu_edit">編輯</string>
+    <string name="menu_duplicate">複製</string>
+    <string name="menu_export">匯出</string>
+    <string name="menu_delete">刪除</string>
+    <string name="menu_delete_prefix">刪除：</string>
+    <string name="default_label_name">新標籤</string>
+    <string name="duplicate_name">%1$s（複本）</string>
+    <string name="toast_export_failed">匯出失敗：%1$s</string>
+    <string name="toast_export_ok">已匯出。</string>
+    <string name="toast_import_failed">匯入失敗：%1$s</string>
+    <string name="delete_title">要刪除標籤嗎？</string>
+    <string name="delete_message">%1$s 將被永久刪除。</string>
+
+    <!-- 標籤對話方塊 -->
+    <string name="dialog_new_title">新增標籤</string>
+    <string name="dialog_edit_title">編輯標籤</string>
+    <string name="field_name">名稱</string>
+    <string name="size_hint">尺寸（標籤帶寬度 x 長度）：</string>
+    <string name="preset_custom">自訂 …</string>
+    <string name="field_tape_mm">標籤帶 (mm)</string>
+    <string name="field_length_mm">長度 (mm)</string>
+    <string name="media_die_cut">模切標籤</string>
+    <string name="media_continuous">連續</string>
+    <string name="field_media">紙張</string>
+    <string name="field_tape_width">標籤帶寬度（高度）</string>
+    <string name="field_length">長度</string>
+    <string name="length_variable">可變</string>
+    <string name="length_fixed">固定</string>
+    <string name="field_min_length_mm">最小長度 (mm)</string>
+
+    <!-- 編輯器 -->
+    <string name="group_add">新增</string>
+    <string name="group_elements">元素</string>
+    <string name="add_text">文字</string>
+    <string name="add_symbol">符號</string>
+    <string name="add_frame">外框</string>
+    <string name="element_frame">外框</string>
+    <string name="editor_hint">在標籤上新增元素，直接輕觸或從清單中選取，拖曳移動，並用角落的控點縮放。</string>
+    <string name="editor_hint_free_move">連按兩下並按住第二下再拖曳，即可自由移動，不會貼齊。</string>
+    <string name="group_format">格式</string>
+    <string name="group_align">對齊</string>
+    <string name="group_variables">變數</string>
+    <string name="group_symbol">選擇符號</string>
+    <string name="group_raster">遞色</string>
+    <string name="raster_hint">僅對多色的表情符號可見。</string>
+    <string name="prop_text">文字</string>
+    <string name="prop_size">大小</string>
+    <string name="prop_bold">粗體</string>
+    <string name="prop_italic">斜體</string>
+    <string name="prop_underline">底線</string>
+    <string name="align_left">靠左</string>
+    <string name="align_center">置中</string>
+    <string name="align_right">靠右</string>
+    <string name="group_font">字型</string>
+    <string name="font_sans">Sans</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_mono">Mono</string>
+    <string name="prop_symbol">符號／表情符號</string>
+    <string name="dither_threshold">臨界值</string>
+    <string name="dither_fs">Floyd-Steinberg</string>
+    <string name="dither_atkinson">Atkinson</string>
+    <string name="dither_outline">輪廓</string>
+    <string name="frame_rect">外框</string>
+    <string name="frame_round">圓角</string>
+    <string name="frame_line_h">線 −</string>
+    <string name="frame_line_v">線 |</string>
+    <string name="prop_stroke">線寬</string>
+    <string name="prop_radius">圓角半徑</string>
+    <string name="prop_contrast">對比</string>
+    <string name="prop_outline_detail">靈敏度</string>
+    <string name="prop_line_width">線條粗細</string>
+    <string name="prop_outline_style">樣式</string>
+    <string name="outline_lines">圖形</string>
+    <string name="outline_canny">照片</string>
+    <string name="outline_smooth">平滑</string>
+    <string name="prop_width">寬度</string>
+    <string name="prop_height">高度</string>
+    <string name="var_date">date</string>
+    <string name="var_time">time</string>
+    <string name="var_number">#</string>
+    <string name="var_var">var</string>
+    <string name="var_format_hint">長按可選擇其他格式</string>
+    <string name="symbol_current">目前符號</string>
+    <string name="action_choose_symbol">選擇符號 …</string>
+    <string name="symbol_field">表情符號或字元</string>
+    <string name="symbol_keyboard_hint">表情符號請使用鍵盤的表情符號鍵，或從下方選擇符號。</string>
+    <string name="action_done">完成</string>
+    <string name="cat_arrows">箭頭</string>
+    <string name="cat_shapes">形狀</string>
+    <string name="cat_stars">星形</string>
+    <string name="cat_signs">標誌</string>
+    <string name="cat_tech">技術與辦公</string>
+    <string name="cat_weather">天氣與自然</string>
+    <string name="cat_math">數學</string>
+    <string name="cat_misc">其他</string>
+    <string name="tab_symbols">符號</string>
+    <string name="tab_emojis">表情符號</string>
+    <string name="tab_icons">圖示</string>
+    <string name="icon_search_hint">搜尋圖示</string>
+    <string name="icon_recent_removed">已從最近使用中移除：%1$s</string>
+    <string name="icon_search_english">圖示名稱與關鍵字均為英文。</string>
+    <string name="cat_smileys">笑臉</string>
+    <string name="cat_animals">動物與自然</string>
+    <string name="cat_food">食物</string>
+    <string name="cat_activity">活動與旅遊</string>
+    <string name="cat_objects">物件</string>
+    <string name="cat_hearts">愛心與符號</string>
+
+    <!-- 列印對話方塊 -->
+    <string name="print_title">列印：%1$s</string>
+    <string name="print_preview">預覽（%1$d mm，依列印效果的 1 位元）：</string>
+    <string name="print_preview_auto">預覽（%1$d mm 可變，依列印效果的 1 位元）：</string>
+    <string name="print_paper">紙張：</string>
+    <string name="print_copies">份數：</string>
+    <string name="print_counter_start">編號從 %1$d 開始</string>
+    <string name="print_need_printer">必須連線印表機才能列印。</string>
+    <string name="perm_bluetooth_missing">缺少藍牙權限。沒有它就無法連線印表機。</string>
+    <string name="print_printer_settings">印表機設定</string>
+    <string name="print_label_progress">標籤 %1$d/%2$d</string>
+
+    <!-- 設定 -->
+    <string name="settings_title">設定</string>
+    <string name="settings_printer">印表機</string>
+    <string name="status_disconnected">未連線</string>
+    <string name="status_connecting">正在連線（第 %1$d/3 次）…</string>
+    <string name="status_ready">已連線：%1$s</string>
+    <string name="status_ready_battery">已連線：%1$s，電量 %2$d %%</string>
+    <string name="status_printing">正在列印（%1$d %%）</string>
+    <string name="status_error">錯誤：%1$s</string>
+    <string name="settings_saved">已記住：%1$s (%2$s)</string>
+    <string name="info_model">型號：%1$s</string>
+    <string name="info_firmware">韌體：%1$s</string>
+    <string name="info_serial">序號：%1$s</string>
+    <string name="info_hardware">硬體：%1$s</string>
+
+    <!-- 字型 -->
+    <string name="settings_fonts">字型</string>
+    <string name="fonts_manage">管理自訂字型</string>
+    <string name="fonts_title">管理字型</string>
+    <string name="fonts_add">新增字型</string>
+    <string name="fonts_empty">還沒有自訂字型。輕觸上方的「+」，從裝置中新增 TTF 或 OTF 檔案。</string>
+    <string name="fonts_source">檔案：%1$s</string>
+    <string name="fonts_rename">重新命名</string>
+    <string name="fonts_rename_title">顯示名稱</string>
+    <string name="fonts_rename_hint">留空即可再次使用字型檔案中的名稱。</string>
+    <string name="fonts_replace">取代檔案</string>
+    <string name="fonts_delete">移除</string>
+    <string name="fonts_delete_title">要移除「%1$s」嗎？</string>
+    <string name="fonts_delete_message">範本會保留參照，重新新增該字型後會再次顯示。</string>
+    <string name="fonts_missing_hint">缺少字型「%1$s」，改以預設字型顯示。</string>
+    <string name="toast_font_added">已新增 %1$s</string>
+    <string name="toast_fonts_added">已新增 %1$d 個字型</string>
+    <string name="toast_fonts_added_partial">已新增 %2$d 個字型中的 %1$d 個</string>
+    <string name="err_font_invalid">不是有效的字型檔案</string>
+    <string name="err_font_too_large">字型檔案過大（最大 32 MB）</string>
+    <string name="err_font_duplicate">「%1$s」已經新增過了</string>
+
+    <string name="settings_diagnostics">診斷</string>
+    <string name="settings_testtools">測試列印工具（幾何圖案）</string>
+    <string name="settings_experimental">實驗性</string>
+    <string name="settings_experimental_hint">實驗性的印表機指令，未在 P15 上驗證。僅在已連線印表機時使用；不確定就略過。</string>
+    <string name="exp_learn_gap">校正標籤間隙</string>
+    <string name="exp_density_value">列印濃度：%1$s</string>
+    <string name="exp_density_off">關閉</string>
+    <string name="exp_density_hint">測試 P15 是否接受 0x1F 濃度指令。0 = 關閉（標準列印不變），1 到 15 = 更深。下次列印時生效。</string>
+    <string name="settings_about">關於</string>
+    <string name="about_text">LaBLEr %1$s\n\n透過 Bluetooth LE 用於 P15 標籤印表機的獨立 FOSS 應用程式。其通訊協定是從 BleWebler 逆向工程得來的，BleWebler 是一個無須安裝、在 Chrome 瀏覽器中執行的網頁版。未取用任何程式碼。</string>
+    <string name="scan_title">尋找印表機</string>
+    <string name="scan_show_all">顯示所有藍牙裝置</string>
+    <string name="scan_empty">找不到任何裝置。印表機開著嗎？</string>
+    <string name="scan_device_line">%1$s  (RSSI %2$d)</string>
+
+    <!-- 狀態標記 -->
+    <string name="chip_no_printer">無印表機</string>
+    <string name="chip_connecting">連線中（%1$d/3）</string>
+    <string name="chip_printing">列印中 %1$d %%</string>
+    <string name="chip_error">錯誤</string>
+    <string name="chip_permission">需要藍牙權限</string>
+
+    <!-- 測試列印 -->
+    <string name="testprint_title">測試列印</string>
+    <string name="testprint_geometry">幾何測試圖案（40 mm）</string>
+    <string name="testprint_text_label">文字樣本</string>
+    <string name="testprint_show">顯示預覽</string>
+
+    <!-- 記錄 -->
+    <string name="history_title">列印記錄</string>
+    <string name="history_empty">尚未列印任何內容。</string>
+    <string name="history_meta">%1$s · %2$d× · %3$d x %4$d mm</string>
+
+    <!-- 資訊對話方塊 ／ 應用程式語言 -->
+    <string name="cd_info">資訊</string>
+    <string name="action_close">關閉</string>
+    <string name="about_version">版本 %1$s</string>
+    <string name="about_description">LaBLEr 是一款用於 Marklife 系列（P15、P12、L13）Bluetooth Low Energy 熱感標籤印表機的標籤列印應用程式。直接在手機上用文字、符號和外框設計自己的標籤，儲存為範本，隨時再次列印。</string>
+    <string name="about_source">原始碼與說明</string>
+    <string name="about_thanks">感謝開放原始碼的 Chrome 網頁應用程式 %1$s，讓 P15 通訊協定得以公開。</string>
+    <string name="about_license">授權：GPL-3.0-or-later</string>
+    <string name="app_language">語言</string>
+    <string name="app_language_title">語言</string>
+    <string name="app_language_system">系統（自動）</string>
+
+    <!-- 後端錯誤訊息 -->
+    <string name="err_no_bluetooth">此裝置沒有藍牙</string>
+    <string name="err_bt_off">藍牙已關閉</string>
+    <string name="err_no_printer_found">找不到印表機。它是否已開機並在範圍內？</string>
+    <string name="err_connect_failed">連線失敗</string>
+    <string name="err_not_connected">未連線印表機</string>
+    <string name="err_print_failed">列印失敗</string>
+    <string name="err_file_not_writable">檔案無法寫入</string>
+    <string name="err_file_not_readable">檔案無法讀取</string>
+    <string name="err_file_invalid">無效的檔案</string>
+    <string name="err_no_scanner">BLE 掃描器無法使用</string>
+    <!-- 條碼 ／ QR -->
+    <string name="add_barcode">條碼</string>
+    <string name="prop_barcode_data">內容</string>
+    <string name="prop_barcode_type">類型</string>
+    <string name="prop_barcode_caption">顯示文字</string>
+
+    <!-- QR 內容 -->
+    <string name="qr_content">QR 內容</string>
+    <string name="qr_type_text">文字</string>
+    <string name="qr_type_link">連結</string>
+    <string name="qr_type_wifi">Wi-Fi</string>
+    <string name="qr_type_email">電子郵件</string>
+    <string name="qr_type_phone">電話</string>
+    <string name="qr_type_contact">聯絡人</string>
+    <string name="qr_url">URL</string>
+    <string name="qr_ssid">網路名稱（SSID）</string>
+    <string name="qr_password">密碼</string>
+    <string name="qr_password_hint">選填。會以明文形式儲存在 QR 碼和範本中。</string>
+    <string name="qr_show_password">顯示密碼</string>
+    <string name="qr_auth">加密</string>
+    <string name="qr_auth_none">無</string>
+    <string name="qr_hidden">隱藏網路</string>
+    <string name="qr_email_addr">電子郵件地址</string>
+    <string name="qr_subject">主旨（選填）</string>
+    <string name="qr_phone">電話號碼</string>
+    <string name="qr_wifi_pw_error_wpa">8 到 63 個字元</string>
+    <string name="qr_wifi_pw_error_wep">5 或 13 個字元</string>
+
+    <!-- 圖片 -->
+    <string name="add_image">圖片</string>
+    <string name="prop_invert">反轉</string>
+    <string name="prop_image_threshold">臨界值</string>
+    <string name="group_scale">縮放</string>
+
+    <!-- 備份 -->
+    <string name="backup">備份</string>
+    <string name="backup_export">匯出</string>
+    <string name="backup_import">匯入</string>
+    <string name="backup_replace_title">匯入備份</string>
+    <string name="backup_replace_message">要取代現有標籤，還是加入匯入的標籤？</string>
+    <string name="backup_replace">取代</string>
+    <string name="backup_add">加入</string>
+    <string name="backup_ok">備份完成。</string>
+    <string name="backup_failed">備份失敗。</string>
+</resources>

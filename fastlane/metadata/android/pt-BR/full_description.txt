@@ -7,7 +7,7 @@ Recursos:
 * Modelos: salvar, renomear, duplicar, favoritar e pesquisar; exporte uma etiqueta como arquivo JSON ou faça backup e restaure toda a sua biblioteca.
 * Espaços reservados para a data, a hora, um número sequencial ou um texto livre solicitado na hora da impressão.
 * Uma pré-visualização exata de 1 bit, escolha de cópias e mídia troquelada ou contínua, e um histórico de impressão que você pode reproduzir.
-* Reconecta-se automaticamente à impressora salva. Disponível em 13 idiomas, design Material 3, claro e escuro conforme o sistema.
+* Reconecta-se automaticamente à impressora salva. Disponível em 17 idiomas, design Material 3, claro e escuro conforme o sistema.
 
 Privacidade: o LaBLEr é um aplicativo totalmente local. Ele não declara a permissão INTERNET, então o processo não pode abrir nenhuma conexão de rede. Sem conta, sem nuvem, sem análises, sem rastreamento. Seus modelos, o histórico de impressão e as configurações ficam no armazenamento privado do aplicativo e nunca saem do dispositivo.
 

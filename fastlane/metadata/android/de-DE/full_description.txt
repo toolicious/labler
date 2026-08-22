@@ -7,7 +7,7 @@ Funktionen:
 * Vorlagen: speichern, umbenennen, duplizieren, favorisieren und suchen; ein einzelnes Etikett als JSON exportieren oder die ganze Sammlung sichern und wiederherstellen.
 * Platzhalter für Datum, Uhrzeit, eine laufende Nummer oder einen Freitext, der beim Drucken abgefragt wird.
 * Eine exakte 1-Bit-Vorschau, Kopienzahl und Stanz- oder Endlosmedien sowie ein Druckverlauf zum erneuten Drucken.
-* Verbindet sich automatisch wieder mit dem gemerkten Drucker. Verfügbar in 13 Sprachen, Material-3-Design, hell und dunkel nach Systemvorgabe.
+* Verbindet sich automatisch wieder mit dem gemerkten Drucker. Verfügbar in 17 Sprachen, Material-3-Design, hell und dunkel nach Systemvorgabe.
 
 Datenschutz: LaBLEr ist eine vollständig lokale App. Sie deklariert keine INTERNET-Berechtigung, der Prozess kann also gar keine Netzwerkverbindung öffnen. Kein Konto, keine Cloud, keine Analyse, kein Tracking. Vorlagen, Druckverlauf und Einstellungen bleiben im privaten Speicher der App und verlassen das Gerät nie.
 

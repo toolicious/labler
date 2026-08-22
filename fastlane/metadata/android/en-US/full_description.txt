@@ -7,7 +7,7 @@ Features:
 * Templates: save, rename, duplicate, favorite and search; export a single label as a JSON file, or back up and restore your whole library.
 * Placeholders for the date, the time, a running number, or a free-text value you are asked for at print time.
 * An exact 1-bit preview, a choice of copies and die-cut or continuous media, and a print history you can reproduce.
-* Reconnects to your saved printer automatically. Available in 13 languages, Material 3 design, light and dark following the system.
+* Reconnects to your saved printer automatically. Available in 17 languages, Material 3 design, light and dark following the system.
 
 Privacy: LaBLEr is a fully local app. It does not declare the INTERNET permission, so the process cannot open a network connection at all. No account, no cloud, no analytics, no tracking. Your templates, print history and settings live in the app's private storage and never leave the device.
 

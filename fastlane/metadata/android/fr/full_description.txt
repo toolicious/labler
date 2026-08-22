@@ -7,7 +7,7 @@ Fonctions :
 * Modèles : enregistrer, renommer, dupliquer, mettre en favori et rechercher ; exportez une étiquette au format JSON, ou sauvegardez et restaurez toute votre bibliothèque.
 * Des variables pour la date, l'heure, un numéro incrémental ou un texte libre demandé au moment de l'impression.
 * Un aperçu 1 bit exact, un choix du nombre de copies et du support prédécoupé ou continu, et un historique d'impression reproductible.
-* Se reconnecte automatiquement à l'imprimante enregistrée. Disponible en 13 langues, design Material 3, clair et sombre selon le système.
+* Se reconnecte automatiquement à l'imprimante enregistrée. Disponible en 17 langues, design Material 3, clair et sombre selon le système.
 
 Confidentialité : LaBLEr est une application entièrement locale. Elle ne déclare pas la permission INTERNET, le processus ne peut donc ouvrir aucune connexion réseau. Sans compte, sans cloud, sans analyse, sans suivi. Vos modèles, l'historique d'impression et les réglages restent dans le stockage privé de l'application et ne quittent jamais l'appareil.
 

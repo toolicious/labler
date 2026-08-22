@@ -7,7 +7,7 @@ Funciones:
 * Plantillas: guardar, renombrar, duplicar, marcar como favoritas y buscar; exporta una etiqueta como archivo JSON, o haz una copia de seguridad de toda la biblioteca y restáurala.
 * Marcadores de posición para la fecha, la hora, un número correlativo o un texto libre que se te pide al imprimir.
 * Una vista previa exacta de 1 bit, elección de copias y material troquelado o continuo, y un historial de impresión que puedes reproducir.
-* Se reconecta automáticamente a la impresora guardada. Disponible en 13 idiomas, diseño Material 3, claro y oscuro según el sistema.
+* Se reconecta automáticamente a la impresora guardada. Disponible en 17 idiomas, diseño Material 3, claro y oscuro según el sistema.
 
 Privacidad: LaBLEr es una app totalmente local. No declara el permiso INTERNET, así que el proceso no puede abrir ninguna conexión de red. Sin cuenta, sin nube, sin analíticas, sin seguimiento. Tus plantillas, el historial de impresión y los ajustes permanecen en el almacenamiento privado de la app y nunca salen del dispositivo.
 

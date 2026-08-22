@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LaBLEr</string>
+
+    <!-- क्रियाएँ -->
+    <string name="action_cancel">रद्द करें</string>
+    <string name="action_save">सहेजें</string>
+    <string name="action_create">बनाएँ</string>
+    <string name="action_print">प्रिंट करें</string>
+    <string name="action_connect">कनेक्ट करें</string>
+    <string name="action_grant_permission">अनुमति दें</string>
+    <string name="action_disconnect">डिस्कनेक्ट करें</string>
+    <string name="action_forget">भूल जाएँ</string>
+    <string name="forget_title">प्रिंटर भूल जाएँ?</string>
+    <string name="forget_message">%1$s अब याद नहीं रखा जाएगा और अपने आप कनेक्ट नहीं होगा।</string>
+    <string name="action_clear">साफ़ करें</string>
+    <string name="action_import_file">या किसी फ़ाइल से आयात करें …</string>
+    <string name="action_import">आयात करें</string>
+
+    <!-- सामग्री विवरण -->
+    <string name="cd_back">वापस</string>
+    <string name="cd_settings">सेटिंग</string>
+    <string name="cd_history">प्रिंट इतिहास</string>
+    <string name="cd_new_label">नया लेबल</string>
+    <string name="cd_favorite">पसंदीदा</string>
+    <string name="cd_menu">मेन्यू</string>
+    <string name="cd_clear">साफ़ करें</string>
+    <string name="cd_delete">मिटाएँ</string>
+    <string name="cd_rotate">घुमाएँ</string>
+    <string name="cd_print">प्रिंट करें</string>
+    <string name="cd_undo">पहले जैसा करें</string>
+    <string name="cd_redo">फिर से करें</string>
+
+    <!-- होम -->
+    <string name="home_search_hint">खोजें</string>
+    <string name="home_empty">अभी कोई लेबल नहीं है।\nपहला बनाने के लिए + दबाएँ।</string>
+    <string name="home_no_results">कोई मेल नहीं मिला।</string>
+    <string name="template_size">%1$d x %2$d mm</string>
+    <string name="menu_edit">संपादित करें</string>
+    <string name="menu_duplicate">प्रतिलिपि बनाएँ</string>
+    <string name="menu_export">निर्यात करें</string>
+    <string name="menu_delete">मिटाएँ</string>
+    <string name="menu_delete_prefix">मिटाएँ:</string>
+    <string name="default_label_name">नया लेबल</string>
+    <string name="duplicate_name">%1$s (प्रति)</string>
+    <string name="toast_export_failed">निर्यात विफल: %1$s</string>
+    <string name="toast_export_ok">निर्यात हो गया।</string>
+    <string name="toast_import_failed">आयात विफल: %1$s</string>
+    <string name="delete_title">लेबल मिटाएँ?</string>
+    <string name="delete_message">%1$s हमेशा के लिए मिटा दिया जाएगा।</string>
+
+    <!-- लेबल संवाद -->
+    <string name="dialog_new_title">नया लेबल</string>
+    <string name="dialog_edit_title">लेबल संपादित करें</string>
+    <string name="field_name">नाम</string>
+    <string name="size_hint">आकार (टेप चौड़ाई x लंबाई):</string>
+    <string name="preset_custom">कस्टम …</string>
+    <string name="field_tape_mm">टेप (mm)</string>
+    <string name="field_length_mm">लंबाई (mm)</string>
+    <string name="media_die_cut">डाई-कट लेबल</string>
+    <string name="media_continuous">लगातार</string>
+    <string name="field_media">कागज़</string>
+    <string name="field_tape_width">टेप की चौड़ाई (ऊँचाई)</string>
+    <string name="field_length">लंबाई</string>
+    <string name="length_variable">परिवर्तनशील</string>
+    <string name="length_fixed">निश्चित</string>
+    <string name="field_min_length_mm">न्यूनतम लंबाई (mm)</string>
+
+    <!-- संपादक -->
+    <string name="group_add">जोड़ें</string>
+    <string name="group_elements">तत्व</string>
+    <string name="add_text">टेक्स्ट</string>
+    <string name="add_symbol">चिह्न</string>
+    <string name="add_frame">फ़्रेम</string>
+    <string name="element_frame">फ़्रेम</string>
+    <string name="editor_hint">लेबल में तत्व जोड़ें, उन्हें सीधे या सूची से चुनें, खिसकाएँ, और कोने से आकार बदलें।</string>
+    <string name="editor_hint_free_move">दो बार टैप करें और दूसरा टैप दबाए रखकर खिसकाएँ, ताकि बिना स्नैप हुए मुक्त रूप से घुमा सकें।</string>
+    <string name="group_format">स्वरूप</string>
+    <string name="group_align">संरेखण</string>
+    <string name="group_variables">वेरिएबल</string>
+    <string name="group_symbol">चिह्न चुनें</string>
+    <string name="group_raster">डिदरिंग</string>
+    <string name="raster_hint">केवल बहुरंगी इमोजी के लिए दिखता है।</string>
+    <string name="prop_text">टेक्स्ट</string>
+    <string name="prop_size">आकार</string>
+    <string name="prop_bold">बोल्ड</string>
+    <string name="prop_italic">इटैलिक</string>
+    <string name="prop_underline">रेखांकित</string>
+    <string name="align_left">बाएँ</string>
+    <string name="align_center">बीच में</string>
+    <string name="align_right">दाएँ</string>
+    <string name="group_font">फ़ॉन्ट</string>
+    <string name="font_sans">Sans</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_mono">Mono</string>
+    <string name="prop_symbol">चिह्न/इमोजी</string>
+    <string name="dither_threshold">थ्रेशोल्ड</string>
+    <string name="dither_fs">Floyd-Steinberg</string>
+    <string name="dither_atkinson">Atkinson</string>
+    <string name="dither_outline">रूपरेखा</string>
+    <string name="frame_rect">फ़्रेम</string>
+    <string name="frame_round">गोल कोने</string>
+    <string name="frame_line_h">रेखा −</string>
+    <string name="frame_line_v">रेखा |</string>
+    <string name="prop_stroke">रेखा की मोटाई</string>
+    <string name="prop_radius">कोने की त्रिज्या</string>
+    <string name="prop_contrast">कंट्रास्ट</string>
+    <string name="prop_outline_detail">संवेदनशीलता</string>
+    <string name="prop_line_width">रेखा की चौड़ाई</string>
+    <string name="prop_outline_style">शैली</string>
+    <string name="outline_lines">ग्राफ़िक</string>
+    <string name="outline_canny">फ़ोटो</string>
+    <string name="outline_smooth">चिकना</string>
+    <string name="prop_width">चौड़ाई</string>
+    <string name="prop_height">ऊँचाई</string>
+    <string name="var_date">date</string>
+    <string name="var_time">time</string>
+    <string name="var_number">#</string>
+    <string name="var_var">var</string>
+    <string name="var_format_hint">अन्य प्रारूपों के लिए देर तक दबाएँ</string>
+    <string name="symbol_current">वर्तमान चिह्न</string>
+    <string name="action_choose_symbol">चिह्न चुनें …</string>
+    <string name="symbol_field">इमोजी या अक्षर</string>
+    <string name="symbol_keyboard_hint">इमोजी के लिए अपने कीबोर्ड की इमोजी कुंजी का उपयोग करें, या नीचे से कोई चिह्न चुनें।</string>
+    <string name="action_done">हो गया</string>
+    <string name="cat_arrows">तीर</string>
+    <string name="cat_shapes">आकृतियाँ</string>
+    <string name="cat_stars">तारे</string>
+    <string name="cat_signs">संकेत</string>
+    <string name="cat_tech">तकनीक और कार्यालय</string>
+    <string name="cat_weather">मौसम और प्रकृति</string>
+    <string name="cat_math">गणित</string>
+    <string name="cat_misc">विविध</string>
+    <string name="tab_symbols">चिह्न</string>
+    <string name="tab_emojis">इमोजी</string>
+    <string name="tab_icons">आइकन</string>
+    <string name="icon_search_hint">आइकन खोजें</string>
+    <string name="icon_recent_removed">हाल के से हटाया गया: %1$s</string>
+    <string name="icon_search_english">आइकन के नाम और कीवर्ड अंग्रेज़ी में हैं।</string>
+    <string name="cat_smileys">स्माइली</string>
+    <string name="cat_animals">जानवर और प्रकृति</string>
+    <string name="cat_food">भोजन</string>
+    <string name="cat_activity">गतिविधि और यात्रा</string>
+    <string name="cat_objects">वस्तुएँ</string>
+    <string name="cat_hearts">दिल और प्रतीक</string>
+
+    <!-- प्रिंट संवाद -->
+    <string name="print_title">प्रिंट करें: %1$s</string>
+    <string name="print_preview">पूर्वावलोकन (%1$d mm, जैसा प्रिंट होगा 1-बिट में):</string>
+    <string name="print_preview_auto">पूर्वावलोकन (%1$d mm परिवर्तनशील, जैसा प्रिंट होगा 1-बिट में):</string>
+    <string name="print_paper">कागज़:</string>
+    <string name="print_copies">प्रतियाँ:</string>
+    <string name="print_counter_start">संख्या %1$d से शुरू होती है</string>
+    <string name="print_need_printer">प्रिंट करने के लिए प्रिंटर कनेक्ट होना चाहिए।</string>
+    <string name="perm_bluetooth_missing">ब्लूटूथ की अनुमति नहीं है। इसके बिना कोई प्रिंटर कनेक्ट नहीं हो सकता।</string>
+    <string name="print_printer_settings">प्रिंटर सेटिंग</string>
+    <string name="print_label_progress">लेबल %1$d/%2$d</string>
+
+    <!-- सेटिंग -->
+    <string name="settings_title">सेटिंग</string>
+    <string name="settings_printer">प्रिंटर</string>
+    <string name="status_disconnected">कनेक्ट नहीं है</string>
+    <string name="status_connecting">कनेक्ट हो रहा है (प्रयास %1$d/3) …</string>
+    <string name="status_ready">कनेक्ट है: %1$s</string>
+    <string name="status_ready_battery">कनेक्ट है: %1$s, बैटरी %2$d %%</string>
+    <string name="status_printing">प्रिंट हो रहा है (%1$d %%)</string>
+    <string name="status_error">त्रुटि: %1$s</string>
+    <string name="settings_saved">सहेजा गया: %1$s (%2$s)</string>
+    <string name="info_model">मॉडल: %1$s</string>
+    <string name="info_firmware">फ़र्मवेयर: %1$s</string>
+    <string name="info_serial">क्रम संख्या: %1$s</string>
+    <string name="info_hardware">हार्डवेयर: %1$s</string>
+
+    <!-- फ़ॉन्ट -->
+    <string name="settings_fonts">फ़ॉन्ट</string>
+    <string name="fonts_manage">कस्टम फ़ॉन्ट प्रबंधित करें</string>
+    <string name="fonts_title">फ़ॉन्ट प्रबंधित करें</string>
+    <string name="fonts_add">फ़ॉन्ट जोड़ें</string>
+    <string name="fonts_empty">अभी कोई कस्टम फ़ॉन्ट नहीं है। अपने डिवाइस से TTF या OTF फ़ाइलें जोड़ने के लिए ऊपर \"+\" का उपयोग करें।</string>
+    <string name="fonts_source">फ़ाइल: %1$s</string>
+    <string name="fonts_rename">नाम बदलें</string>
+    <string name="fonts_rename_title">प्रदर्शित नाम</string>
+    <string name="fonts_rename_hint">फ़ॉन्ट फ़ाइल का नाम फिर से उपयोग करने के लिए खाली छोड़ दें।</string>
+    <string name="fonts_replace">फ़ाइल बदलें</string>
+    <string name="fonts_delete">हटाएँ</string>
+    <string name="fonts_delete_title">\"%1$s\" हटाएँ?</string>
+    <string name="fonts_delete_message">टेम्पलेट संदर्भ बनाए रखते हैं और फ़ॉन्ट दोबारा जोड़ने पर उसे फिर से दिखाएँगे।</string>
+    <string name="fonts_missing_hint">फ़ॉन्ट \"%1$s\" मौजूद नहीं है, इसके बजाय डिफ़ॉल्ट फ़ॉन्ट दिखाया जा रहा है।</string>
+    <string name="toast_font_added">%1$s जोड़ा गया</string>
+    <string name="toast_fonts_added">%1$d फ़ॉन्ट जोड़े गए</string>
+    <string name="toast_fonts_added_partial">%2$d में से %1$d फ़ॉन्ट जोड़े गए</string>
+    <string name="err_font_invalid">यह मान्य फ़ॉन्ट फ़ाइल नहीं है</string>
+    <string name="err_font_too_large">फ़ॉन्ट फ़ाइल बहुत बड़ी है (अधिकतम 32 MB)</string>
+    <string name="err_font_duplicate">\"%1$s\" पहले से जोड़ा जा चुका है</string>
+
+    <string name="settings_diagnostics">निदान</string>
+    <string name="settings_testtools">परीक्षण प्रिंट उपकरण (ज्यामिति पैटर्न)</string>
+    <string name="settings_experimental">प्रयोगात्मक</string>
+    <string name="settings_experimental_hint">प्रयोगात्मक प्रिंटर कमांड, P15 पर सत्यापित नहीं। केवल कनेक्टेड प्रिंटर के साथ; संदेह हो तो छोड़ दें।</string>
+    <string name="exp_learn_gap">लेबल गैप कैलिब्रेट करें</string>
+    <string name="exp_density_value">प्रिंट घनत्व: %1$s</string>
+    <string name="exp_density_off">बंद</string>
+    <string name="exp_density_hint">जाँचता है कि P15, 0x1F घनत्व कमांड स्वीकार करता है या नहीं। 0 = बंद (मानक प्रिंटिंग अपरिवर्तित), 1 से 15 = गहरा। अगले प्रिंट से लागू होगा।</string>
+    <string name="settings_about">बारे में</string>
+    <string name="about_text">LaBLEr %1$s\n\nब्लूटूथ LE के ज़रिए P15 लेबल प्रिंटर के लिए स्वतंत्र FOSS ऐप। प्रोटोकॉल को BleWebler से रिवर्स-इंजीनियर किया गया, जो क्रोम ब्राउज़र के लिए बिना इंस्टॉल चलने वाला वेब संस्करण है। कोई कोड नहीं लिया गया।</string>
+    <string name="scan_title">प्रिंटर खोजें</string>
+    <string name="scan_show_all">सभी ब्लूटूथ डिवाइस दिखाएँ</string>
+    <string name="scan_empty">कुछ नहीं मिला। क्या प्रिंटर चालू है?</string>
+    <string name="scan_device_line">%1$s  (RSSI %2$d)</string>
+
+    <!-- स्थिति चिप -->
+    <string name="chip_no_printer">कोई प्रिंटर नहीं</string>
+    <string name="chip_connecting">कनेक्ट हो रहा है (%1$d/3)</string>
+    <string name="chip_printing">प्रिंट हो रहा है %1$d %%</string>
+    <string name="chip_error">त्रुटि</string>
+    <string name="chip_permission">ब्लूटूथ अनुमति चाहिए</string>
+
+    <!-- परीक्षण प्रिंट -->
+    <string name="testprint_title">परीक्षण प्रिंट</string>
+    <string name="testprint_geometry">ज्यामिति परीक्षण पैटर्न (40 mm)</string>
+    <string name="testprint_text_label">टेक्स्ट नमूना</string>
+    <string name="testprint_show">पूर्वावलोकन दिखाएँ</string>
+
+    <!-- इतिहास -->
+    <string name="history_title">प्रिंट इतिहास</string>
+    <string name="history_empty">अभी तक कुछ प्रिंट नहीं हुआ।</string>
+    <string name="history_meta">%1$s · %2$d× · %3$d x %4$d mm</string>
+
+    <!-- जानकारी संवाद / ऐप भाषा -->
+    <string name="cd_info">जानकारी</string>
+    <string name="action_close">बंद करें</string>
+    <string name="about_version">संस्करण %1$s</string>
+    <string name="about_description">LaBLEr, Marklife परिवार (P15, P12, L13) के ब्लूटूथ लो एनर्जी थर्मल लेबल प्रिंटर के लिए एक लेबल प्रिंटर ऐप है। टेक्स्ट, चिह्नों और फ़्रेम के साथ अपने लेबल सीधे फ़ोन पर डिज़ाइन करें, उन्हें टेम्पलेट के रूप में सहेजें और जब चाहें दोबारा प्रिंट करें।</string>
+    <string name="about_source">सोर्स कोड और मदद</string>
+    <string name="about_thanks">ओपन-सोर्स क्रोम वेब ऐप %1$s का धन्यवाद, जिसने P15 प्रोटोकॉल को सुलभ बनाया।</string>
+    <string name="about_license">लाइसेंस: GPL-3.0-or-later</string>
+    <string name="app_language">भाषा</string>
+    <string name="app_language_title">भाषा</string>
+    <string name="app_language_system">सिस्टम (स्वचालित)</string>
+
+    <!-- बैकएंड त्रुटि संदेश -->
+    <string name="err_no_bluetooth">इस डिवाइस में ब्लूटूथ नहीं है</string>
+    <string name="err_bt_off">ब्लूटूथ बंद है</string>
+    <string name="err_no_printer_found">कोई प्रिंटर नहीं मिला। क्या वह चालू है और पास में है?</string>
+    <string name="err_connect_failed">कनेक्ट नहीं हो सका</string>
+    <string name="err_not_connected">कोई प्रिंटर कनेक्ट नहीं है</string>
+    <string name="err_print_failed">प्रिंट नहीं हो सका</string>
+    <string name="err_file_not_writable">फ़ाइल में लिखा नहीं जा सकता</string>
+    <string name="err_file_not_readable">फ़ाइल पढ़ी नहीं जा सकती</string>
+    <string name="err_file_invalid">अमान्य फ़ाइल</string>
+    <string name="err_no_scanner">BLE स्कैनर उपलब्ध नहीं है</string>
+    <!-- बारकोड / QR -->
+    <string name="add_barcode">कोड</string>
+    <string name="prop_barcode_data">सामग्री</string>
+    <string name="prop_barcode_type">प्रकार</string>
+    <string name="prop_barcode_caption">टेक्स्ट दिखाएँ</string>
+
+    <!-- QR सामग्री -->
+    <string name="qr_content">QR सामग्री</string>
+    <string name="qr_type_text">टेक्स्ट</string>
+    <string name="qr_type_link">लिंक</string>
+    <string name="qr_type_wifi">Wi-Fi</string>
+    <string name="qr_type_email">ईमेल</string>
+    <string name="qr_type_phone">फ़ोन</string>
+    <string name="qr_type_contact">संपर्क</string>
+    <string name="qr_url">URL</string>
+    <string name="qr_ssid">नेटवर्क का नाम (SSID)</string>
+    <string name="qr_password">पासवर्ड</string>
+    <string name="qr_password_hint">वैकल्पिक। QR कोड और टेम्पलेट में सादे टेक्स्ट में संग्रहित होता है।</string>
+    <string name="qr_show_password">पासवर्ड दिखाएँ</string>
+    <string name="qr_auth">एन्क्रिप्शन</string>
+    <string name="qr_auth_none">कोई नहीं</string>
+    <string name="qr_hidden">छिपा हुआ नेटवर्क</string>
+    <string name="qr_email_addr">ईमेल पता</string>
+    <string name="qr_subject">विषय (वैकल्पिक)</string>
+    <string name="qr_phone">फ़ोन नंबर</string>
+    <string name="qr_wifi_pw_error_wpa">8 से 63 अक्षर</string>
+    <string name="qr_wifi_pw_error_wep">5 या 13 अक्षर</string>
+
+    <!-- छवि -->
+    <string name="add_image">छवि</string>
+    <string name="prop_invert">उलटें</string>
+    <string name="prop_image_threshold">थ्रेशोल्ड</string>
+    <string name="group_scale">स्केल</string>
+
+    <!-- बैकअप -->
+    <string name="backup">बैकअप</string>
+    <string name="backup_export">निर्यात करें</string>
+    <string name="backup_import">आयात करें</string>
+    <string name="backup_replace_title">बैकअप आयात करें</string>
+    <string name="backup_replace_message">मौजूदा लेबल बदलें या आयात किए गए जोड़ें?</string>
+    <string name="backup_replace">बदलें</string>
+    <string name="backup_add">जोड़ें</string>
+    <string name="backup_ok">बैकअप हो गया।</string>
+    <string name="backup_failed">बैकअप विफल।</string>
+</resources>

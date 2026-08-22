@@ -1,0 +1,5 @@
+- Font khusus: Tambahkan berkas TTF dan OTF di Setelan lalu pilih sebagai font di editor.
+  Jika sebuah font tidak ada, font bawaan ditampilkan dan referensi aslinya tetap tersimpan.
+- Ketuk dua kali lalu seret untuk memindahkan elemen tanpa penjajaran
+- Editor menampilkan teks pada resolusi printer
+- Mengetuk ukuran label akan membuka dialog label

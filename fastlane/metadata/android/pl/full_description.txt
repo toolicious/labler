@@ -7,7 +7,7 @@ Funkcje:
 * Szablony: zapisywanie, zmiana nazwy, powielanie, dodawanie do ulubionych i wyszukiwanie; wyeksportuj pojedynczą etykietę jako plik JSON albo utwórz kopię zapasową całej biblioteki i przywróć ją.
 * Symbole zastępcze dla daty, godziny, kolejnego numeru lub dowolnego tekstu, o który aplikacja pyta podczas drukowania.
 * Dokładny podgląd 1-bitowy, wybór liczby kopii oraz nośnika wykrawanego lub ciągłego, a także historia druku, którą można powtórzyć.
-* Automatycznie łączy się ponownie z zapisaną drukarką. Dostępna w 13 językach, wygląd Material 3, jasny i ciemny zgodnie z systemem.
+* Automatycznie łączy się ponownie z zapisaną drukarką. Dostępna w 17 językach, wygląd Material 3, jasny i ciemny zgodnie z systemem.
 
 Prywatność: LaBLEr to w pełni lokalna aplikacja. Nie deklaruje uprawnienia INTERNET, więc proces w ogóle nie może otworzyć połączenia sieciowego. Bez konta, bez chmury, bez analityki, bez śledzenia. Twoje szablony, historia druku i ustawienia pozostają w prywatnej pamięci aplikacji i nigdy nie opuszczają urządzenia.
 
