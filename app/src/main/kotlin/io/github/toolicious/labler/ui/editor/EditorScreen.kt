@@ -388,7 +388,6 @@ fun EditorScreen(
             },
             onImport = null,
             currentLengthMm = LabelRenderer.effectiveLengthMm(t.spec, t.elements),
-            currentLeadingMm = LabelRenderer.leadingMmFor(t.spec, t.elements),
         )
     }
 }

@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -254,6 +255,10 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         var xGuide: SnapGuide? = null
         var yGuide: SnapGuide? = null
 
+        // In element coordinates the tape starts wherever the drawing puts it: at zero for a fixed
+        // label, and at minus the leading edge for a manual one.
+        val labelStart = (-spec.leadingPx).toFloat()
+
         if (!dragSnapFree) {
             // The label's own lines first, then the cached lines of the other elements, so a line
             // they share is credited to the label.
@@ -266,12 +271,12 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         }
 
         // Keep at least 8 px grabbable. This is placement, not snapping, so it always applies.
-        // A label laid out from its content has no edge to stop at in either direction, it moves
-        // along with whatever is dragged, so the only bound there is the largest length the printer
-        // and the UI accept. That is what lets an element be put in front of all the others.
+        // A variable label has no edge to stop at in either direction, it moves along with whatever
+        // is dragged, so the only bound there is the largest length the printer and the UI accept.
+        // That is what lets an element be put in front of all the others.
         val bound = LabelSpec.MAX_LENGTH_PX.toFloat()
-        val minX = if (spec.contentIsAnchored) -bound else 8f - box.width
-        val maxX = if (spec.contentIsAnchored) bound else spec.lengthPx.toFloat()
+        val minX = if (spec.lengthIsAuto) -bound else labelStart + 8f - box.width
+        val maxX = if (spec.lengthIsAuto) bound else labelStart + spec.lengthPx
         val boxX = (nx + offX).coerceIn(minX, maxX - 8f)
         val boxY = (ny + offY).coerceIn(8f - box.height, LabelSpec.PRINT_HEIGHT_PX - 8f)
         // A guide would point at a line the element is no longer on once the bound had to move it.
@@ -366,20 +371,21 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
     private var edgeStartLengthMm = 0
 
     /**
-     * Whole millimetres the elements take up between the two edges, rounded up so a rounding step
-     * can never cut content off. Uses the same bounding box the canvas draws around a selected
-     * element, which is where the rotation of an element is accounted for.
+     * Where the content starts and ends on the label, in whole millimetres, rounded outwards so a
+     * rounding step can never cut anything off. Uses the same bounding box the canvas draws around
+     * a selected element, which is where the rotation of an element is accounted for. Null on an
+     * empty label, which has nothing to measure against.
      */
-    private fun contentSpanMm(elements: List<LabelElement>): Int {
-        if (elements.isEmpty()) return 0
-        val left = elements.minOf { elementBounds(it).left }
-        val right = elements.maxOf { elementBounds(it).right }
-        return ceil((right - left) / Protocol.DOTS_PER_MM).toInt().coerceAtLeast(0)
+    private fun contentBoundsMm(spec: LabelSpec, elements: List<LabelElement>): Pair<Int, Int>? {
+        if (elements.isEmpty()) return null
+        val left = elements.minOf { elementBounds(it).left } + spec.leadingPx
+        val right = elements.maxOf { elementBounds(it).right } + spec.leadingPx
+        return floor(left / Protocol.DOTS_PER_MM).toInt() to ceil(right / Protocol.DOTS_PER_MM).toInt()
     }
 
     /**
-     * Moves the leading edge to [mm], the blank tape in front of the content. The elements keep
-     * their coordinates, so the length carries the same change and the content stays where it is.
+     * Moves the leading edge to [mm]. The elements keep their coordinates, so the length carries
+     * the same change and the content stays where it is on the tape.
      */
     fun setLeadingMm(mm: Int) {
         val t = _template.value ?: return
@@ -425,12 +431,13 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         edgeRawPx = 0f
     }
 
-    /** Double tap on an edge handle: pulls that edge up to [FIT_GAP_MM] in front of the content. */
+    /** Double tap on an edge: pulls it up to [FIT_GAP_MM] from the content. */
     fun fitEdge(edge: LabelEdge) {
         val t = _template.value ?: return
+        val (left, right) = contentBoundsMm(t.spec, t.elements) ?: return
         when (edge) {
-            LabelEdge.LEFT -> setLeadingMm(FIT_GAP_MM)
-            LabelEdge.RIGHT -> setLengthMm(t.spec.leadingMm + contentSpanMm(t.elements) + FIT_GAP_MM)
+            LabelEdge.LEFT -> setLeadingMm(t.spec.leadingMm + FIT_GAP_MM - left)
+            LabelEdge.RIGHT -> setLengthMm(right + FIT_GAP_MM)
         }
     }
 

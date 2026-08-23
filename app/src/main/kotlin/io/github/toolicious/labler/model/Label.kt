@@ -24,7 +24,11 @@ data class LabelSpec(
      */
     val autoLength: Boolean = false,
     val manualEdges: Boolean = false,
-    /** MANUAL only: blank tape in front of the leftmost element. */
+    /**
+     * MANUAL only: where the element coordinates start inside the label, which is what the leading
+     * edge moves. Negative once that edge has been pulled in past them, and what lies in front of
+     * it prints cut off.
+     */
     val leadingMm: Int = 0,
 ) {
     val lengthPx: Int get() = lengthMm * Protocol.DOTS_PER_MM
@@ -45,12 +49,15 @@ data class LabelSpec(
     /** Whether the length follows the content. */
     val lengthIsAuto: Boolean get() = lengthMode == LengthMode.VARIABLE
 
-    /** Whether the label is laid out from its content rather than from the tape start. */
-    val contentIsAnchored: Boolean get() = lengthMode != LengthMode.FIXED
-
+    /**
+     * [this] in [mode], with the leading edge back at zero: changing the mode hands the shift the
+     * old one drew with over to the element coordinates (see LabelRenderer.rebasedForMode), and a
+     * manual label starts measuring from there.
+     */
     fun withLengthMode(mode: LengthMode): LabelSpec = copy(
         autoLength = mode == LengthMode.VARIABLE,
         manualEdges = mode == LengthMode.MANUAL,
+        leadingMm = 0,
     )
 
     companion object {

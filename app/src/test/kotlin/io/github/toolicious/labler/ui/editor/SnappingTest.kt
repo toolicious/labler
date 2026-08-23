@@ -130,14 +130,25 @@ class SnappingTest {
     }
 
     @Test
-    fun `a label laid out from its content offers no line of its own along the tape`() {
+    fun `a variable label offers no line of its own along the tape`() {
         // Both edges follow whatever is dragged, so every line derived from the frame would chase
         // itself. Only the other elements' lines are left, and the tape's height is unaffected.
         val variable = LabelSpec(lengthMm = 40, media = MediaType.CONTINUOUS, autoLength = true)
-        val manual = LabelSpec(lengthMm = 40, media = MediaType.CONTINUOUS, manualEdges = true)
         assertEquals(emptyList<SnapTarget>(), labelXTargets(variable))
-        assertEquals(emptyList<SnapTarget>(), labelXTargets(manual))
         assertEquals(3, labelYTargets().size)
+    }
+
+    @Test
+    fun `a manual label offers its lines where its leading edge puts them`() {
+        // Its edges are dragged rather than derived, so they hold still and can be snapped to. The
+        // element coordinates start 2 mm inside the tape, so the tape starts 16 px before them.
+        val manual = LabelSpec(
+            lengthMm = 40,
+            media = MediaType.CONTINUOUS,
+            manualEdges = true,
+            leadingMm = 2,
+        )
+        assertEquals(listOf(144f, -16f, 304f), labelXTargets(manual).map { it.line })
     }
 
     @Test

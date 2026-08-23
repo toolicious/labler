@@ -303,7 +303,6 @@ fun HomeScreen(
             },
             onImport = null,
             currentLengthMm = LabelRenderer.effectiveLengthMm(target.spec, target.elements),
-            currentLeadingMm = LabelRenderer.leadingMmFor(target.spec, target.elements),
         )
     }
 
@@ -458,9 +457,6 @@ private fun TemplateCard(
  *   its own because it never sees the elements. It pre-fills the length field when the user leaves
  *   the variable mode, so that picking another mode keeps the label as long as it already is.
  *   Null where there is nothing to measure yet, and then the minimum has to do.
- * @param currentLeadingMm blank tape in front of the content right now, measured the same way and
- *   for the same reason. Switching to the manual mode adopts it as the leading edge, so the mode
- *   change alone leaves the content exactly where it was.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -472,7 +468,6 @@ internal fun LabelDialog(
     onConfirm: (String, LabelSpec) -> Unit,
     onImport: (() -> Unit)?,
     currentLengthMm: Int? = null,
-    currentLeadingMm: Int? = null,
     autofocusName: Boolean = false,
 ) {
     val isPresetSize = LabelSpec.PRESETS.any { it.first == initialSpec.tapeWidthMm && it.second == initialSpec.lengthMm }
@@ -686,17 +681,8 @@ internal fun LabelDialog(
                     ?.coerceIn(LabelSpec.MIN_LENGTH_MM, LabelSpec.MAX_LENGTH_MM) ?: 40
                 val media = if (dieCut) MediaType.DIE_CUT else MediaType.CONTINUOUS
                 val mode = if (dieCut) LengthMode.FIXED else lengthMode
-                // A label that was already manual keeps the gap that was dragged in front of its
-                // content. One that becomes manual here starts from the gap it happens to have, so
-                // that picking the mode does not shift the content by itself; the other two modes
-                // ignore the value and so may as well carry it.
-                val leading = if (mode == LengthMode.MANUAL && initialSpec.lengthMode != LengthMode.MANUAL) {
-                    currentLeadingMm ?: initialSpec.leadingMm
-                } else {
-                    initialSpec.leadingMm
-                }
                 // A die-cut label is always fixed, its length belongs to the stock.
-                onConfirm(name, LabelSpec(width, length, media, leadingMm = leading).withLengthMode(mode))
+                onConfirm(name, LabelSpec(width, length, media).withLengthMode(mode))
             }
             if (onImport != null) {
                 Row(

@@ -115,50 +115,37 @@ object LabelRenderer {
     /**
      * How far every element moves when the label is drawn.
      *
-     * A fixed label keeps its coordinates, the tape starting at x = 0. The other two anchor the
-     * content instead: VARIABLE puts the leftmost element on the margin, MANUAL on the leading edge
-     * that was dragged there. That is what lets something be placed in front of everything else
-     * without having to move everything else out of the way first. Whole pixels, so the dot grid
-     * the drawing snaps to stays intact.
+     * A fixed label keeps its coordinates, the tape starting at x = 0. A variable one is laid out
+     * from its content instead, putting the leftmost element on the margin, which is what lets
+     * something be placed in front of everything else without having to move everything else out of
+     * the way first. A manual label shifts by its leading edge and by nothing else, so moving an
+     * element there never moves an edge. Whole pixels, so the dot grid the drawing snaps to stays
+     * intact.
      */
     fun contentOffsetPx(spec: LabelSpec, elements: List<LabelElement>): Float = when (spec.lengthMode) {
         LengthMode.FIXED -> 0f
         LengthMode.VARIABLE -> (AUTO_LENGTH_MARGIN_PX - contentLeft(elements)).roundToInt().toFloat()
-        LengthMode.MANUAL -> (spec.leadingPx - contentLeft(elements)).roundToInt().toFloat()
+        LengthMode.MANUAL -> spec.leadingPx.toFloat()
     }
-
-    /**
-     * The blank tape in front of the content as the label stands right now, in whole millimetres.
-     *
-     * This is what [LabelSpec.leadingMm] has to become when a label is switched to MANUAL, so that
-     * changing the mode on its own does not move anything: a fixed label reports where its leftmost
-     * element sits, a variable one the margin it is laid out with. Without it a fixed label whose
-     * content starts well into the tape would snap flush to the tape start.
-     *
-     * Negative where the content already starts off the front of the tape, which a fixed label can
-     * do and the manual mode carries on doing.
-     */
-    fun leadingMmFor(spec: LabelSpec, elements: List<LabelElement>): Int =
-        ((contentOffsetPx(spec, elements) + contentLeft(elements)) / Protocol.DOTS_PER_MM)
-            .roundToInt()
 
     /**
      * The elements to keep when a label changes its length mode.
      *
-     * A fixed label draws its elements where they stand; the other two anchor them to an edge and
-     * draw them shifted. Leaving one of those for fixed therefore has to bake that shift into the
-     * coordinates, or the content would jump the moment the mode changed.
+     * A fixed label draws its elements where they stand, a manual one shifts them by its leading
+     * edge, a variable one by whatever its content needs. Leaving one of the latter two therefore
+     * has to bake that shift into the coordinates, or the content would jump the moment the mode
+     * changed. The new spec starts from a leading edge of zero for the same reason.
      *
-     * There is no such trick for the other direction. The variable mode puts the content on its
-     * front margin by definition, so a gap in front of it cannot survive the switch; keeping one is
-     * what the manual mode is for.
+     * There is no such trick for a label becoming variable. That mode puts the content on its front
+     * margin by definition, so a gap in front of it cannot survive the switch; keeping one is what
+     * the manual mode is for.
      */
     fun rebasedForMode(
         old: LabelSpec,
         elements: List<LabelElement>,
         new: LabelSpec,
     ): List<LabelElement> {
-        if (new.lengthMode != LengthMode.FIXED || old.lengthMode == LengthMode.FIXED) return elements
+        if (new.lengthMode == LengthMode.VARIABLE || old.lengthMode == LengthMode.FIXED) return elements
         val offset = contentOffsetPx(old, elements)
         return if (offset == 0f) elements else elements.map { it.moved(offset, 0f) }
     }

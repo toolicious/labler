@@ -40,18 +40,22 @@ internal data class SnapTarget(
 internal data class AxisSnap(val shift: Float, val guide: SnapGuide)
 
 /**
- * The label's own lines along the tape. A label laid out from its content has no fixed edge on
- * either side, both follow whatever is being dragged, so all three targets derived from the frame
- * would chase themselves and are left out. The other elements' lines still hold.
+ * The label's own lines along the tape. A variable label has no fixed edge on either side, both
+ * follow whatever is being dragged, so all three targets derived from the frame would chase
+ * themselves and are left out. The other elements' lines still hold.
+ *
+ * A manual label does have edges, but they sit where its leading edge puts them: element
+ * coordinates start [LabelSpec.leadingPx] inside the tape, so the tape starts at minus that.
  */
 internal fun labelXTargets(spec: LabelSpec): List<SnapTarget> =
-    if (spec.contentIsAnchored) {
+    if (spec.lengthIsAuto) {
         emptyList()
     } else {
+        val start = (-spec.leadingPx).toFloat()
         listOf(
-            SnapTarget(spec.lengthPx / 2f, LABEL_SNAP_TOL, SnapAnchor.CENTER),
-            SnapTarget(0f, LABEL_SNAP_TOL, SnapAnchor.LEADING),
-            SnapTarget(spec.lengthPx.toFloat(), LABEL_SNAP_TOL, SnapAnchor.TRAILING),
+            SnapTarget(start + spec.lengthPx / 2f, LABEL_SNAP_TOL, SnapAnchor.CENTER),
+            SnapTarget(start, LABEL_SNAP_TOL, SnapAnchor.LEADING),
+            SnapTarget(start + spec.lengthPx, LABEL_SNAP_TOL, SnapAnchor.TRAILING),
         )
     }
 
