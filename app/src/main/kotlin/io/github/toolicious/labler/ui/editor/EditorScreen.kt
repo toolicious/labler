@@ -551,15 +551,25 @@ private fun LabelElement.withRotation(deg: Int): LabelElement = when (this) {
 }
 
 /** Scales the element so its height becomes pct % of the label height; width proportional. */
+/**
+ * How large an element may be made. Twice the printable height, so it can be blown up and cropped
+ * rather than only ever fitted, which is the same thing the label edges allow. Text goes by its
+ * font size instead of its height and carries its own number.
+ *
+ * The size fields and the scale control both work to these, or the one would stop where the other
+ * still went on.
+ */
+private const val MAX_ELEMENT_HEIGHT_PX = 2 * LabelSpec.PRINT_HEIGHT_PX
+private const val MAX_FONT_SIZE_PX = 200
+
 private fun LabelElement.scaledToHeightPercent(pct: Int): LabelElement {
     val target = pct / 100f * LabelSpec.PRINT_HEIGHT_PX
     val current = LabelRenderer.measure(this).height
     val factor = if (current > 0.1f) target / current else 1f
-    // Allow up to 200 % (bigger than the label) so an element can be zoomed/cropped.
-    val maxH = 2f * LabelSpec.PRINT_HEIGHT_PX
+    val maxH = MAX_ELEMENT_HEIGHT_PX.toFloat()
     return when (this) {
         is TextElement -> copy(
-            fontSizePx = (fontSizePx * factor).coerceIn(6f, 200f),
+            fontSizePx = (fontSizePx * factor).coerceIn(6f, MAX_FONT_SIZE_PX.toFloat()),
             boxWidthPx = boxWidthPx?.let { it * factor },
         )
         is IconElement -> copy(sizePx = target.coerceIn(8f, maxH))
@@ -1158,11 +1168,13 @@ private fun TextProperties(
         label = stringResource(R.string.prop_size) + ": ",
         value = "${element.fontSizePx.toInt()} px",
         onDecrease = { onUpdate(element.copy(fontSizePx = (element.fontSizePx - 4).coerceAtLeast(8f))) },
-        onIncrease = { onUpdate(element.copy(fontSizePx = (element.fontSizePx + 4).coerceAtMost(96f))) },
+        onIncrease = {
+            onUpdate(element.copy(fontSizePx = (element.fontSizePx + 4).coerceAtMost(MAX_FONT_SIZE_PX.toFloat())))
+        },
         edit = NumberEdit(
             title = stringResource(R.string.prop_size),
             value = element.fontSizePx.toInt(),
-            range = 8..96,
+            range = 8..MAX_FONT_SIZE_PX,
             onValue = { onUpdate(element.copy(fontSizePx = it.toFloat())) },
         ),
     )
@@ -1414,11 +1426,13 @@ private fun IconProperties(element: IconElement, onUpdate: (LabelElement) -> Uni
         label = stringResource(R.string.prop_size) + ": ",
         value = "${element.sizePx.toInt()} px",
         onDecrease = { onUpdate(element.copy(sizePx = (element.sizePx - 8).coerceAtLeast(16f))) },
-        onIncrease = { onUpdate(element.copy(sizePx = (element.sizePx + 8).coerceAtMost(96f))) },
+        onIncrease = {
+            onUpdate(element.copy(sizePx = (element.sizePx + 8).coerceAtMost(MAX_ELEMENT_HEIGHT_PX.toFloat())))
+        },
         edit = NumberEdit(
             title = stringResource(R.string.prop_size),
             value = element.sizePx.toInt(),
-            range = 16..96,
+            range = 16..MAX_ELEMENT_HEIGHT_PX,
             onValue = { onUpdate(element.copy(sizePx = it.toFloat())) },
         ),
     )
@@ -1578,11 +1592,13 @@ private fun FrameProperties(element: FrameElement, onUpdate: (LabelElement) -> U
         label = stringResource(R.string.prop_height) + ": ",
         value = "${element.heightPx.toInt()} px",
         onDecrease = { onUpdate(element.copy(heightPx = (element.heightPx - 8).coerceAtLeast(8f))) },
-        onIncrease = { onUpdate(element.copy(heightPx = (element.heightPx + 8).coerceAtMost(96f))) },
+        onIncrease = {
+            onUpdate(element.copy(heightPx = (element.heightPx + 8).coerceAtMost(MAX_ELEMENT_HEIGHT_PX.toFloat())))
+        },
         edit = NumberEdit(
             title = stringResource(R.string.prop_height),
             value = element.heightPx.toInt(),
-            range = 8..LabelSpec.PRINT_HEIGHT_PX,
+            range = 8..MAX_ELEMENT_HEIGHT_PX,
             onValue = { onUpdate(element.copy(heightPx = it.toFloat())) },
         ),
     )
