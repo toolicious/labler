@@ -22,6 +22,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -54,6 +55,7 @@ import io.github.toolicious.labler.render.MonoConverter
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.abs
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
@@ -71,17 +73,14 @@ private val EDGE_FLAG_PAD = 9.dp
 private val EDGE_FLAG_TEXT = 12.sp
 private val EDGE_FLAG_ARROW_GAP = 5.dp  // between the word and the arrow beside it
 
-/** Axis-aligned bounding box of an element rotated by an arbitrary angle. */
+/**
+ * Axis-aligned bounding box of an element rotated by an arbitrary angle. This is the box the canvas
+ * outlines and the box the view model snaps against, so a guide always lands on an edge the user
+ * can actually see.
+ */
 internal fun elementBounds(el: LabelElement): Rect {
     val s = LabelRenderer.measure(el)
-    val cx = el.x + s.width / 2f
-    val cy = el.y + s.height / 2f
-    val rad = Math.toRadians(el.rotation.toDouble())
-    val c = abs(cos(rad)).toFloat()
-    val sn = abs(sin(rad)).toFloat()
-    val hw = s.width / 2f * c + s.height / 2f * sn
-    val hh = s.width / 2f * sn + s.height / 2f * c
-    return Rect(cx - hw, cy - hh, cx + hw, cy + hh)
+    return rotatedBounds(el.x, el.y, s.width, s.height, el.rotation)
 }
 
 /**
@@ -379,20 +378,9 @@ fun EditorCanvas(
             // Element coordinates, which the anchored modes shift against the frame.
             fun elToScreen(lx: Float, ly: Float) = toScreen(lx + offsetPx, ly)
 
-            // Snap guide lines
-            val dash = PathEffect.dashPathEffect(floatArrayOf(9f, 6f))
-            guides.xLine?.let { gx ->
-                drawLine(
-                    guideColor, elToScreen(gx, 0f), elToScreen(gx, labelH),
-                    strokeWidth = 2f, pathEffect = dash
-                )
-            }
-            guides.yLine?.let { gy ->
-                drawLine(
-                    guideColor, toScreen(0f, gy), toScreen(labelW, gy),
-                    strokeWidth = 2f, pathEffect = dash
-                )
-            }
+            drawSnapOverlay(
+                guides, contentTL, labelW, labelH, total, offsetPx, isDieCut, cornerR, guideColor,
+            )
 
             // Selection frame and scale handle. While dragging without snapping, the frame
             // switches to the guide color, because no guide lines show up in that mode.
@@ -488,6 +476,100 @@ fun EditorCanvas(
                 arrow(leftFlag.right - flagPad - arrowHalf, leftFlag.center.y)
                 arrow(rightFlag.left + flagPad + arrowHalf, rightFlag.center.y)
             }
+        }
+    }
+}
+
+/** How small a reference may get on screen before its box would be unreadable. Device px. */
+private const val MIN_REF_PX = 12f
+
+/**
+ * Shows what the dragged element is currently aligned to: a dashed line across the label at the
+ * snapped coordinate, a thin dashed box around the reference, and a solid bar on the anchor of that
+ * reference the element locked onto. The reference is either another element or the label itself,
+ * and then the label's own frame is the box, which is what tells a label center apart from an
+ * element center.
+ */
+private fun DrawScope.drawSnapOverlay(
+    guides: SnapGuides,
+    contentTL: Offset,
+    labelW: Float,
+    labelH: Float,
+    total: Float,
+    offsetPx: Float,
+    isDieCut: Boolean,
+    cornerR: Float,
+    color: Color,
+) {
+    val x = guides.x
+    val y = guides.y
+    if (x == null && y == null) return
+
+    // Frame coordinates for the label's own lines, element coordinates for everything a guide or a
+    // reference box carries, because the anchored length modes shift the two against each other.
+    fun toScreen(lx: Float, ly: Float) = contentTL + Offset(lx * total, ly * total)
+    fun elToScreen(lx: Float, ly: Float) = toScreen(lx + offsetPx, ly)
+    val refDash = PathEffect.dashPathEffect(floatArrayOf(4f, 4f))
+    val lineDash = PathEffect.dashPathEffect(floatArrayOf(9f, 6f))
+    val refStroke = Stroke(width = 1.5f, pathEffect = refDash)
+
+    // One box per reference, so an element both axes snapped to is outlined once, not twice.
+    listOfNotNull(x, y).map { it.refBounds }.distinct().forEach { ref ->
+        if (ref == null) {
+            // The label is the reference, so its own frame is the box, rounded on a die-cut label.
+            val size = Size(labelW * total, labelH * total)
+            if (isDieCut) {
+                drawRoundRect(
+                    color, topLeft = contentTL, size = size,
+                    cornerRadius = CornerRadius(cornerR * total, cornerR * total),
+                    style = refStroke,
+                )
+            } else {
+                drawRect(color, topLeft = contentTL, size = size, style = refStroke)
+            }
+        } else {
+            // Grown about its center when the element is a hairline, so the box does not collapse
+            // into nothing. Only the box is grown; the line and the bar keep the true coordinates.
+            val w = max(ref.width * total, MIN_REF_PX)
+            val h = max(ref.height * total, MIN_REF_PX)
+            val c = elToScreen(ref.center.x, ref.center.y)
+            drawRect(color, topLeft = c - Offset(w / 2f, h / 2f), size = Size(w, h), style = refStroke)
+        }
+    }
+
+    x?.let { drawLine(color, elToScreen(it.line, 0f), elToScreen(it.line, labelH), strokeWidth = 2f, pathEffect = lineDash) }
+    y?.let { drawLine(color, toScreen(0f, it.line), toScreen(labelW, it.line), strokeWidth = 2f, pathEffect = lineDash) }
+
+    // The bars go last, so they read on top of both the box and the line. A label anchor is nudged
+    // half a stroke inwards, because a bar centered on the tape edge would sit half in the gray
+    // border; an element anchor never is, it has to stay exactly on the edge it names.
+    fun nudge(g: SnapGuide) = if (g.refBounds != null) 0f else when (g.anchor) {
+        SnapAnchor.LEADING -> 2.5f / total
+        SnapAnchor.TRAILING -> -2.5f / total
+        SnapAnchor.CENTER -> 0f
+    }
+    val inset = if (isDieCut) cornerR else 0f
+
+    x?.let { g ->
+        val lx = g.line + nudge(g)
+        val ref = g.refBounds
+        if (ref == null) {
+            drawLine(color, toScreen(lx, inset), toScreen(lx, labelH - inset), strokeWidth = 5f)
+        } else {
+            val half = max(ref.height * total, MIN_REF_PX) / 2f
+            val c = elToScreen(lx, ref.center.y)
+            drawLine(color, c - Offset(0f, half), c + Offset(0f, half), strokeWidth = 5f)
+        }
+    }
+    y?.let { g ->
+        val ly = g.line + nudge(g)
+        val ref = g.refBounds
+        if (ref == null) {
+            drawLine(color, toScreen(inset, ly), toScreen(labelW - inset, ly), strokeWidth = 5f)
+        } else {
+            val half = max(ref.width * total, MIN_REF_PX) / 2f
+            val c = elToScreen(ref.center.x, ly)
+            drawLine(color, c - Offset(half, 0f), c + Offset(half, 0f), strokeWidth = 5f)
         }
     }
 }

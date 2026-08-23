@@ -29,22 +29,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.roundToInt
-
-/** Active snap guide lines during dragging, as label coordinates (null = no guide on that axis). */
-data class SnapGuides(val xLine: Float? = null, val yLine: Float? = null)
 
 /**
  * The two ends of a manual length label, as they are grabbed in the editor. LEFT is the leading
  * edge (the blank tape in front of the content), RIGHT is the end of the label.
  */
 enum class LabelEdge { LEFT, RIGHT }
-
-private const val LABEL_SNAP_TOL = 4f // label center and borders
-private const val ELEM_SNAP_TOL = 3f  // small zone for aligning to other elements
 
 /** Blank tape an edge keeps to the content when it is fitted to it (double tap on its handle). */
 private const val FIT_GAP_MM = 1
@@ -233,18 +226,9 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
             _guides.value = SnapGuides()
             return
         }
-        val xt = mutableListOf<SnapTarget>()
-        val yt = mutableListOf<SnapTarget>()
-        t.elements.forEach { other ->
-            if (other.id == id) return@forEach
-            val os = LabelRenderer.measure(other)
-            xt += SnapTarget(other.x, true, ELEM_SNAP_TOL)
-            xt += SnapTarget(other.x + os.width / 2f, true, ELEM_SNAP_TOL)
-            xt += SnapTarget(other.x + os.width, true, ELEM_SNAP_TOL)
-            yt += SnapTarget(other.y, true, ELEM_SNAP_TOL)
-            yt += SnapTarget(other.y + os.height / 2f, true, ELEM_SNAP_TOL)
-            yt += SnapTarget(other.y + os.height, true, ELEM_SNAP_TOL)
-        }
+        // Each line comes from the rotated box, the same one the canvas outlines, and the box is
+        // carried along with it so the canvas can highlight exactly the geometry a snap used.
+        val (xt, yt) = elementTargets(t.elements.filter { it.id != id }.map { elementBounds(it) })
         dragXTargets = xt
         dragYTargets = yt
     }
@@ -256,39 +240,29 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         val raw = (dragRaw ?: Offset(el.x, el.y)) + delta
         dragRaw = raw
 
-        val size = LabelRenderer.measure(el)
+        // Snapping and the placement bound both work on the rotated box the canvas draws, not on
+        // the unrotated one, so a guide lands on an edge the user can see and the element stays
+        // grabbable by the shape it is grabbed by. The offset from the element origin to that box
+        // depends only on size and rotation, so it holds for the whole drag. Both are zero for an
+        // unrotated element, which leaves the common case exactly as it was.
+        val box = elementBounds(el)
+        val offX = box.left - el.x
+        val offY = box.top - el.y
+
         var nx = raw.x
         var ny = raw.y
+        var xGuide: SnapGuide? = null
+        var yGuide: SnapGuide? = null
 
         if (!dragSnapFree) {
-            val centerX = spec.lengthPx / 2f
-            val centerY = LabelSpec.PRINT_HEIGHT_PX / 2f
-
-            // Label center + borders, then the cached lines of the other elements. A label laid
-            // out from its content has no fixed edge on either side, both follow whatever is being
-            // dragged, so all three targets derived from the frame would chase themselves and are
-            // left out. The lines of the other elements still hold.
-            val xTargets = if (spec.contentIsAnchored) {
-                dragXTargets
-            } else {
-                listOf(
-                    SnapTarget(centerX, true, LABEL_SNAP_TOL),
-                    SnapTarget(0f, false, LABEL_SNAP_TOL),
-                    SnapTarget(spec.lengthPx.toFloat(), false, LABEL_SNAP_TOL),
-                ) + dragXTargets
-            }
-            val yTargets = listOf(
-                SnapTarget(centerY, true, LABEL_SNAP_TOL),
-                SnapTarget(0f, false, LABEL_SNAP_TOL),
-                SnapTarget(LabelSpec.PRINT_HEIGHT_PX.toFloat(), false, LABEL_SNAP_TOL),
-            ) + dragYTargets
-
-            val snapX = bestSnapAxis(raw.x, size.width, xTargets)
-            val snapY = bestSnapAxis(raw.y, size.height, yTargets)
-
-            nx = snapX?.origin ?: raw.x
-            ny = snapY?.origin ?: raw.y
-            _guides.value = SnapGuides(snapX?.guideLine, snapY?.guideLine)
+            // The label's own lines first, then the cached lines of the other elements, so a line
+            // they share is credited to the label.
+            val snapX = bestSnapAxis(raw.x + offX, box.width, labelXTargets(spec) + dragXTargets)
+            val snapY = bestSnapAxis(raw.y + offY, box.height, labelYTargets() + dragYTargets)
+            nx += snapX?.shift ?: 0f
+            ny += snapY?.shift ?: 0f
+            xGuide = snapX?.guide
+            yGuide = snapY?.guide
         }
 
         // Keep at least 8 px grabbable. This is placement, not snapping, so it always applies.
@@ -296,39 +270,22 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         // along with whatever is dragged, so the only bound there is the largest length the printer
         // and the UI accept. That is what lets an element be put in front of all the others.
         val bound = LabelSpec.MAX_LENGTH_PX.toFloat()
-        val minX = if (spec.contentIsAnchored) -bound else 8f - size.width
+        val minX = if (spec.contentIsAnchored) -bound else 8f - box.width
         val maxX = if (spec.contentIsAnchored) bound else spec.lengthPx.toFloat()
-        nx = nx.coerceIn(minX, maxX - 8f)
-        ny = ny.coerceIn(8f - size.height, LabelSpec.PRINT_HEIGHT_PX - 8f)
-
-        applyWithoutHistory(el.moved(nx - el.x, ny - el.y))
-    }
-
-    private data class SnapTarget(val line: Float, val guide: Boolean, val tol: Float)
-    private data class AxisSnap(val origin: Float, val guideLine: Float?)
-
-    /**
-     * Picks the closest snap target on an axis. The dragged element snaps by its leading edge,
-     * center, or trailing edge to any target line within that target's tolerance. Returns the new
-     * origin and, when the target should show a guide, its label coordinate.
-     */
-    private fun bestSnapAxis(origin: Float, extent: Float, targets: List<SnapTarget>): AxisSnap? {
-        val features = floatArrayOf(origin, origin + extent / 2f, origin + extent)
-        var bestDist = Float.MAX_VALUE
-        var bestTarget: SnapTarget? = null
-        var bestFeature = 0f
-        for (target in targets) {
-            for (f in features) {
-                val d = abs(f - target.line)
-                if (d < target.tol && d < bestDist) {
-                    bestDist = d
-                    bestTarget = target
-                    bestFeature = f
-                }
-            }
+        val boxX = (nx + offX).coerceIn(minX, maxX - 8f)
+        val boxY = (ny + offY).coerceIn(8f - box.height, LabelSpec.PRINT_HEIGHT_PX - 8f)
+        // A guide would point at a line the element is no longer on once the bound had to move it.
+        if (boxX != nx + offX) {
+            nx = boxX - offX
+            xGuide = null
         }
-        val target = bestTarget ?: return null
-        return AxisSnap(origin = target.line - (bestFeature - origin), guideLine = if (target.guide) target.line else null)
+        if (boxY != ny + offY) {
+            ny = boxY - offY
+            yGuide = null
+        }
+
+        if (!dragSnapFree) _guides.value = SnapGuides(xGuide, yGuide)
+        applyWithoutHistory(el.moved(nx - el.x, ny - el.y))
     }
 
     fun endDrag() {
