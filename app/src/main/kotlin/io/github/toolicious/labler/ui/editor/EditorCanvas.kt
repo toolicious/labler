@@ -145,10 +145,17 @@ fun EditorCanvas(
     val edgeLineWidth = with(density) { EDGE_LINE_WIDTH.toPx() }
     val edgeDash = with(density) { floatArrayOf(EDGE_DASH_ON.toPx(), EDGE_DASH_OFF.toPx()) }
     val arrowStroke = with(density) { 2.dp.toPx() }
-    // The strip the flags hang in is taken out of the height the tape is fitted into, and it is
-    // taken in every mode, not just where they are drawn. Reserving it only for the manual mode
-    // would rescale the tape on every switch, and the label has to look the same in all three.
-    val bottomRoom = flagHeight
+    // Room for the flags that hang under the tape. Most labels are wider than they are tall and
+    // leave more than enough of it beside their own margin, and then nothing is taken off and the
+    // tape sits in the middle of the canvas. Only a label tall enough to fill the canvas has to
+    // give some height up for them.
+    //
+    // Worked out for every mode, not just the manual one where the flags are drawn, because a strip
+    // that came and went with the mode would rescale and move the tape on every switch.
+    val plain = if (boxSize.width > 0 && boxSize.height > 0) {
+        min(boxSize.width / labelW, boxSize.height / labelH) * 0.96f
+    } else 1f
+    val bottomRoom = (flagHeight - (boxSize.height - labelH * plain) / 2f).coerceAtLeast(0f)
     val total = if (boxSize.width > 0 && boxSize.height > 0) {
         min(
             boxSize.width / labelW,
