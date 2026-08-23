@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -72,6 +73,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
@@ -1250,6 +1254,45 @@ private fun StampChip(label: String, token: String, patterns: List<String>, onPi
     }
 }
 
+/**
+ * A symbol the way the label draws it, centered on its own outline. Compose centers the text line
+ * instead, and a font that reserves room above for accents and below for tails then leaves the
+ * symbol sitting low in the box.
+ */
+@Composable
+private fun GlyphPreview(glyph: String, iconFont: String?, modifier: Modifier = Modifier) {
+    val color = MaterialTheme.colorScheme.onSurface
+    val paint = remember(iconFont, color) {
+        android.graphics.Paint().apply {
+            isAntiAlias = true
+            this.color = color.toArgb()
+            FontRegistry.iconFont(iconFont)?.let { typeface = it }
+        }
+    }
+    Canvas(modifier) {
+        // The square it gets is the em square of the glyph, the same rule the label draws by, so a
+        // symbol is as large here as it is there. One that reaches past its square is scaled down
+        // until it fits, again as on the label.
+        val box = minOf(size.width, size.height)
+        val ink = android.graphics.Rect()
+        paint.textSize = box
+        paint.getTextBounds(glyph, 0, glyph.length, ink)
+        val over = maxOf(ink.width(), ink.height()) / box
+        if (over > 1f) {
+            paint.textSize = box / over
+            paint.getTextBounds(glyph, 0, glyph.length, ink)
+        }
+        drawIntoCanvas {
+            it.nativeCanvas.drawText(
+                glyph,
+                size.width / 2f - (ink.left + ink.right) / 2f,
+                size.height / 2f - (ink.top + ink.bottom) / 2f,
+                paint,
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun IconProperties(element: IconElement, onUpdate: (LabelElement) -> Unit) {
@@ -1262,7 +1305,7 @@ private fun IconProperties(element: IconElement, onUpdate: (LabelElement) -> Uni
             .clickable { showPicker = true },
         contentAlignment = Alignment.Center
     ) {
-        Text(element.glyph, fontFamily = iconFontFamily(element.iconFont), fontSize = 40.sp)
+        GlyphPreview(element.glyph, element.iconFont, Modifier.fillMaxSize().padding(4.dp))
     }
     Spacer(Modifier.height(8.dp))
     Stepper(

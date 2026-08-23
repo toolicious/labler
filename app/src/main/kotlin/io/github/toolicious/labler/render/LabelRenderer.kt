@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.text.Layout
 import android.text.StaticLayout
@@ -318,16 +319,45 @@ object LabelRenderer {
         val paint = TextPaint().apply {
             isAntiAlias = true
             color = Color.BLACK
-            textSize = size * 0.85f
+            // The element square is the em square the glyph was drawn in, so a symbol comes out at
+            // the size its designer gave it. Room left inside that square is part of the drawing:
+            // it keeps a bullet a bullet, and it holds the symbols of one font in the proportions
+            // they were drawn in, which fitting each glyph to the square on its own would undo.
+            textSize = size.toFloat()
             FontRegistry.iconFont(e.iconFont)?.let { typeface = it }
         }
-        val layout = StaticLayout.Builder
-            .obtain(e.glyph, 0, e.glyph.length, paint, size)
-            .setAlignment(Layout.Alignment.ALIGN_CENTER)
-            .setIncludePad(false)
-            .build()
-        oc.translate(0f, ((size - layout.height) / 2f).coerceAtLeast(0f))
-        layout.draw(oc)
+        val ink = Rect()
+        paint.getTextBounds(e.glyph, 0, e.glyph.length, ink)
+        // Not every font stays inside its em square. Emoji are drawn past theirs as a rule, and
+        // cutting their outlines off at the edge of the element looks like a fault, so a glyph
+        // that reaches beyond its square is scaled down until it fits. Only ever downwards: a
+        // glyph drawn small is drawn small on purpose.
+        val over = maxOf(ink.width(), ink.height()) / size.toFloat()
+        if (over > 1f) {
+            paint.textSize = size / over
+            paint.getTextBounds(e.glyph, 0, e.glyph.length, ink)
+        }
+        // Placed by its outline rather than by the text line it would sit on. A line reserves room
+        // above for accents and below for tails, neither of which a symbol has, and how much of it
+        // a font takes differs from font to font: the icon font reserves nothing, so its line is
+        // the em square, while the font the plain symbols come from is built for letters and would
+        // leave a symbol sitting low in its square.
+        if (ink.isEmpty) {
+            val fm = paint.fontMetrics
+            oc.drawText(
+                e.glyph,
+                (size - paint.measureText(e.glyph)) / 2f,
+                (size - fm.ascent - fm.descent) / 2f,
+                paint,
+            )
+        } else {
+            oc.drawText(
+                e.glyph,
+                size / 2f - (ink.left + ink.right) / 2f,
+                size / 2f - (ink.top + ink.bottom) / 2f,
+                paint,
+            )
+        }
 
         val px = IntArray(size * size)
         off.getPixels(px, 0, size, 0, 0, size, size)
