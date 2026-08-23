@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -47,6 +48,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.IconButton
@@ -54,6 +56,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -62,6 +65,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -81,12 +85,15 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
@@ -473,6 +480,12 @@ private fun PropertiesPanel(
                         value = "${element.rotation}°",
                         onDecrease = { onUpdate(element.withRotation((element.rotation - 15 + 360) % 360)) },
                         onIncrease = { onUpdate(element.withRotation((element.rotation + 15) % 360)) },
+                        edit = NumberEdit(
+                            title = stringResource(R.string.cd_rotate),
+                            value = element.rotation,
+                            range = 0..359,
+                            onValue = { onUpdate(element.withRotation(it)) },
+                        ),
                     )
                     OutlinedButton(
                         onClick = { onUpdate(element.withRotation((element.rotation + 90) % 360)) },
@@ -500,6 +513,12 @@ private fun PropertiesPanel(
                     value = "$pct %",
                     onDecrease = { onUpdate(element.scaledToHeightPercent((pct - 1).coerceAtLeast(2))) },
                     onIncrease = { onUpdate(element.scaledToHeightPercent((pct + 1).coerceAtMost(scaleMax))) },
+                    edit = NumberEdit(
+                        title = stringResource(R.string.group_scale),
+                        value = pct,
+                        range = 2..scaleMax,
+                        onValue = { onUpdate(element.scaledToHeightPercent(it)) },
+                    ),
                 )
             }
         }
@@ -559,14 +578,85 @@ private fun LabelElement.scaledToHeightPercent(pct: Int): LabelElement {
     }
 }
 
+/**
+ * What a tap on a stepper number offers to type in: the number that is there, the bounds it has to
+ * keep to, and where the result goes. [title] names the dialog, because the label beside a number
+ * is not always there to say what it is.
+ */
+private class NumberEdit(
+    val title: String,
+    val value: Int,
+    val range: IntRange,
+    val onValue: (Int) -> Unit,
+)
+
+/**
+ * @param edit what a tap on the number opens. Stepping through a range with the buttons is fine
+ *   for a nudge and tedious for a jump, so the number itself takes a value straight away.
+ */
 @Composable
-private fun Stepper(label: String, value: String, onDecrease: () -> Unit, onIncrease: () -> Unit) {
+private fun Stepper(
+    label: String,
+    value: String,
+    onDecrease: () -> Unit,
+    onIncrease: () -> Unit,
+    edit: NumberEdit? = null,
+) {
+    var typing by remember { mutableStateOf(false) }
     Row(verticalAlignment = Alignment.CenterVertically) {
         if (label.isNotEmpty()) Text(label, style = MaterialTheme.typography.bodyMedium)
         StepButton("-", onDecrease)
-        Text(value, style = MaterialTheme.typography.bodyMedium)
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(6.dp))
+                .then(if (edit == null) Modifier else Modifier.clickable { typing = true })
+                // As tall as the two buttons beside it, so the number is as easy to hit as they are
+                // and the row does not change height for it.
+                .heightIn(min = 44.dp)
+                .padding(horizontal = 8.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(value, style = MaterialTheme.typography.bodyMedium)
+        }
         StepButton("+", onIncrease)
     }
+    if (typing && edit != null) {
+        NumberDialog(edit) { typing = false }
+    }
+}
+
+/** Types a number into a stepper. Opens with the current one filled in and selected. */
+@Composable
+private fun NumberDialog(edit: NumberEdit, onDismiss: () -> Unit) {
+    val current = edit.value.toString()
+    var text by remember { mutableStateOf(TextFieldValue(current, TextRange(0, current.length))) }
+    val focus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { focus.requestFocus() }
+    val commit = {
+        // An empty or unreadable entry leaves the value alone rather than guessing at one.
+        text.text.trim().toIntOrNull()?.let { edit.onValue(it.coerceIn(edit.range)) }
+        onDismiss()
+    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(edit.title) },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(onDone = { commit() }),
+                supportingText = { Text("${edit.range.first} - ${edit.range.last}") },
+                modifier = Modifier.focusRequester(focus),
+            )
+        },
+        confirmButton = { TextButton(onClick = commit) { Text(stringResource(R.string.action_done)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+    )
 }
 
 /**
@@ -1002,6 +1092,12 @@ private fun ImageProperties(element: ImageElement, onUpdate: (LabelElement) -> U
                 value = "${element.outlineThickness} px",
                 onDecrease = { onUpdate(element.copy(outlineThickness = (element.outlineThickness - 1).coerceAtLeast(1))) },
                 onIncrease = { onUpdate(element.copy(outlineThickness = (element.outlineThickness + 1).coerceAtMost(3))) },
+                edit = NumberEdit(
+                    title = stringResource(R.string.prop_line_width),
+                    value = element.outlineThickness,
+                    range = 1..3,
+                    onValue = { onUpdate(element.copy(outlineThickness = it)) },
+                ),
             )
             OutlineOptionsRow(
                 method = element.outlineMethod,
@@ -1062,7 +1158,13 @@ private fun TextProperties(
         label = stringResource(R.string.prop_size) + ": ",
         value = "${element.fontSizePx.toInt()} px",
         onDecrease = { onUpdate(element.copy(fontSizePx = (element.fontSizePx - 4).coerceAtLeast(8f))) },
-        onIncrease = { onUpdate(element.copy(fontSizePx = (element.fontSizePx + 4).coerceAtMost(96f))) }
+        onIncrease = { onUpdate(element.copy(fontSizePx = (element.fontSizePx + 4).coerceAtMost(96f))) },
+        edit = NumberEdit(
+            title = stringResource(R.string.prop_size),
+            value = element.fontSizePx.toInt(),
+            range = 8..96,
+            onValue = { onUpdate(element.copy(fontSizePx = it.toFloat())) },
+        ),
     )
 
     Spacer(Modifier.height(6.dp))
@@ -1312,7 +1414,13 @@ private fun IconProperties(element: IconElement, onUpdate: (LabelElement) -> Uni
         label = stringResource(R.string.prop_size) + ": ",
         value = "${element.sizePx.toInt()} px",
         onDecrease = { onUpdate(element.copy(sizePx = (element.sizePx - 8).coerceAtLeast(16f))) },
-        onIncrease = { onUpdate(element.copy(sizePx = (element.sizePx + 8).coerceAtMost(96f))) }
+        onIncrease = { onUpdate(element.copy(sizePx = (element.sizePx + 8).coerceAtMost(96f))) },
+        edit = NumberEdit(
+            title = stringResource(R.string.prop_size),
+            value = element.sizePx.toInt(),
+            range = 16..96,
+            onValue = { onUpdate(element.copy(sizePx = it.toFloat())) },
+        ),
     )
     Spacer(Modifier.height(6.dp))
     GroupLabel(stringResource(R.string.group_raster))
@@ -1356,7 +1464,13 @@ private fun IconProperties(element: IconElement, onUpdate: (LabelElement) -> Uni
             label = stringResource(R.string.prop_line_width) + ": ",
             value = "${element.outlineThickness} px",
             onDecrease = { onUpdate(element.copy(outlineThickness = (element.outlineThickness - 1).coerceAtLeast(1))) },
-            onIncrease = { onUpdate(element.copy(outlineThickness = (element.outlineThickness + 1).coerceAtMost(3))) }
+            onIncrease = { onUpdate(element.copy(outlineThickness = (element.outlineThickness + 1).coerceAtMost(3))) },
+            edit = NumberEdit(
+                title = stringResource(R.string.prop_line_width),
+                value = element.outlineThickness,
+                range = 1..3,
+                onValue = { onUpdate(element.copy(outlineThickness = it)) },
+            ),
         )
         OutlineOptionsRow(
             method = element.outlineMethod,
@@ -1425,26 +1539,51 @@ private fun FrameProperties(element: FrameElement, onUpdate: (LabelElement) -> U
         label = stringResource(R.string.prop_stroke) + ": ",
         value = "${element.strokePx.toInt()} px",
         onDecrease = { onUpdate(element.copy(strokePx = (element.strokePx - 1).coerceAtLeast(1f))) },
-        onIncrease = { onUpdate(element.copy(strokePx = (element.strokePx + 1).coerceAtMost(10f))) }
+        onIncrease = { onUpdate(element.copy(strokePx = (element.strokePx + 1).coerceAtMost(10f))) },
+        edit = NumberEdit(
+            title = stringResource(R.string.prop_stroke),
+            value = element.strokePx.toInt(),
+            range = 1..10,
+            onValue = { onUpdate(element.copy(strokePx = it.toFloat())) },
+        ),
     )
     if (rectSelected) {
         Stepper(
             label = stringResource(R.string.prop_radius) + ": ",
             value = "${element.cornerRadiusPx.toInt()} px",
             onDecrease = { onUpdate(element.copy(cornerRadiusPx = (element.cornerRadiusPx - 2).coerceAtLeast(0f))) },
-            onIncrease = { onUpdate(element.copy(cornerRadiusPx = (element.cornerRadiusPx + 2).coerceAtMost(48f))) }
+            onIncrease = { onUpdate(element.copy(cornerRadiusPx = (element.cornerRadiusPx + 2).coerceAtMost(48f))) },
+            edit = NumberEdit(
+                title = stringResource(R.string.prop_radius),
+                value = element.cornerRadiusPx.toInt(),
+                range = 0..48,
+                onValue = { onUpdate(element.copy(cornerRadiusPx = it.toFloat())) },
+            ),
         )
     }
     Stepper(
         label = stringResource(R.string.prop_width) + ": ",
         value = "${element.widthPx.toInt()} px",
         onDecrease = { onUpdate(element.copy(widthPx = (element.widthPx - 8).coerceAtLeast(8f))) },
-        onIncrease = { onUpdate(element.copy(widthPx = element.widthPx + 8)) }
+        onIncrease = { onUpdate(element.copy(widthPx = element.widthPx + 8)) },
+        edit = NumberEdit(
+            title = stringResource(R.string.prop_width),
+            value = element.widthPx.toInt(),
+            // A frame may run the whole length of the label, so its width stops where the label does.
+            range = 8..LabelSpec.MAX_LENGTH_PX,
+            onValue = { onUpdate(element.copy(widthPx = it.toFloat())) },
+        ),
     )
     Stepper(
         label = stringResource(R.string.prop_height) + ": ",
         value = "${element.heightPx.toInt()} px",
         onDecrease = { onUpdate(element.copy(heightPx = (element.heightPx - 8).coerceAtLeast(8f))) },
-        onIncrease = { onUpdate(element.copy(heightPx = (element.heightPx + 8).coerceAtMost(96f))) }
+        onIncrease = { onUpdate(element.copy(heightPx = (element.heightPx + 8).coerceAtMost(96f))) },
+        edit = NumberEdit(
+            title = stringResource(R.string.prop_height),
+            value = element.heightPx.toInt(),
+            range = 8..LabelSpec.PRINT_HEIGHT_PX,
+            onValue = { onUpdate(element.copy(heightPx = it.toFloat())) },
+        ),
     )
 }
