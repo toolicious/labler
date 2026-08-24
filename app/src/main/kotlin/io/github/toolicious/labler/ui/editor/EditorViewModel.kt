@@ -2,6 +2,7 @@ package io.github.toolicious.labler.ui.editor
 
 import android.app.Application
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -142,8 +143,62 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         scheduleSave(updated)
     }
 
-    fun addElement(element: LabelElement) {
-        mutate(null) { it.copy(elements = it.elements + element) }
+    /**
+     * The tape as the elements see it. Element coordinates and the label frame only line up on a
+     * fixed label: the other two modes draw the content shifted, so anything that has to match what
+     * is on screen goes through here rather than assuming the tape starts at zero.
+     */
+    private fun tapeRect(t: LabelTemplate): Rect {
+        val left = -LabelRenderer.contentOffsetPx(t.spec, t.elements)
+        return Rect(
+            left,
+            0f,
+            left + LabelRenderer.effectiveLengthPx(t.spec, t.elements),
+            LabelSpec.PRINT_HEIGHT_PX.toFloat(),
+        )
+    }
+
+    /**
+     * Where the tape begins. It is not the origin of the element coordinates: a manual label starts
+     * them inside the tape and a variable one wherever its content happens to be, so something laid
+     * out from zero would sit as far off the tape as the layout is shifted, which after a few drags
+     * is well out of sight.
+     */
+    val tapeStartPx: Float get() = _template.value?.let { tapeRect(it).left } ?: 0f
+
+    /**
+     * Where a new element goes: flush against the right edge of the selected one and centered on
+     * it, so adding several in a row lines them up, and in the middle of the tape when nothing is
+     * selected. Both beat a fixed corner, which after any amount of editing is nowhere in
+     * particular and, on the two shifted layouts, not even on the tape.
+     */
+    private fun placed(t: LabelTemplate, element: LabelElement): LabelElement {
+        val size = LabelRenderer.measure(element)
+        val tape = tapeRect(t)
+        val beside = t.elements.find { it.id == _selectedId.value }?.let { elementBounds(it) }
+        val x = if (beside != null) beside.right else tape.left + (tape.width - size.width) / 2f
+        val y = if (beside != null) beside.center.y - size.height / 2f
+        else (tape.height - size.height) / 2f
+
+        // A variable label grows to hold whatever is put on it. The other two have edges to stay
+        // within, and the same 8 px of a new element stays on the tape as of a dragged one.
+        val onTapeX =
+            if (t.spec.lengthIsAuto) x else x.coerceIn(tape.left + 8f - size.width, tape.right - 8f)
+        // An element taller than the tape is centered on it and hangs over both ways; one that fits
+        // is kept fully on it, however high or low the element it was placed beside sits.
+        val room = tape.height - size.height
+        val onTapeY = if (room < 0f) room / 2f else y.coerceIn(0f, room)
+        return element.moved(onTapeX - element.x, onTapeY - element.y)
+    }
+
+    /**
+     * @param place false keeps the coordinates the element was built with, for the ones that are
+     *   worked out from what they wrap or span rather than simply put somewhere free.
+     */
+    fun addElement(element: LabelElement, place: Boolean = true) {
+        mutate(null) { t ->
+            t.copy(elements = t.elements + if (place) placed(t, element) else element)
+        }
         _selectedId.value = element.id
     }
 

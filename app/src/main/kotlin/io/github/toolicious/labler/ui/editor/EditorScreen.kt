@@ -295,10 +295,10 @@ fun EditorScreen(
             GroupLabel(stringResource(R.string.group_add))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 AddButton(stringResource(R.string.add_text)) {
-                    vm.addElement(TextElement(id = UUID.randomUUID().toString(), x = 8f, y = 32f))
+                    vm.addElement(TextElement(id = UUID.randomUUID().toString()))
                 }
                 AddButton(stringResource(R.string.add_symbol)) {
-                    vm.addElement(IconElement(id = UUID.randomUUID().toString(), x = 8f, y = 24f))
+                    vm.addElement(IconElement(id = UUID.randomUUID().toString()))
                 }
                 AddButton(stringResource(R.string.add_image)) {
                     imagePicker.launch(
@@ -330,15 +330,16 @@ fun EditorScreen(
                         // itself is a fixed element and holds that length.
                         FrameElement(
                             id = id,
-                            x = 2f, y = 2f,
+                            x = vm.tapeStartPx + 2f, y = 2f,
                             widthPx = (LabelRenderer.effectiveLengthPx(t.spec, t.elements) - 4).toFloat(),
                             heightPx = (LabelSpec.PRINT_HEIGHT_PX - 4).toFloat()
                         )
                     }
-                    vm.addElement(frame)
+                    // Placed already: it either wraps the selected element or spans the tape.
+                    vm.addElement(frame, place = false)
                 }
                 AddButton(stringResource(R.string.add_barcode)) {
-                    vm.addElement(BarcodeElement(id = UUID.randomUUID().toString(), x = 8f, y = 16f))
+                    vm.addElement(BarcodeElement(id = UUID.randomUUID().toString()))
                 }
             }
 
