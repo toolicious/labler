@@ -1,0 +1,8 @@
+- Novo modo de comprimento "Manual": arraste as bordas; toque duplo ajusta (#2)
+- O comprimento variável cresce e diminui dos dois lados, com centro (#2)
+- As guias mostram com o que está se alinhando (#16)
+- Os símbolos são desenhados sem a margem invisível
+- Ao mover, um segundo quadro mostra o impresso, para alinhar
+- Toque em um número nas propriedades para digitá-lo
+- Novos elementos ficam ao lado da seleção ou centralizados
+- O status da impressora cabe em telas estreitas (#18)

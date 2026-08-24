@@ -1,0 +1,8 @@
+- Nieuwe lengtemodus "Handmatig": sleep de randen, dubbeltik past aan (#2)
+- Variabele lengte groeit en krimpt naar beide kanten, met midden (#2)
+- Hulplijnen tonen waarop wordt uitgelijnd (#16)
+- Symbolen worden zonder de onzichtbare marge getekend
+- Bij verplaatsen toont een tweede kader het afgedrukte om op uit te lijnen
+- Tik op een getal in de eigenschappen om het in te typen
+- Nieuwe elementen komen naast de selectie of in het midden
+- Printerstatus past op smalle schermen (#18)

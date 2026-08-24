@@ -1,0 +1,8 @@
+- Nuova modalità "Manuale": trascina i bordi, doppio tocco adatta (#2)
+- La lunghezza variabile cresce e si riduce sui due lati, con centro (#2)
+- Le guide mostrano a cosa ci si sta allineando (#16)
+- I simboli sono disegnati senza il margine invisibile
+- Spostando appare una seconda cornice dello stampato, per allineare
+- Tocca un numero nelle proprietà per digitarlo
+- I nuovi elementi vanno accanto alla selezione o al centro
+- Lo stato della stampante sta negli schermi stretti (#18)

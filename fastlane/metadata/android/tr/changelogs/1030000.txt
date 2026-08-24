@@ -1,0 +1,8 @@
+- Yeni "Elle" uzunluk kipi: kenarları sürükleyin, çift dokunuş yaslar (#2)
+- Değişken uzunluk iki yana da büyüyüp küçülüyor, ortaya hizalanıyor (#2)
+- Hizalama çizgileri neye hizalandığınızı gösterir (#16)
+- Simgeler çevresindeki görünmez boşluk olmadan çizilir
+- Taşırken ikinci bir çerçeve basılanı gösterir, hizalamak için
+- Öğe özelliklerinde bir sayıya dokunarak yazabilirsiniz
+- Yeni öğeler seçimin yanına ya da ortaya yerleşir
+- Yazıcı durumu dar ekranlara sığıyor (#18)

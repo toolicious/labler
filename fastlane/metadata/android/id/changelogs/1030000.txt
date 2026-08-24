@@ -1,0 +1,8 @@
+- Mode panjang baru "Manual": geser tepi label, ketuk dua kali (#2)
+- Panjang variabel tumbuh dan menyusut ke kedua sisi, dengan titik tengah (#2)
+- Garis bantu menunjukkan apa yang jadi acuan (#16)
+- Simbol digambar tanpa margin tak terlihat
+- Saat digeser, bingkai kedua menunjukkan yang tercetak, untuk meluruskan
+- Ketuk sebuah angka di properti elemen untuk mengetiknya
+- Elemen baru diletakkan di samping yang terpilih, atau di tengah
+- Status printer muat di layar sempit (#18)

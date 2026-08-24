@@ -1,0 +1,8 @@
+- Nuevo modo de longitud "Manual": arrastra los bordes; doble toque ajusta (#2)
+- La longitud variable crece y se encoge por ambos lados, con centro (#2)
+- Las guías muestran con qué se está alineando (#16)
+- Los símbolos se dibujan sin el margen invisible
+- Al mover aparece un segundo marco con lo impreso, para alinear
+- Toca un número en las propiedades para escribirlo
+- Los elementos nuevos van junto a la selección
+- El estado de la impresora cabe en pantallas estrechas (#18)

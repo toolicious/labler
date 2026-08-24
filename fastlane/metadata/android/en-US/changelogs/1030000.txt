@@ -1,0 +1,8 @@
+- New "Manual" length mode: drag the label edges, double tap one to fit (#2)
+- Variable length grows and shrinks on both sides, and snaps to its center (#2)
+- Snap guides show what you are aligning to (#16)
+- Symbols are drawn without the invisible margin
+- Moving an element also frames its printed area, so you can align to it
+- Tap a number in the properties to type it in
+- New elements go beside the selection, or centered
+- Printer status fits narrow screens, no stray characters (#18)

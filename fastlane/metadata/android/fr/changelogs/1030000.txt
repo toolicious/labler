@@ -1,0 +1,8 @@
+- Nouveau mode « Manuel » : glissez les bords, double appui ajuste (#2)
+- La longueur variable s'étend et se réduit des deux côtés, avec centre (#2)
+- Les repères indiquent sur quoi on s'aligne (#16)
+- Les symboles sont dessinés sans la marge invisible
+- En déplaçant, un second cadre montre l'imprimé, pour s'aligner
+- Appuyez sur un nombre dans les propriétés pour le saisir
+- Les nouveaux éléments arrivent près de la sélection
+- L'état de l'imprimante tient sur un écran étroit (#18)

@@ -1,0 +1,8 @@
+- Nowy tryb długości "Ręczny": przeciągaj krawędzie, dwukrotnie dopasuj (#2)
+- Długość zmienna rośnie i maleje w obie strony, z przyciąganiem do środka (#2)
+- Prowadnice pokazują, do czego następuje wyrównanie (#16)
+- Symbole są rysowane bez niewidocznego marginesu
+- Przy przesuwaniu druga ramka pokazuje obszar druku, do wyrównania
+- Stuknij liczbę we właściwościach, aby ją wpisać
+- Nowe elementy trafiają obok zaznaczenia albo na środek
+- Stan drukarki mieści się na wąskich ekranach (#18)

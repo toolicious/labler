@@ -1,0 +1,8 @@
+- Längenmodus "Manuell": Ränder ziehen oder per Doppeltipp anlegen (#2)
+- Variable Länge wächst und schrumpft beidseitig, Mitte rastet ein (#2)
+- Hilfslinien zeigen, woran ausgerichtet wird (#16)
+- Symbole werden ohne unsichtbaren Rand gezeichnet
+- Beim Verschieben zeigt ein zweiter Rahmen den Druckbereich zum Ausrichten
+- Zahlen in den Eigenschaften kann man eintippen
+- Neue Elemente sitzen neben der Auswahl oder mittig
+- Druckerstatus passt auf schmale Displays, ohne Störzeichen (#18)
