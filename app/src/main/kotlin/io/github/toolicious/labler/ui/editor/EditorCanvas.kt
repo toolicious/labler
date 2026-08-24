@@ -512,8 +512,9 @@ private fun DrawScope.drawSnapOverlay(
     val y = guides.y
     if (x == null && y == null) return
 
-    // Frame coordinates for the label's own lines, element coordinates for everything a guide or a
-    // reference box carries, because the anchored length modes shift the two against each other.
+    // Every line and every reference box arrives in element coordinates, which a manual or
+    // variable label draws shifted against its frame. Only the frame itself, the tape and its
+    // corners, is laid out in frame coordinates.
     fun toScreen(lx: Float, ly: Float) = contentTL + Offset(lx * total, ly * total)
     fun elToScreen(lx: Float, ly: Float) = toScreen(lx + offsetPx, ly)
     val refDash = PathEffect.dashPathEffect(floatArrayOf(4f, 4f))
@@ -561,7 +562,7 @@ private fun DrawScope.drawSnapOverlay(
         val lx = g.line + nudge(g)
         val ref = g.refBounds
         if (ref == null) {
-            drawLine(color, toScreen(lx, inset), toScreen(lx, labelH - inset), strokeWidth = 5f)
+            drawLine(color, elToScreen(lx, inset), elToScreen(lx, labelH - inset), strokeWidth = 5f)
         } else {
             val half = max(ref.height * total, MIN_REF_PX) / 2f
             val c = elToScreen(lx, ref.center.y)
