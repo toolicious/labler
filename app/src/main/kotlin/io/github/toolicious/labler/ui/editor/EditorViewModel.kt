@@ -284,7 +284,17 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         }
         // Each line comes from the rotated box, the same one the canvas outlines, and the box is
         // carried along with it so the canvas can highlight exactly the geometry a snap used.
-        val (xt, yt) = elementTargets(t.elements.filter { it.id != id }.map { elementBounds(it) })
+        //
+        // Only what is on the tape offers lines. Pulling the edges of a manual label in past an
+        // element leaves it outside, where it is not printed and cannot be seen, and a guide from
+        // it would point at nothing.
+        val tape = tapeRect(t)
+        val (xt, yt) = elementTargets(
+            t.elements
+                .filter { it.id != id }
+                .map { elementBounds(it) }
+                .filter { it.overlaps(tape) }
+        )
         dragXTargets = xt
         dragYTargets = yt
     }
