@@ -6,13 +6,19 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import io.github.toolicious.labler.printer.Protocol
+import io.github.toolicious.labler.printer.DeviceNames
+import io.github.toolicious.labler.printer.PrinterFamily
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore(name = "settings")
 
-data class SavedPrinter(val address: String, val name: String)
+data class SavedPrinter(
+    val address: String,
+    val name: String,
+    /** Absent for a printer paired before the app knew about families, hence the default. */
+    val family: PrinterFamily = PrinterFamily.DEFAULT,
+)
 
 /**
  * More than fit on a row, a tablet in landscape included, so that removing one always has
@@ -25,6 +31,7 @@ class SettingsRepository(private val context: Context) {
     private object Keys {
         val PRINTER_ADDRESS = stringPreferencesKey("printer_address")
         val PRINTER_NAME = stringPreferencesKey("printer_name")
+        val PRINTER_FAMILY = stringPreferencesKey("printer_family")
         val DEFAULT_TAPE_WIDTH = intPreferencesKey("default_tape_width_mm")
         val DEFAULT_LENGTH = intPreferencesKey("default_length_mm")
         val DEFAULT_DIE_CUT = booleanPreferencesKey("default_die_cut")
@@ -37,17 +44,22 @@ class SettingsRepository(private val context: Context) {
     val savedPrinter: Flow<SavedPrinter?> = context.dataStore.data.map { prefs ->
         val address = prefs[Keys.PRINTER_ADDRESS] ?: return@map null
         // Cleaned on the way out, so a name stored before that cleaning existed is fixed too.
-        SavedPrinter(address, prefs[Keys.PRINTER_NAME]?.let(Protocol::cleanDeviceName) ?: address)
+        SavedPrinter(
+            address = address,
+            name = prefs[Keys.PRINTER_NAME]?.let(DeviceNames::clean) ?: address,
+            family = PrinterFamily.ofName(prefs[Keys.PRINTER_FAMILY]),
+        )
     }
 
     val defaultTapeWidthMm: Flow<Int> = context.dataStore.data.map { it[Keys.DEFAULT_TAPE_WIDTH] ?: 12 }
     val defaultLengthMm: Flow<Int> = context.dataStore.data.map { it[Keys.DEFAULT_LENGTH] ?: 40 }
     val defaultDieCut: Flow<Boolean> = context.dataStore.data.map { it[Keys.DEFAULT_DIE_CUT] ?: true }
 
-    suspend fun savePrinter(address: String, name: String) {
+    suspend fun savePrinter(address: String, name: String, family: PrinterFamily) {
         context.dataStore.edit {
             it[Keys.PRINTER_ADDRESS] = address
             it[Keys.PRINTER_NAME] = name
+            it[Keys.PRINTER_FAMILY] = family.name
         }
     }
 
@@ -55,6 +67,7 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit {
             it.remove(Keys.PRINTER_ADDRESS)
             it.remove(Keys.PRINTER_NAME)
+            it.remove(Keys.PRINTER_FAMILY)
         }
     }
 

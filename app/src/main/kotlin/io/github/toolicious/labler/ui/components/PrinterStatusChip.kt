@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.toolicious.labler.R
 import io.github.toolicious.labler.ble.PrinterState
+import io.github.toolicious.labler.printer.PrinterProtocols
 
 /**
  * Printer status shown as a small "pill". Deliberately not an AssistChip so that the
@@ -46,7 +47,7 @@ fun PrinterStatusChip(state: PrinterState, permissionMissing: Boolean = false, o
     val text = if (permissionMissing) stringResource(R.string.chip_permission) else when (state) {
         is PrinterState.Disconnected -> stringResource(R.string.chip_no_printer)
         is PrinterState.Connecting -> stringResource(R.string.chip_connecting, state.attempt)
-        is PrinterState.Ready -> state.name.removeSuffix("_BLE")
+        is PrinterState.Ready -> PrinterProtocols.of(state.family).ble.displayName(state.name)
         is PrinterState.Printing -> stringResource(R.string.chip_printing, (state.progress * 100).toInt())
         is PrinterState.Error -> stringResource(R.string.chip_error)
     }

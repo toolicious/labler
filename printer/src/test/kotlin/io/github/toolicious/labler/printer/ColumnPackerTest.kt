@@ -8,14 +8,14 @@ class ColumnPackerTest {
 
     @Test
     fun `white image yields only zero bytes`() {
-        val packed = ColumnPacker.packColumns(MonoImage.blank(2))
+        val packed = ColumnPacker.packColumns(MonoImage.blank(2, PhomemoProtocol.HEAD_DOTS))
         assertEquals(24, packed.size)
         assertTrue(packed.all { it == 0.toByte() })
     }
 
     @Test
     fun `top-left pixel lands in the last byte of the first column as LSB`() {
-        val img = MonoImage.blank(2)
+        val img = MonoImage.blank(2, PhomemoProtocol.HEAD_DOTS)
         img.setBlack(0, 0)
         val packed = ColumnPacker.packColumns(img)
         assertEquals(0x01.toByte(), packed[11])
@@ -26,7 +26,7 @@ class ColumnPackerTest {
 
     @Test
     fun `bottom-left pixel lands in the first byte of the first column as MSB`() {
-        val img = MonoImage.blank(2)
+        val img = MonoImage.blank(2, PhomemoProtocol.HEAD_DOTS)
         img.setBlack(0, 95)
         val packed = ColumnPacker.packColumns(img)
         assertEquals(0x80.toByte(), packed[0])
@@ -37,7 +37,7 @@ class ColumnPackerTest {
 
     @Test
     fun `second column starts at byte 12`() {
-        val img = MonoImage.blank(2)
+        val img = MonoImage.blank(2, PhomemoProtocol.HEAD_DOTS)
         img.setBlack(1, 0)
         val packed = ColumnPacker.packColumns(img)
         assertEquals(0x01.toByte(), packed[23])
@@ -46,7 +46,7 @@ class ColumnPackerTest {
 
     @Test
     fun `row 88 is bit 0 of the first byte`() {
-        val img = MonoImage.blank(1)
+        val img = MonoImage.blank(1, PhomemoProtocol.HEAD_DOTS)
         img.setBlack(0, 88)
         val packed = ColumnPacker.packColumns(img)
         assertEquals(0x01.toByte(), packed[0])

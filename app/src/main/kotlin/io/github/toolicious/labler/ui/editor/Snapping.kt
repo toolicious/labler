@@ -64,11 +64,14 @@ internal fun labelXTargets(spec: LabelSpec, autoCenter: Float? = null): List<Sna
         )
     }
 
-/** The label's own lines across the tape. The height is fixed, so this never depends on the spec. */
-internal fun labelYTargets(): List<SnapTarget> = listOf(
-    SnapTarget(LabelSpec.PRINT_HEIGHT_PX / 2f, LABEL_SNAP_TOL, SnapAnchor.CENTER),
+/**
+ * The label's own lines across the tape. The height never varies within a label, but how many dots
+ * it is belongs to the printer family, so it comes from the spec like everything else.
+ */
+internal fun labelYTargets(spec: LabelSpec): List<SnapTarget> = listOf(
+    SnapTarget(spec.printHeightPx / 2f, LABEL_SNAP_TOL, SnapAnchor.CENTER),
     SnapTarget(0f, LABEL_SNAP_TOL, SnapAnchor.LEADING),
-    SnapTarget(LabelSpec.PRINT_HEIGHT_PX.toFloat(), LABEL_SNAP_TOL, SnapAnchor.TRAILING),
+    SnapTarget(spec.printHeightPx.toFloat(), LABEL_SNAP_TOL, SnapAnchor.TRAILING),
 )
 
 /** Leading edge, center and trailing edge of every other element, as (x targets, y targets). */

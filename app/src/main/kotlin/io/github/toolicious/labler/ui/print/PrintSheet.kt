@@ -40,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.toolicious.labler.R
 import io.github.toolicious.labler.ble.PrinterState
 import io.github.toolicious.labler.printer.MediaType
+import io.github.toolicious.labler.printer.HeadGeometry
 import io.github.toolicious.labler.printer.MonoImage
 import io.github.toolicious.labler.render.MonoConverter
 
@@ -51,6 +52,7 @@ import io.github.toolicious.labler.render.MonoConverter
 @Composable
 fun PrintSheet(
     image: MonoImage,
+    geometry: HeadGeometry,
     initialMedia: MediaType,
     onDismiss: () -> Unit,
     onPrinted: (copies: Int, media: MediaType) -> Unit = { _, _ -> },
@@ -86,7 +88,7 @@ fun PrintSheet(
             Spacer(Modifier.height(12.dp))
 
             Text(
-                stringResource(R.string.print_preview, image.width / 8),
+                stringResource(R.string.print_preview, geometry.dotsToMm(image.width)),
                 style = MaterialTheme.typography.bodySmall
             )
             Spacer(Modifier.height(4.dp))

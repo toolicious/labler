@@ -1,6 +1,7 @@
 package io.github.toolicious.labler.data
 
 import io.github.toolicious.labler.model.LabelTemplate
+import io.github.toolicious.labler.printer.PrinterFamily
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -13,6 +14,8 @@ data class BackupSettings(
     val defaultDieCut: Boolean? = null,
     val printerAddress: String? = null,
     val printerName: String? = null,
+    /** Absent in a backup written before families existed, which read as the default. */
+    val printerFamily: String? = null,
     val language: String? = null,
 )
 
@@ -50,6 +53,7 @@ class BackupRepository(
                 defaultDieCut = settings.defaultDieCut.first(),
                 printerAddress = printer?.address,
                 printerName = printer?.name,
+                printerFamily = printer?.family?.name,
                 language = languageTag,
             ),
         )
@@ -83,7 +87,11 @@ class BackupRepository(
             settings.saveDefaultLabel(s.defaultTapeWidthMm, s.defaultLengthMm, s.defaultDieCut)
         }
         if (s.printerAddress != null) {
-            settings.savePrinter(s.printerAddress, s.printerName ?: s.printerAddress)
+            settings.savePrinter(
+                s.printerAddress,
+                s.printerName ?: s.printerAddress,
+                PrinterFamily.ofName(s.printerFamily),
+            )
         }
     }
 }

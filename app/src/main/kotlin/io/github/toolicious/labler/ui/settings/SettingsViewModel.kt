@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import io.github.toolicious.labler.App
 import io.github.toolicious.labler.ble.FoundPrinter
 import io.github.toolicious.labler.ble.PrinterScanner
-import io.github.toolicious.labler.printer.Protocol
+import io.github.toolicious.labler.ble.PrinterState
+import io.github.toolicious.labler.printer.PhomemoProtocol
+import io.github.toolicious.labler.printer.PrinterFamily
+import io.github.toolicious.labler.printer.PrinterProtocols
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -45,7 +48,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     /** Found devices, filtered to known printer prefixes by default. */
     val visibleResults = combine(_scanResults, _showAll) { list, all ->
         if (all) list
-        else list.filter { f -> Protocol.DEVICE_NAME_PREFIXES.any { f.name.startsWith(it) } }
+        else list.filter { f -> PrinterProtocols.matchName(f.name) != null }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private var scanJob: Job? = null
@@ -87,8 +90,11 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun connectTo(found: FoundPrinter) {
         stopScan()
+        // "Show all" can offer a device no family claims. Connecting to one anyway is the
+        // user overriding the filter, and it gets the family the app has always assumed.
+        val family = PrinterProtocols.matchName(found.name)?.family ?: PrinterFamily.DEFAULT
         viewModelScope.launch {
-            runCatching { manager.connect(found.device, found.name) }
+            runCatching { manager.connect(found.device, found.name, family) }
         }
     }
 
@@ -103,11 +109,13 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     private val _commandFeedback = MutableStateFlow<String?>(null)
     val commandFeedback = _commandFeedback.asStateFlow()
 
-    /** Experimental: teach the gap detection. */
+    /** Experimental: teach the gap detection. A Phomemo command, so only sent to one. */
     fun learnGap() {
+        val connected = (manager.state.value as? PrinterState.Ready)?.family
+        if (connected != PrinterFamily.PHOMEMO) return
         viewModelScope.launch {
             _commandFeedback.value = runCatching {
-                manager.sendCommand(Protocol.LEARN_GAP)
+                manager.sendCommand(PhomemoProtocol.LEARN_GAP)
             }.fold(
                 onSuccess = { "Teach command sent. The printer may feed a few labels." },
                 onFailure = { "Error: ${it.message}" },

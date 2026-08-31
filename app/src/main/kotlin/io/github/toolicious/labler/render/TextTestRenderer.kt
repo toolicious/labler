@@ -21,7 +21,7 @@ object TextTestRenderer {
         )
         val size = LabelRenderer.measure(element)
         element = element.copy(
-            y = ((LabelSpec.PRINT_HEIGHT_PX - size.height) / 2f).coerceAtLeast(0f)
+            y = ((spec.printHeightPx - size.height) / 2f).coerceAtLeast(0f)
         )
         return LabelRenderer.renderMono(spec, listOf(element))
     }

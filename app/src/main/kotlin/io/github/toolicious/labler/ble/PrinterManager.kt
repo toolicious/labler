@@ -10,7 +10,8 @@ import io.github.toolicious.labler.R
 import io.github.toolicious.labler.data.SettingsRepository
 import io.github.toolicious.labler.printer.MediaType
 import io.github.toolicious.labler.printer.MonoImage
-import io.github.toolicious.labler.printer.PrintJobBuilder
+import io.github.toolicious.labler.printer.PrinterFamily
+import io.github.toolicious.labler.printer.PrinterProtocols
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -91,7 +92,10 @@ class PrinterManager(
             bleLog("arming background reconnect for ${saved.name} / ${saved.address}")
             val device = adapter.getRemoteDevice(saved.address)
             runCatching {
-                connectInternal(device, saved.name, autoConnect = true, connectTimeoutMs = null, retries = 1)
+                connectInternal(
+                    device, saved.name, saved.family,
+                    autoConnect = true, connectTimeoutMs = null, retries = 1,
+                )
             }.onFailure {
                 bleLog("background reconnect ended: ${it.message}")
             }
@@ -109,7 +113,7 @@ class PrinterManager(
                 showTransientError(context.getString(R.string.err_bt_off))
                 return@launch
             }
-            runCatching { connect(adapter.getRemoteDevice(saved.address), saved.name) }
+            runCatching { connect(adapter.getRemoteDevice(saved.address), saved.name, saved.family) }
         }
     }
 
@@ -121,30 +125,35 @@ class PrinterManager(
     }
 
     /** Connects actively with a short timeout per attempt and 3 attempts; throws on failure. */
-    suspend fun connect(device: BluetoothDevice, name: String) {
+    suspend fun connect(device: BluetoothDevice, name: String, family: PrinterFamily) {
         reconnectJob?.cancelAndJoin()
-        connectInternal(device, name, autoConnect = false, connectTimeoutMs = 6_000, retries = 3)
+        connectInternal(device, name, family, autoConnect = false, connectTimeoutMs = 6_000, retries = 3)
     }
 
     private suspend fun connectInternal(
         device: BluetoothDevice,
         name: String,
+        family: PrinterFamily,
         autoConnect: Boolean,
         connectTimeoutMs: Long?,
         retries: Int,
     ) {
+        val protocol = PrinterProtocols.of(family)
         var lastError: Throwable? = null
         for (attempt in 1..retries) {
             if (!autoConnect) _state.value = PrinterState.Connecting(attempt)
             try {
-                val conn = PrinterConnection.open(context, device, autoConnect, connectTimeoutMs)
+                val conn = PrinterConnection.open(context, device, protocol, autoConnect, connectTimeoutMs)
                 _state.value = PrinterState.Connecting(attempt)
                 connection = conn
-                val sc = StatusClient(conn.client)
-                statusClient = if (sc.initialize()) sc else null
-                settings.savePrinter(device.address, name)
+                // A family that cannot be asked for its status simply has none.
+                statusClient = protocol.statusQueries?.let { queries ->
+                    val sc = StatusClient(conn.client, conn.uuids, queries, protocol.transport.queryGapMs)
+                    sc.takeIf { it.initialize() }
+                }
+                settings.savePrinter(device.address, name, family)
                 bleLog("printer connected and ready: $name")
-                _state.value = PrinterState.Ready(name, device.address, null)
+                _state.value = PrinterState.Ready(name, device.address, null, family)
                 watchDisconnect(conn)
                 startBatteryPolling()
                 fetchStatusOnce()
@@ -195,10 +204,19 @@ class PrinterManager(
             val ready = _state.value as? PrinterState.Ready
                 ?: error(context.getString(R.string.err_not_connected))
             val conn = connection ?: error(context.getString(R.string.err_not_connected))
+            val protocol = conn.protocol
+            // Checked before the try, so a label meant for another printer reports the mismatch
+            // instead of tearing down a perfectly good connection.
+            if (images.any { it.height != protocol.geometry.headDots }) {
+                error(context.getString(R.string.err_printer_mismatch))
+            }
+            if (media !in protocol.supportedMedia) {
+                error(context.getString(R.string.err_media_unsupported))
+            }
             try {
                 // Experimental 0x1F darkness: 0 (off) keeps the default print path byte-for-byte.
                 val density = settings.printDensity.first().takeIf { it in 1..15 }
-                val payloads = images.map { PrintJobBuilder.buildJob(it, media, density) }
+                val payloads = images.map { protocol.buildJob(it, media, density) }
                 _state.value = PrinterState.Printing(0f, 1, payloads.size)
                 gattExclusive.withLock {
                     PrintJobSender.sendAll(conn, payloads) { progress, jobIndex ->

@@ -110,6 +110,7 @@ fun HistoryScreen(onBack: () -> Unit, vm: HistoryViewModel = viewModel()) {
     reprint?.let { (image, entry) ->
         PrintSheet(
             image = image,
+            geometry = entry.spec.geometry,
             initialMedia = entry.spec.media,
             onDismiss = { reprint = null }
         )
@@ -132,7 +133,7 @@ private fun HistoryCard(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(entry.spec.lengthPx.toFloat() / LabelSpec.PRINT_HEIGHT_PX)
+                    .aspectRatio(entry.spec.lengthPx.toFloat() / entry.spec.printHeightPx)
                     .border(1.dp, MaterialTheme.colorScheme.outlineVariant),
                 contentScale = ContentScale.FillBounds
             )

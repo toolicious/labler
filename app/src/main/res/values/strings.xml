@@ -262,6 +262,8 @@
     <string name="err_file_not_readable">File not readable</string>
     <string name="err_file_invalid">Invalid file</string>
     <string name="err_no_scanner">BLE scanner unavailable</string>
+    <string name="err_printer_mismatch">This label was designed for a different printer</string>
+    <string name="err_media_unsupported">The connected printer does not support this paper type</string>
     <!-- Barcode / QR -->
     <string name="add_barcode">Code</string>
     <string name="prop_barcode_data">Content</string>

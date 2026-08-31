@@ -112,7 +112,7 @@ import io.github.toolicious.labler.model.IconElement
 import io.github.toolicious.labler.model.ImageElement
 import io.github.toolicious.labler.model.LabelElement
 import io.github.toolicious.labler.model.LabelFont
-import io.github.toolicious.labler.model.LabelSpec
+import io.github.toolicious.labler.printer.HeadGeometry
 import io.github.toolicious.labler.model.LabelTextAlign
 import io.github.toolicious.labler.model.QrPayload
 import io.github.toolicious.labler.model.QrPayloadType
@@ -332,7 +332,7 @@ fun EditorScreen(
                             id = id,
                             x = vm.tapeStartPx + 2f, y = 2f,
                             widthPx = (LabelRenderer.effectiveLengthPx(t.spec, t.elements) - 4).toFloat(),
-                            heightPx = (LabelSpec.PRINT_HEIGHT_PX - 4).toFloat()
+                            heightPx = (t.spec.printHeightPx - 4).toFloat()
                         )
                     }
                     // Placed already: it either wraps the selected element or spans the tape.
@@ -364,6 +364,7 @@ fun EditorScreen(
             selected?.let { element ->
                     PropertiesPanel(
                         element = element,
+                        geometry = t.spec.geometry,
                         onUpdate = vm::updateElement,
                         onDelete = vm::deleteSelected,
                         onOpenFonts = onOpenFonts
@@ -452,6 +453,7 @@ private fun ElementChipLabel(element: LabelElement) {
 @Composable
 private fun PropertiesPanel(
     element: LabelElement,
+    geometry: HeadGeometry,
     onUpdate: (LabelElement) -> Unit,
     onDelete: () -> Unit,
     onOpenFonts: () -> Unit,
@@ -459,8 +461,8 @@ private fun PropertiesPanel(
     Column {
         when (element) {
             is TextElement -> TextProperties(element, onUpdate, onOpenFonts)
-            is IconElement -> IconProperties(element, onUpdate)
-            is FrameElement -> FrameProperties(element, onUpdate)
+            is IconElement -> IconProperties(element, geometry, onUpdate)
+            is FrameElement -> FrameProperties(element, geometry, onUpdate)
             is BarcodeElement -> BarcodeProperties(element, onUpdate)
             is ImageElement -> ImageProperties(element, onUpdate)
         }
@@ -504,7 +506,7 @@ private fun PropertiesPanel(
             }
             Column {
                 GroupLabel(stringResource(R.string.group_scale))
-                val pct = (LabelRenderer.measure(element).height / LabelSpec.PRINT_HEIGHT_PX * 100f)
+                val pct = (LabelRenderer.measure(element).height / geometry.headDots * 100f)
                     .roundToInt().coerceIn(1, 999)
                 // Codes cap at 100 % (their box must fit the printable height to stay scannable);
                 // everything else scales up to 200 %.
@@ -512,13 +514,13 @@ private fun PropertiesPanel(
                 Stepper(
                     label = "",
                     value = "$pct %",
-                    onDecrease = { onUpdate(element.scaledToHeightPercent((pct - 1).coerceAtLeast(2))) },
-                    onIncrease = { onUpdate(element.scaledToHeightPercent((pct + 1).coerceAtMost(scaleMax))) },
+                    onDecrease = { onUpdate(element.scaledToHeightPercent((pct - 1).coerceAtLeast(2), geometry)) },
+                    onIncrease = { onUpdate(element.scaledToHeightPercent((pct + 1).coerceAtMost(scaleMax), geometry)) },
                     edit = NumberEdit(
                         title = stringResource(R.string.group_scale),
                         value = pct,
                         range = 2..scaleMax,
-                        onValue = { onUpdate(element.scaledToHeightPercent(it)) },
+                        onValue = { onUpdate(element.scaledToHeightPercent(it, geometry)) },
                     ),
                 )
             }
@@ -560,14 +562,14 @@ private fun LabelElement.withRotation(deg: Int): LabelElement = when (this) {
  * The size fields and the scale control both work to these, or the one would stop where the other
  * still went on.
  */
-private const val MAX_ELEMENT_HEIGHT_PX = 2 * LabelSpec.PRINT_HEIGHT_PX
+private fun maxElementHeightPx(geometry: HeadGeometry): Int = 2 * geometry.headDots
 private const val MAX_FONT_SIZE_PX = 200
 
-private fun LabelElement.scaledToHeightPercent(pct: Int): LabelElement {
-    val target = pct / 100f * LabelSpec.PRINT_HEIGHT_PX
+private fun LabelElement.scaledToHeightPercent(pct: Int, geometry: HeadGeometry): LabelElement {
+    val target = pct / 100f * geometry.headDots
     val current = LabelRenderer.measure(this).height
     val factor = if (current > 0.1f) target / current else 1f
-    val maxH = MAX_ELEMENT_HEIGHT_PX.toFloat()
+    val maxH = maxElementHeightPx(geometry).toFloat()
     return when (this) {
         is TextElement -> copy(
             fontSizePx = (fontSizePx * factor).coerceIn(6f, MAX_FONT_SIZE_PX.toFloat()),
@@ -581,7 +583,7 @@ private fun LabelElement.scaledToHeightPercent(pct: Int): LabelElement {
         is BarcodeElement -> {
             // Scale the reserved box like an image (keep aspect); the code re-fits and centers inside.
             // Capped at the label height so the printed code stays within the printable area.
-            val h = target.coerceIn(16f, LabelSpec.PRINT_HEIGHT_PX.toFloat())
+            val h = target.coerceIn(16f, geometry.headDots.toFloat())
             val f = if (current > 0.1f) h / current else 1f
             copy(heightPx = h, widthPx = (widthPx * f).coerceAtLeast(16f))
         }
@@ -1410,7 +1412,12 @@ private fun GlyphPreview(glyph: String, iconFont: String?, modifier: Modifier = 
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun IconProperties(element: IconElement, onUpdate: (LabelElement) -> Unit) {
+private fun IconProperties(
+    element: IconElement,
+    geometry: HeadGeometry,
+    onUpdate: (LabelElement) -> Unit,
+) {
+    val maxHeightPx = maxElementHeightPx(geometry)
     var showPicker by remember { mutableStateOf(false) }
     GroupLabel(stringResource(R.string.symbol_current))
     Box(
@@ -1428,12 +1435,12 @@ private fun IconProperties(element: IconElement, onUpdate: (LabelElement) -> Uni
         value = "${element.sizePx.toInt()} px",
         onDecrease = { onUpdate(element.copy(sizePx = (element.sizePx - 8).coerceAtLeast(16f))) },
         onIncrease = {
-            onUpdate(element.copy(sizePx = (element.sizePx + 8).coerceAtMost(MAX_ELEMENT_HEIGHT_PX.toFloat())))
+            onUpdate(element.copy(sizePx = (element.sizePx + 8).coerceAtMost(maxHeightPx.toFloat())))
         },
         edit = NumberEdit(
             title = stringResource(R.string.prop_size),
             value = element.sizePx.toInt(),
-            range = 16..MAX_ELEMENT_HEIGHT_PX,
+            range = 16..maxHeightPx,
             onValue = { onUpdate(element.copy(sizePx = it.toFloat())) },
         ),
     )
@@ -1530,7 +1537,12 @@ private fun IconProperties(element: IconElement, onUpdate: (LabelElement) -> Uni
 }
 
 @Composable
-private fun FrameProperties(element: FrameElement, onUpdate: (LabelElement) -> Unit) {
+private fun FrameProperties(
+    element: FrameElement,
+    geometry: HeadGeometry,
+    onUpdate: (LabelElement) -> Unit,
+) {
+    val maxHeightPx = maxElementHeightPx(geometry)
     val rectSelected = element.style == FrameStyle.RECT || element.style == FrameStyle.ROUND_RECT
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         ChoiceChip(
@@ -1585,7 +1597,7 @@ private fun FrameProperties(element: FrameElement, onUpdate: (LabelElement) -> U
             title = stringResource(R.string.prop_width),
             value = element.widthPx.toInt(),
             // A frame may run the whole length of the label, so its width stops where the label does.
-            range = 8..LabelSpec.MAX_LENGTH_PX,
+            range = 8..geometry.maxLengthDots,
             onValue = { onUpdate(element.copy(widthPx = it.toFloat())) },
         ),
     )
@@ -1594,12 +1606,12 @@ private fun FrameProperties(element: FrameElement, onUpdate: (LabelElement) -> U
         value = "${element.heightPx.toInt()} px",
         onDecrease = { onUpdate(element.copy(heightPx = (element.heightPx - 8).coerceAtLeast(8f))) },
         onIncrease = {
-            onUpdate(element.copy(heightPx = (element.heightPx + 8).coerceAtMost(MAX_ELEMENT_HEIGHT_PX.toFloat())))
+            onUpdate(element.copy(heightPx = (element.heightPx + 8).coerceAtMost(maxHeightPx.toFloat())))
         },
         edit = NumberEdit(
             title = stringResource(R.string.prop_height),
             value = element.heightPx.toInt(),
-            range = 8..MAX_ELEMENT_HEIGHT_PX,
+            range = 8..maxHeightPx,
             onValue = { onUpdate(element.copy(heightPx = it.toFloat())) },
         ),
     )

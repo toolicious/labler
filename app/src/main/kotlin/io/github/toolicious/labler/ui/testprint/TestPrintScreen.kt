@@ -32,7 +32,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.toolicious.labler.R
+import io.github.toolicious.labler.model.LabelSpec
+import io.github.toolicious.labler.ble.PrinterState
 import io.github.toolicious.labler.printer.MediaType
+import io.github.toolicious.labler.printer.PrinterFamily
+import io.github.toolicious.labler.printer.PrinterProtocols
 import io.github.toolicious.labler.printer.MonoImage
 import io.github.toolicious.labler.printer.TestPattern
 import io.github.toolicious.labler.render.TextTestRenderer
@@ -45,6 +49,10 @@ import io.github.toolicious.labler.ui.print.PrintSheet
 @Composable
 fun TestPrintScreen(onOpenSettings: () -> Unit, vm: TestPrintViewModel = viewModel()) {
     val printerState by vm.printerState.collectAsState()
+    // A test print is about the printer in front of the user, so it uses that one's geometry
+    // rather than a label's. With nothing connected there is nothing better than the default.
+    val family = (printerState as? PrinterState.Ready)?.family ?: PrinterFamily.DEFAULT
+    val geometry = PrinterProtocols.of(family).geometry
     var text by remember { mutableStateOf("Ää Üü ß 0123 iIlL1") }
     var media by remember { mutableStateOf(MediaType.DIE_CUT) }
     var sheetImage by remember { mutableStateOf<MonoImage?>(null) }
@@ -86,7 +94,7 @@ fun TestPrintScreen(onOpenSettings: () -> Unit, vm: TestPrintViewModel = viewMod
 
             Text(stringResource(R.string.testprint_geometry), style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(8.dp))
-            Button(onClick = { withBlePermissions { sheetImage = TestPattern.create(320) } }) {
+            Button(onClick = { withBlePermissions { sheetImage = TestPattern.create(geometry) } }) {
                 Text(stringResource(R.string.testprint_show))
             }
 
@@ -101,7 +109,11 @@ fun TestPrintScreen(onOpenSettings: () -> Unit, vm: TestPrintViewModel = viewMod
                 singleLine = true
             )
             Spacer(Modifier.height(8.dp))
-            Button(onClick = { withBlePermissions { sheetImage = TextTestRenderer.render(text) } }) {
+            Button(onClick = {
+                withBlePermissions {
+                    sheetImage = TextTestRenderer.render(text, LabelSpec(family = family))
+                }
+            }) {
                 Text(stringResource(R.string.testprint_show))
             }
         }
@@ -110,6 +122,7 @@ fun TestPrintScreen(onOpenSettings: () -> Unit, vm: TestPrintViewModel = viewMod
     sheetImage?.let { image ->
         PrintSheet(
             image = image,
+            geometry = geometry,
             initialMedia = media,
             onDismiss = { sheetImage = null }
         )

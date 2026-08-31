@@ -12,6 +12,7 @@ import io.github.toolicious.labler.data.MIGRATION_1_2
 import io.github.toolicious.labler.data.MIGRATION_2_3
 import io.github.toolicious.labler.data.MIGRATION_3_4
 import io.github.toolicious.labler.data.MIGRATION_4_5
+import io.github.toolicious.labler.data.MIGRATION_5_6
 import io.github.toolicious.labler.data.SettingsRepository
 import io.github.toolicious.labler.data.TemplateJson
 import io.github.toolicious.labler.data.TemplateRepository
@@ -49,7 +50,7 @@ class AppContainer(context: Context) {
      */
     private fun openDatabase(context: Context): AppDatabase {
         fun build() = Room.databaseBuilder(context, AppDatabase::class.java, "labler.db")
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
             .build()
         if (!BuildConfig.DEBUG) return build()
         // Opened here and not on first use, so a repair happens before anything reads.

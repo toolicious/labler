@@ -1,6 +1,6 @@
 package io.github.toolicious.labler.ble
 
-import io.github.toolicious.labler.printer.Protocol
+import io.github.toolicious.labler.printer.StatusQueries
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -15,19 +15,27 @@ data class PrinterInfo(
 )
 
 /**
- * Status queries (battery, model, firmware, serial number, hardware). The commands go
- * to the print characteristic FF02, the responses arrive as notifications on FF01 of the
- * same service. Strictly optional: if FF01 is missing or the printer does not respond, all
- * methods return null; printing remains unaffected.
+ * Status queries (battery, model, firmware, serial number, hardware). The commands go to the
+ * print characteristic, the responses arrive as notifications on the notify characteristic of
+ * the same service. Strictly optional: if the characteristic is missing or the printer does not
+ * respond, all methods return null; printing remains unaffected.
+ *
+ * Only created for a family whose protocol declares [StatusQueries]; a printer that cannot be
+ * asked simply has none.
  */
-class StatusClient(private val client: GattClient) {
+class StatusClient(
+    private val client: GattClient,
+    private val uuids: PrinterUuids,
+    private val queries: StatusQueries,
+    private val queryGapMs: Long,
+) {
 
     private var ready = false
 
-    /** Enables notifications on FF01. false if the characteristic is missing. */
+    /** Enables notifications. false if the characteristic is missing. */
     suspend fun initialize(): Boolean {
-        val notify = client.findCharacteristic(PrinterUuids.PRINT_SERVICE, PrinterUuids.PRINT_NOTIFY)
-            ?: return false
+        val notifyUuid = uuids.notify ?: return false
+        val notify = client.findCharacteristic(uuids.service, notifyUuid) ?: return false
         ready = runCatching { client.enableNotifications(notify) }.isSuccess
         return ready
     }
@@ -56,7 +64,7 @@ class StatusClient(private val client: GattClient) {
     suspend fun batteryPercent(): Int? {
         var last: Int? = null
         repeat(4) { attempt ->
-            val pct = query(Protocol.QUERY_BATTERY)?.let { resp ->
+            val pct = query(queries.battery)?.let { resp ->
                 if (resp.size >= 2) (resp[1].toInt() and 0xFF).coerceIn(0, 100) else null
             }
             if (pct != null) last = pct
@@ -67,10 +75,10 @@ class StatusClient(private val client: GattClient) {
     }
 
     suspend fun printerInfo(): PrinterInfo = PrinterInfo(
-        model = queryText(Protocol.QUERY_MODEL),
-        firmware = queryText(Protocol.QUERY_FIRMWARE),
-        serial = queryText(Protocol.QUERY_SERIAL),
-        hardware = queryText(Protocol.QUERY_HARDWARE),
+        model = queryText(queries.model),
+        firmware = queryText(queries.firmware),
+        serial = queryText(queries.serial),
+        hardware = queryText(queries.hardware),
     )
 
     private suspend fun queryText(cmd: ByteArray): String? =
@@ -82,17 +90,17 @@ class StatusClient(private val client: GattClient) {
 
     private suspend fun query(cmd: ByteArray, timeoutMs: Long = 1000): ByteArray? {
         if (!ready) return null
-        val writeChar = client.findCharacteristic(PrinterUuids.PRINT_SERVICE, PrinterUuids.PRINT_WRITE)
-            ?: return null
+        val notifyUuid = uuids.notify ?: return null
+        val writeChar = client.findCharacteristic(uuids.service, uuids.write) ?: return null
         val response = runCatching {
             withTimeout(timeoutMs) {
                 client.events
                     .onSubscription { client.writeCharacteristic(writeChar, cmd) }
                     .filterIsInstance<GattEvent.Notification>()
-                    .first { it.uuid == PrinterUuids.PRINT_NOTIFY }
+                    .first { it.uuid == notifyUuid }
             }
         }.getOrNull()
-        delay(Protocol.QUERY_GAP_MS)
+        delay(queryGapMs)
         return response?.value
     }
 }

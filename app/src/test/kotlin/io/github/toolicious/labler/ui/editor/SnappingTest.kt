@@ -135,7 +135,7 @@ class SnappingTest {
         // itself. Only the other elements' lines are left, and the tape's height is unaffected.
         val variable = LabelSpec(lengthMm = 40, media = MediaType.CONTINUOUS, autoLength = true)
         assertEquals(emptyList<SnapTarget>(), labelXTargets(variable))
-        assertEquals(3, labelYTargets().size)
+        assertEquals(3, labelYTargets(variable).size)
     }
 
     @Test
@@ -170,7 +170,7 @@ class SnappingTest {
 
     @Test
     fun `the tape offers its center and both edges across`() {
-        val t = labelYTargets()
+        val t = labelYTargets(LabelSpec())
         assertEquals(listOf(48f, 0f, 96f), t.map { it.line })
     }
 

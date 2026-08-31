@@ -86,7 +86,6 @@ import io.github.toolicious.labler.model.LabelSpec
 import io.github.toolicious.labler.model.LabelTemplate
 import io.github.toolicious.labler.model.LengthMode
 import io.github.toolicious.labler.printer.MediaType
-import io.github.toolicious.labler.printer.Protocol
 import kotlin.math.roundToInt
 import io.github.toolicious.labler.render.FontRegistry
 import io.github.toolicious.labler.render.LabelRenderer
@@ -387,7 +386,7 @@ private fun TemplateCard(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(lengthPx.toFloat() / LabelSpec.PRINT_HEIGHT_PX)
+                    .aspectRatio(lengthPx.toFloat() / template.spec.printHeightPx)
                     .clip(labelShape)
                     .border(1.dp, MaterialTheme.colorScheme.outlineVariant, labelShape),
                 contentScale = ContentScale.FillBounds
@@ -434,7 +433,7 @@ private fun TemplateCard(
                         stringResource(
                             R.string.template_size_auto,
                             template.spec.tapeWidthMm,
-                            lengthPx / Protocol.DOTS_PER_MM,
+                            template.spec.geometry.dotsToMm(lengthPx),
                         )
                     } else {
                         stringResource(R.string.template_size, template.spec.tapeWidthMm, template.spec.lengthMm)
@@ -477,18 +476,21 @@ internal fun LabelDialog(
     currentLengthMm: Int? = null,
     autofocusName: Boolean = false,
 ) {
-    val isPresetSize = LabelSpec.PRESETS.any { it.first == initialSpec.tapeWidthMm && it.second == initialSpec.lengthMm }
+    val geometry = initialSpec.geometry
+    val isPresetSize = geometry.diecutPresets.any {
+        it.first == initialSpec.tapeWidthMm && it.second == initialSpec.lengthMm
+    }
     var name by rememberSaveable(initialName) { mutableStateOf(initialName) }
     val nameFocus = remember { FocusRequester() }
     LaunchedEffect(Unit) { if (autofocusName) nameFocus.requestFocus() }
     // Two separate "custom" flags: die-cut picks a whole stock size, continuous only a width.
     var customSize by rememberSaveable(initialSpec) { mutableStateOf(!isPresetSize) }
     var customWidth by rememberSaveable(initialSpec) {
-        mutableStateOf(initialSpec.tapeWidthMm !in LabelSpec.TAPE_WIDTHS)
+        mutableStateOf(initialSpec.tapeWidthMm !in geometry.tapeWidthsMm)
     }
     var widthText by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.tapeWidthMm.toString()) }
     var lengthText by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.lengthMm.toString()) }
-    var marginText by rememberSaveable(initialSpec) { mutableStateOf(mmText(initialSpec.marginPx)) }
+    var marginText by rememberSaveable(initialSpec) { mutableStateOf(mmText(initialSpec.marginPx, geometry.dotsPerMm)) }
     var dieCut by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.media == MediaType.DIE_CUT) }
     var lengthMode by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.lengthMode) }
     // Picking a mode leaves the label exactly as long as it is now. In the variable mode the
@@ -557,7 +559,7 @@ internal fun LabelDialog(
                     // they only make sense here.
                     Text(stringResource(R.string.size_hint), style = MaterialTheme.typography.bodySmall)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        LabelSpec.PRESETS.forEach { (w, l) ->
+                        geometry.diecutPresets.forEach { (w, l) ->
                             FilterChip(
                                 selected = !customSize && widthText == "$w" && lengthText == "$l",
                                 onClick = {
@@ -582,7 +584,7 @@ internal fun LabelDialog(
                                 onValueChange = { widthText = it },
                                 label = stringResource(R.string.field_tape_mm),
                                 maxDigits = 2,
-                                range = LabelSpec.MIN_TAPE_MM..LabelSpec.MAX_TAPE_MM,
+                                range = geometry.minTapeMm..geometry.maxTapeMm,
                                 modifier = Modifier.weight(1f),
                             )
                             MmField(
@@ -590,7 +592,7 @@ internal fun LabelDialog(
                                 onValueChange = { lengthText = it },
                                 label = stringResource(R.string.field_length_mm),
                                 maxDigits = 3,
-                                range = LabelSpec.MIN_LENGTH_MM..LabelSpec.MAX_LENGTH_MM,
+                                range = geometry.minLengthMm..geometry.maxLengthMm,
                                 modifier = Modifier.weight(1f),
                             )
                         }
@@ -599,7 +601,7 @@ internal fun LabelDialog(
                     // Continuous tape: the width is the cartridge, the length is a design choice.
                     Text(stringResource(R.string.field_tape_width), style = MaterialTheme.typography.bodySmall)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        LabelSpec.TAPE_WIDTHS.forEach { w ->
+                        geometry.tapeWidthsMm.forEach { w ->
                             FilterChip(
                                 selected = !customWidth && widthText == "$w",
                                 onClick = {
@@ -622,7 +624,7 @@ internal fun LabelDialog(
                             onValueChange = { widthText = it },
                             label = stringResource(R.string.field_tape_mm),
                             maxDigits = 2,
-                            range = LabelSpec.MIN_TAPE_MM..LabelSpec.MAX_TAPE_MM,
+                            range = geometry.minTapeMm..geometry.maxTapeMm,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -664,7 +666,7 @@ internal fun LabelDialog(
                                 else R.string.field_length_mm
                             ),
                             maxDigits = 3,
-                            range = LabelSpec.MIN_LENGTH_MM..LabelSpec.MAX_LENGTH_MM,
+                            range = geometry.minLengthMm..geometry.maxLengthMm,
                             modifier = Modifier.weight(1f),
                         )
                         if (lengthMode != LengthMode.FIXED) {
@@ -705,16 +707,22 @@ internal fun LabelDialog(
         confirmButton = {
             val submit = {
                 val width = widthText.toIntOrNull()
-                    ?.coerceIn(LabelSpec.MIN_TAPE_MM, LabelSpec.MAX_TAPE_MM) ?: 12
+                    ?.coerceIn(geometry.minTapeMm, geometry.maxTapeMm) ?: 12
                 val length = lengthText.toIntOrNull()
-                    ?.coerceIn(LabelSpec.MIN_LENGTH_MM, LabelSpec.MAX_LENGTH_MM) ?: 40
+                    ?.coerceIn(geometry.minLengthMm, geometry.maxLengthMm) ?: 40
                 val media = if (dieCut) MediaType.DIE_CUT else MediaType.CONTINUOUS
                 val mode = if (dieCut) LengthMode.FIXED else lengthMode
-                val margin = mmPx(marginText)
-                // A die-cut label is always fixed, its length belongs to the stock.
+                val margin = mmPx(marginText, geometry.dotsPerMm)
+                // Edited from the spec that came in, so the label keeps the printer family it
+                // was designed for. A die-cut label is always fixed, its length belongs to the stock.
                 onConfirm(
                     name,
-                    LabelSpec(width, length, media, marginPx = margin).withLengthMode(mode),
+                    initialSpec.copy(
+                        tapeWidthMm = width,
+                        lengthMm = length,
+                        media = media,
+                        marginPx = margin,
+                    ).withLengthMode(mode),
                 )
             }
             if (onImport != null) {
@@ -789,7 +797,7 @@ private fun MmField(
 }
 
 /** Millimetres of [px] dots, without the trailing zeros a plain conversion leaves behind. */
-private fun mmText(px: Int): String = trimmed(px / Protocol.DOTS_PER_MM.toFloat())
+private fun mmText(px: Int, dotsPerMm: Float): String = trimmed(px / dotsPerMm)
 
 private fun trimmed(mm: Float): String =
     if (mm == mm.toInt().toFloat()) mm.toInt().toString() else mm.toString().trimEnd('0')
@@ -799,10 +807,12 @@ private fun trimmed(mm: Float): String =
  * Anything unreadable falls back to the default margin rather than to zero, which would silently
  * print flush to the edge.
  */
-private fun mmPx(text: String): Int {
-    val mm = text.replace(',', '.').toFloatOrNull() ?: return Protocol.DOTS_PER_MM
-    return (mm * Protocol.DOTS_PER_MM).roundToInt()
-        .coerceIn(LabelSpec.MIN_MARGIN_MM * Protocol.DOTS_PER_MM, LabelSpec.MAX_MARGIN_MM * Protocol.DOTS_PER_MM)
+private fun mmPx(text: String, dotsPerMm: Float): Int {
+    val mm = text.replace(',', '.').toFloatOrNull() ?: return (dotsPerMm).roundToInt()
+    return (mm * dotsPerMm).roundToInt().coerceIn(
+        (LabelSpec.MIN_MARGIN_MM * dotsPerMm).roundToInt(),
+        (LabelSpec.MAX_MARGIN_MM * dotsPerMm).roundToInt(),
+    )
 }
 
 /** One half of the spinner in [MmField]. Half the height of the field, so both halves fit in it. */

@@ -303,4 +303,6 @@
     <string name="err_file_not_readable">Datei nicht lesbar</string>
     <string name="err_file_invalid">Ungültige Datei</string>
     <string name="err_no_scanner">BLE-Scanner nicht verfügbar</string>
+    <string name="err_printer_mismatch">Dieses Etikett wurde für einen anderen Drucker entworfen</string>
+    <string name="err_media_unsupported">Der verbundene Drucker kennt diese Papierart nicht</string>
 </resources>

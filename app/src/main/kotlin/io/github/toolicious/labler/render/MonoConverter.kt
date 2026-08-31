@@ -2,7 +2,6 @@ package io.github.toolicious.labler.render
 
 import android.graphics.Bitmap
 import io.github.toolicious.labler.printer.MonoImage
-import io.github.toolicious.labler.printer.Protocol
 
 /**
  * Converts a rendered ARGB bitmap into the 1-bit printer image:
@@ -19,9 +18,10 @@ object MonoConverter {
         return Bitmap.createBitmap(px, mono.width, mono.height, Bitmap.Config.ARGB_8888)
     }
 
-    fun convert(bitmap: Bitmap): MonoImage {
-        require(bitmap.height == Protocol.HEAD_DOTS) {
-            "Bitmap height must be ${Protocol.HEAD_DOTS} px, was ${bitmap.height}"
+    /** @param headDots dots across the print head of the family the label was rendered for. */
+    fun convert(bitmap: Bitmap, headDots: Int): MonoImage {
+        require(bitmap.height == headDots) {
+            "Bitmap height must be $headDots px, was ${bitmap.height}"
         }
         val w = bitmap.width
         val pixels = IntArray(w * bitmap.height)
@@ -34,6 +34,6 @@ object MonoConverter {
             val b = p and 0xFF
             black[i] = (r + g + b) / 3 < 128
         }
-        return MonoImage(w, black)
+        return MonoImage(w, headDots, black)
     }
 }

@@ -35,6 +35,9 @@ data class TemplateEntity(
     /** Blank tape in dots between the content and an edge the app places itself; see LabelSpec. */
     @ColumnInfo(defaultValue = "8")
     val marginPx: Int = 8,
+    /** Printer family the label was designed for; see MIGRATION_5_6 for the default. */
+    @ColumnInfo(defaultValue = "PHOMEMO")
+    val family: String = "PHOMEMO",
     val elementsJson: String,
     val schemaVersion: Int,
     val favorite: Boolean,
@@ -82,6 +85,8 @@ data class PrintHistoryEntity(
     val tapeWidthMm: Int,
     val lengthMm: Int,
     val media: String,
+    @ColumnInfo(defaultValue = "PHOMEMO")
+    val family: String = "PHOMEMO",
     /** Elements AFTER placeholder resolution, so that reprinting reproduces exactly. */
     val elementsJson: String,
     val copies: Int,
@@ -149,9 +154,20 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
     }
 }
 
+/**
+ * Printer family per label (issue #19). Everything that exists was designed on the one printer
+ * the app knew, hence the constant default rather than a lookup.
+ */
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `templates` ADD COLUMN `family` TEXT NOT NULL DEFAULT 'PHOMEMO'")
+        db.execSQL("ALTER TABLE `print_history` ADD COLUMN `family` TEXT NOT NULL DEFAULT 'PHOMEMO'")
+    }
+}
+
 @Database(
     entities = [TemplateEntity::class, PrintHistoryEntity::class],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {

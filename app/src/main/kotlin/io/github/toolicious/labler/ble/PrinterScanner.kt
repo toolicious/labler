@@ -8,7 +8,8 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import io.github.toolicious.labler.R
-import io.github.toolicious.labler.printer.Protocol
+import io.github.toolicious.labler.printer.DeviceNames
+import io.github.toolicious.labler.printer.PrinterProtocols
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -35,7 +36,7 @@ class PrinterScanner(private val context: Context) {
         val cb = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 val raw = result.scanRecord?.deviceName ?: result.device?.name ?: return
-                trySend(FoundPrinter(result.device, Protocol.cleanDeviceName(raw), result.rssi))
+                trySend(FoundPrinter(result.device, DeviceNames.clean(raw), result.rssi))
             }
 
             override fun onScanFailed(errorCode: Int) {
@@ -51,6 +52,6 @@ class PrinterScanner(private val context: Context) {
 
     /** Returns the first printer with a matching name prefix, or null after a timeout. */
     suspend fun findFirstPrinter(timeoutMs: Long = 15_000): FoundPrinter? = withTimeoutOrNull(timeoutMs) {
-        scan().first { found -> Protocol.DEVICE_NAME_PREFIXES.any { found.name.startsWith(it) } }
+        scan().first { found -> PrinterProtocols.matchName(found.name) != null }
     }
 }

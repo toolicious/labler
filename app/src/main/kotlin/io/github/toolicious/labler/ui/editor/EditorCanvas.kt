@@ -213,7 +213,7 @@ fun EditorCanvas(
     // element coordinates onto the canvas has to carry this. Taken from the full element list, not
     // from the subset the raster is built from, or the two would drift apart while dragging.
     val offsetPx = LabelRenderer.contentOffsetPx(spec, elements)
-    val labelH = LabelSpec.PRINT_HEIGHT_PX.toFloat()
+    val labelH = spec.printHeightPx.toFloat()
     // Fixed size (die-cut label) = rounded corners, continuous = hard corners.
     val isDieCut = spec.media == MediaType.DIE_CUT
     val cornerR = 12f // label pixels (~1.5 mm)

@@ -8,9 +8,10 @@ import android.util.Base64
 import java.io.ByteArrayOutputStream
 
 /**
- * Loads an image from a SAF/photo-picker Uri, scales it down (the print head is only
- * 96 dots tall) and returns it as PNG Base64, so it can be stored and exported
- * independently within the template. The actual dithering only happens at render time.
+ * Loads an image from a SAF/photo-picker Uri, scales it down (no print head is more than a
+ * hundred dots tall, so anything larger is stored for nothing) and returns it as PNG Base64,
+ * so it can be stored and exported independently within the template. The actual dithering
+ * only happens at render time.
  */
 object ImageImport {
 

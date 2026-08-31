@@ -3,6 +3,7 @@ package io.github.toolicious.labler.data
 import io.github.toolicious.labler.model.LabelElement
 import io.github.toolicious.labler.model.LabelSpec
 import io.github.toolicious.labler.printer.MediaType
+import io.github.toolicious.labler.printer.PrinterFamily
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
@@ -36,6 +37,7 @@ class HistoryRepository(private val dao: PrintHistoryDao, private val json: Json
                 tapeWidthMm = spec.tapeWidthMm,
                 lengthMm = spec.lengthMm,
                 media = spec.media.name,
+                family = spec.family.name,
                 elementsJson = json.encodeToString(resolvedElements),
                 copies = copies,
                 printedAt = System.currentTimeMillis(),
@@ -56,6 +58,7 @@ class HistoryRepository(private val dao: PrintHistoryDao, private val json: Json
             tapeWidthMm = tapeWidthMm,
             lengthMm = lengthMm,
             media = runCatching { MediaType.valueOf(media) }.getOrDefault(MediaType.DIE_CUT),
+            family = PrinterFamily.ofName(family),
         ),
         elements = runCatching { json.decodeFromString<List<LabelElement>>(elementsJson) }
             .getOrDefault(emptyList()),

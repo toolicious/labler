@@ -29,7 +29,6 @@ import io.github.toolicious.labler.model.LabelTextAlign
 import io.github.toolicious.labler.model.Symbology
 import io.github.toolicious.labler.model.TextElement
 import io.github.toolicious.labler.printer.MonoImage
-import io.github.toolicious.labler.printer.Protocol
 import io.github.toolicious.labler.printer.dither.Contrast
 import io.github.toolicious.labler.printer.dither.Canny
 import io.github.toolicious.labler.printer.dither.DitherMode
@@ -44,7 +43,8 @@ import kotlin.math.round
 import kotlin.math.sin
 
 /**
- * Renders a label 1:1 at print resolution (lengthPx x 96, white background).
+ * Renders a label 1:1 at print resolution (lengthPx x the head height of its family,
+ * white background).
  * Used identically for the editor preview, thumbnails and printing (WYSIWYG);
  * the 1-bit quantization is handled by the MonoConverter.
  */
@@ -90,12 +90,12 @@ object LabelRenderer {
         val needed = ceil(span + 2 * spec.marginPx).toInt()
         // coerceAtMost rather than coerceIn, so an out-of-range minimum from hand-edited JSON
         // caps out instead of throwing.
-        return maxOf(spec.lengthPx, needed).coerceAtMost(LabelSpec.MAX_LENGTH_PX)
+        return maxOf(spec.lengthPx, needed).coerceAtMost(spec.geometry.maxLengthDots)
     }
 
     /** [effectiveLengthPx] in millimetres, rounded up, for the length shown in the UI. */
     fun effectiveLengthMm(spec: LabelSpec, elements: List<LabelElement>): Int =
-        ceil(effectiveLengthPx(spec, elements) / Protocol.DOTS_PER_MM.toFloat()).toInt()
+        ceil(effectiveLengthPx(spec, elements) / spec.geometry.dotsPerMm).toInt()
 
     /** Leftmost point any element reaches, mirroring [rightEdge]. Zero on an empty label. */
     private fun contentLeft(elements: List<LabelElement>): Float =
@@ -190,7 +190,7 @@ object LabelRenderer {
         lengthPx: Int = effectiveLengthPx(spec, elements),
         offsetPx: Float = contentOffsetPx(spec, elements),
     ): Bitmap {
-        val bmp = Bitmap.createBitmap(lengthPx, LabelSpec.PRINT_HEIGHT_PX, Bitmap.Config.ARGB_8888)
+        val bmp = Bitmap.createBitmap(lengthPx, spec.printHeightPx, Bitmap.Config.ARGB_8888)
         drawInto(Canvas(bmp), spec, elements, offsetPx)
         return bmp
     }
@@ -202,7 +202,7 @@ object LabelRenderer {
         offsetPx: Float = contentOffsetPx(spec, elements),
     ): MonoImage {
         val bmp = render(spec, elements, lengthPx, offsetPx)
-        val mono = MonoConverter.convert(bmp)
+        val mono = MonoConverter.convert(bmp, spec.printHeightPx)
         bmp.recycle()
         return mono
     }

@@ -1,16 +1,21 @@
 package io.github.toolicious.labler.model
 
+import io.github.toolicious.labler.printer.HeadGeometry
 import io.github.toolicious.labler.printer.MediaType
-import io.github.toolicious.labler.printer.Protocol
+import io.github.toolicious.labler.printer.PrinterFamily
+import io.github.toolicious.labler.printer.PrinterProtocols
 import io.github.toolicious.labler.printer.dither.DitherMode
 import io.github.toolicious.labler.printer.dither.OutlineMethod
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Coordinate system: label pixels (1 px = 1 dot = 0.125 mm), origin top
- * left, X along the tape, Y across (0..95). Identical in editor,
- * renderer and print.
+ * Coordinate system: label pixels (1 px = 1 printer dot), origin top left, X along the tape,
+ * Y across it. Identical in editor, renderer and print.
+ *
+ * How large a dot is and how many of them fit across the tape belongs to the printer family, so
+ * every label carries the [family] it was drawn for and reads its [geometry] from there. A design
+ * therefore keeps its own scale instead of following whichever printer happens to be connected.
  */
 @Serializable
 data class LabelSpec(
@@ -35,14 +40,26 @@ data class LabelSpec(
      * ends of a variable label, and where a double tap fits a manual edge to the content. Zero
      * prints flush to the edge, which is what someone trimming to the content exactly wants.
      *
-     * In dots rather than millimetres, so half a millimetre is a value like any other. The tape
-     * has eight dots to the millimetre and nothing finer can be printed anyway.
+     * In dots rather than millimetres, so half a millimetre is a value like any other, and
+     * nothing finer than a dot can be printed anyway.
      */
-    val marginPx: Int = Protocol.DOTS_PER_MM,
+    val marginPx: Int = DEFAULT_MARGIN_PX,
+    /**
+     * Printer family this label was designed for. Last in the list and defaulted, so a
+     * template, backup or history row written before families existed reads back as the one
+     * printer the app used to know.
+     */
+    val family: PrinterFamily = PrinterFamily.DEFAULT,
 ) {
-    val lengthPx: Int get() = lengthMm * Protocol.DOTS_PER_MM
-    val leadingPx: Int get() = leadingMm * Protocol.DOTS_PER_MM
-    val marginMm: Float get() = marginPx / Protocol.DOTS_PER_MM.toFloat()
+    /** Print geometry of [family]: head height, dots per millimetre and the bounds. */
+    val geometry: HeadGeometry get() = PrinterProtocols.of(family).geometry
+
+    val lengthPx: Int get() = geometry.mmToDots(lengthMm)
+    val leadingPx: Int get() = geometry.mmToDots(leadingMm)
+    val marginMm: Float get() = marginPx / geometry.dotsPerMm
+
+    /** Height of every label of this family, in dots. */
+    val printHeightPx: Int get() = geometry.headDots
 
     /**
      * How the length of this label comes about. Die-cut is always FIXED whatever the flags say,
@@ -71,30 +88,12 @@ data class LabelSpec(
     )
 
     companion object {
-        const val PRINT_HEIGHT_PX = Protocol.HEAD_DOTS
-
-        /** Bounds for a label length in mm, for the fixed value as well as an auto-grown one. */
-        const val MIN_LENGTH_MM = 10
-        const val MAX_LENGTH_MM = 500
-        const val MAX_LENGTH_PX = MAX_LENGTH_MM * Protocol.DOTS_PER_MM
+        /** One millimetre on the head the app was built around, and the stored column default. */
+        const val DEFAULT_MARGIN_PX = 8
 
         /** Bounds for the margin an auto edge keeps from the content, in whole millimetres. */
         const val MIN_MARGIN_MM = 0
         const val MAX_MARGIN_MM = 10
-
-        /** Bounds for the tape width in mm. */
-        const val MIN_TAPE_MM = 10
-        const val MAX_TAPE_MM = 15
-
-        /** Commercially available die-cut labels for P15/P12 (tape width x length in mm). */
-        val PRESETS = listOf(
-            12 to 40,
-            14 to 30, 14 to 40,
-            15 to 30, 15 to 40,
-        )
-
-        /** Tape widths available as continuous cartridges, derived from the die-cut stock. */
-        val TAPE_WIDTHS = PRESETS.map { it.first }.distinct()
     }
 }
 

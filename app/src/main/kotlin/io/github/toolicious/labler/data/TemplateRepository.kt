@@ -4,6 +4,7 @@ import io.github.toolicious.labler.model.LabelElement
 import io.github.toolicious.labler.model.LabelSpec
 import io.github.toolicious.labler.model.LabelTemplate
 import io.github.toolicious.labler.printer.MediaType
+import io.github.toolicious.labler.printer.PrinterFamily
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
@@ -90,6 +91,7 @@ class TemplateRepository(private val dao: TemplateDao, private val json: Json) {
             manualEdges = manualEdges,
             leadingMm = leadingMm,
             marginPx = marginPx,
+            family = PrinterFamily.ofName(family),
         ),
         elements = decodeElements(schemaVersion, elementsJson),
         favorite = favorite,
@@ -108,6 +110,7 @@ class TemplateRepository(private val dao: TemplateDao, private val json: Json) {
         manualEdges = spec.manualEdges,
         leadingMm = spec.leadingMm,
         marginPx = spec.marginPx,
+        family = spec.family.name,
         elementsJson = json.encodeToString(elements),
         schemaVersion = SCHEMA_VERSION,
         favorite = favorite,

@@ -20,7 +20,6 @@ import io.github.toolicious.labler.model.LabelTextAlign
 import io.github.toolicious.labler.model.LengthMode
 import io.github.toolicious.labler.model.Symbology
 import io.github.toolicious.labler.model.TextElement
-import io.github.toolicious.labler.printer.Protocol
 import io.github.toolicious.labler.render.LabelRenderer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -173,7 +172,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
             left,
             0f,
             left + LabelRenderer.effectiveLengthPx(t.spec, t.elements),
-            LabelSpec.PRINT_HEIGHT_PX.toFloat(),
+            t.spec.printHeightPx.toFloat(),
         )
     }
 
@@ -375,7 +374,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
             }
             val snapX =
                 bestSnapAxis(xFeatures, labelXTargets(spec, dragAutoCenter) + dragXTargets)
-            val snapY = bestSnapAxis(yFeatures, labelYTargets() + dragYTargets)
+            val snapY = bestSnapAxis(yFeatures, labelYTargets(spec) + dragYTargets)
             nx += snapX?.shift ?: 0f
             ny += snapY?.shift ?: 0f
             xGuide = snapX?.guide
@@ -386,12 +385,12 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         // edges, and 8 px of the element stay on the tape so it can be grabbed again. A variable
         // one has none: moving an element changes how far the content reaches, so the label
         // follows, and what will not fit is put back by set() rather than stopped here.
-        val bound = LabelSpec.MAX_LENGTH_PX.toFloat()
+        val bound = spec.geometry.maxLengthDots.toFloat()
         val (minX, maxX) =
             if (spec.lengthIsAuto) -bound to bound
             else (labelStart + 8f - box.width) to (labelStart + spec.lengthPx - 8f)
         val boxX = (nx + offX).coerceIn(minX, maxX)
-        val boxY = (ny + offY).coerceIn(8f - box.height, LabelSpec.PRINT_HEIGHT_PX - 8f)
+        val boxY = (ny + offY).coerceIn(8f - box.height, spec.printHeightPx - 8f)
         // A guide would point at a line the element is no longer on once the bound had to move it.
         if (boxX != nx + offX) {
             nx = boxX - offX
@@ -496,6 +495,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
     fun resizeSelectedBy(delta: Offset) {
         val id = resizeId ?: return
         val el = _template.value?.elements?.find { it.id == id } ?: return
+        val headPx = (_template.value?.spec ?: return).printHeightPx.toFloat()
         val updated = when (el) {
             is TextElement -> {
                 val size = LabelRenderer.measure(el)
@@ -507,21 +507,21 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
                 anchorText(el, scaled)
             }
             is IconElement -> el.copy(
-                sizePx = (el.sizePx + max(delta.x, delta.y)).coerceIn(16f, 96f)
+                sizePx = (el.sizePx + max(delta.x, delta.y)).coerceIn(16f, headPx)
             )
             is FrameElement -> el.copy(
                 widthPx = (el.widthPx + delta.x).coerceAtLeast(8f),
-                heightPx = (el.heightPx + delta.y).coerceIn(8f, LabelSpec.PRINT_HEIGHT_PX.toFloat())
+                heightPx = (el.heightPx + delta.y).coerceIn(8f, headPx)
             )
             is BarcodeElement -> if (el.symbology == Symbology.QR_CODE) {
                 // QR stays square.
                 val s = (minOf(el.widthPx, el.heightPx) + max(delta.x, delta.y))
-                    .coerceIn(24f, LabelSpec.PRINT_HEIGHT_PX.toFloat())
+                    .coerceIn(24f, headPx)
                 el.copy(widthPx = s, heightPx = s)
             } else {
                 el.copy(
                     widthPx = (el.widthPx + delta.x).coerceAtLeast(32f),
-                    heightPx = (el.heightPx + delta.y).coerceIn(16f, LabelSpec.PRINT_HEIGHT_PX.toFloat())
+                    heightPx = (el.heightPx + delta.y).coerceIn(16f, headPx)
                 )
             }
             is ImageElement -> el.copy(
@@ -556,7 +556,8 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         if (elements.isEmpty()) return null
         val left = elements.minOf { elementBounds(it).left } + spec.leadingPx
         val right = elements.maxOf { elementBounds(it).right } + spec.leadingPx
-        return floor(left / Protocol.DOTS_PER_MM).toInt() to ceil(right / Protocol.DOTS_PER_MM).toInt()
+        val perMm = spec.geometry.dotsPerMm
+        return floor(left / perMm).toInt() to ceil(right / perMm).toInt()
     }
 
     /**
@@ -593,7 +594,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         val edge = edgeDrag ?: return
         val t = _template.value ?: return
         edgeRawPx += dxPx
-        val mm = (edgeRawPx / Protocol.DOTS_PER_MM).roundToInt()
+        val mm = (edgeRawPx / t.spec.geometry.dotsPerMm).roundToInt()
         val spec = when (edge) {
             // Moving the leading edge to the left (negative) grows the label in front of the content.
             LabelEdge.LEFT -> withLeadingMm(t.spec, edgeStartLeadingMm - mm)
@@ -631,7 +632,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
      */
     private fun withLeadingMm(spec: LabelSpec, mm: Int): LabelSpec {
         val lengthMm = (spec.lengthMm + (mm - spec.leadingMm))
-            .coerceIn(LabelSpec.MIN_LENGTH_MM, LabelSpec.MAX_LENGTH_MM)
+            .coerceIn(spec.geometry.minLengthMm, spec.geometry.maxLengthMm)
         return spec.copy(
             leadingMm = spec.leadingMm + (lengthMm - spec.lengthMm),
             lengthMm = lengthMm,
@@ -644,7 +645,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
      * coordinates and come back into view as soon as the edge is pulled out again.
      */
     private fun withLengthMm(spec: LabelSpec, mm: Int): LabelSpec = spec.copy(
-        lengthMm = mm.coerceIn(LabelSpec.MIN_LENGTH_MM, LabelSpec.MAX_LENGTH_MM),
+        lengthMm = mm.coerceIn(spec.geometry.minLengthMm, spec.geometry.maxLengthMm),
     )
 
     /**
