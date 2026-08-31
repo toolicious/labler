@@ -34,8 +34,8 @@ class PrinterScanner(private val context: Context) {
 
         val cb = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
-                val name = result.scanRecord?.deviceName ?: result.device?.name ?: return
-                trySend(FoundPrinter(result.device, name, result.rssi))
+                val raw = result.scanRecord?.deviceName ?: result.device?.name ?: return
+                trySend(FoundPrinter(result.device, Protocol.cleanDeviceName(raw), result.rssi))
             }
 
             override fun onScanFailed(errorCode: Int) {

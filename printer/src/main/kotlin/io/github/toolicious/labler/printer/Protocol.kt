@@ -16,6 +16,15 @@ object Protocol {
     /** Name prefixes of compatible printers (name pattern "P15_xxxx_BLE" etc.). */
     val DEVICE_NAME_PREFIXES = listOf("P15", "P12", "L13")
 
+    /**
+     * An advertised name with the padding some printers send along stripped off: control
+     * characters, and the replacement character Android puts in for bytes that are not valid
+     * UTF-8. One of them turns "P12_xxxx_BLE" into "P12_xxxx_BLE�", which shows up as a box
+     * and defeats every match on the "_BLE" suffix.
+     */
+    fun cleanDeviceName(raw: String): String =
+        raw.filter { !it.isISOControl() && it != '�' }.trim()
+
     // Print head geometry
     const val HEAD_DOTS = 96
     const val DOTS_PER_MM = 8

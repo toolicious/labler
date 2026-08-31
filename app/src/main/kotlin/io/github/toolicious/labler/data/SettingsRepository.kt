@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import io.github.toolicious.labler.printer.Protocol
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -35,7 +36,8 @@ class SettingsRepository(private val context: Context) {
 
     val savedPrinter: Flow<SavedPrinter?> = context.dataStore.data.map { prefs ->
         val address = prefs[Keys.PRINTER_ADDRESS] ?: return@map null
-        SavedPrinter(address, prefs[Keys.PRINTER_NAME] ?: address)
+        // Cleaned on the way out, so a name stored before that cleaning existed is fixed too.
+        SavedPrinter(address, prefs[Keys.PRINTER_NAME]?.let(Protocol::cleanDeviceName) ?: address)
     }
 
     val defaultTapeWidthMm: Flow<Int> = context.dataStore.data.map { it[Keys.DEFAULT_TAPE_WIDTH] ?: 12 }
