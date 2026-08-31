@@ -10,6 +10,7 @@ import io.github.toolicious.labler.R
 import io.github.toolicious.labler.data.SettingsRepository
 import io.github.toolicious.labler.printer.MediaType
 import io.github.toolicious.labler.printer.MonoImage
+import io.github.toolicious.labler.printer.PrintResult
 import io.github.toolicious.labler.printer.PrinterFamily
 import io.github.toolicious.labler.printer.PrinterProtocols
 import kotlinx.coroutines.CancellationException
@@ -146,17 +147,18 @@ class PrinterManager(
                 val conn = PrinterConnection.open(context, device, protocol, autoConnect, connectTimeoutMs)
                 _state.value = PrinterState.Connecting(attempt)
                 connection = conn
-                // A family that cannot be asked for its status simply has none.
-                statusClient = protocol.statusQueries?.let { queries ->
-                    val sc = StatusClient(conn.client, conn.uuids, queries, protocol.transport.queryGapMs)
-                    sc.takeIf { it.initialize() }
-                }
+                // Built for anything the printer might say, whether that is an answer to a
+                // query or an unprompted verdict on a finished job.
+                statusClient = StatusClient(conn.client, conn.uuids, protocol)
+                    .takeIf { it.initialize() }
                 settings.savePrinter(device.address, name, family)
                 bleLog("printer connected and ready: $name")
                 _state.value = PrinterState.Ready(name, device.address, null, family)
                 watchDisconnect(conn)
-                startBatteryPolling()
-                fetchStatusOnce()
+                if (protocol.statusQueries != null) {
+                    startBatteryPolling()
+                    fetchStatusOnce()
+                }
                 return
             } catch (c: CancellationException) {
                 connection?.close()
@@ -219,8 +221,17 @@ class PrinterManager(
                 val payloads = images.map { protocol.buildJob(it, media, density) }
                 _state.value = PrinterState.Printing(0f, 1, payloads.size)
                 gattExclusive.withLock {
-                    PrintJobSender.sendAll(conn, payloads) { progress, jobIndex ->
-                        _state.value = PrinterState.Printing(progress, jobIndex, payloads.size)
+                    val send: suspend () -> Unit = {
+                        PrintJobSender.sendAll(conn, payloads) { progress, jobIndex ->
+                            _state.value = PrinterState.Printing(progress, jobIndex, payloads.size)
+                        }
+                    }
+                    val listener = statusClient.takeIf { protocol.awaitsPrintResult }
+                    if (listener != null) {
+                        val result = listener.awaitPrintResult(PRINT_RESULT_TIMEOUT_MS, send)
+                        if (result != null && !result.printed) error(printResultMessage(result))
+                    } else {
+                        send()
                     }
                 }
                 _state.value = ready.copy(batteryPercent = lastBattery ?: ready.batteryPercent)
@@ -248,6 +259,16 @@ class PrinterManager(
             conn.client.writeCharacteristic(conn.writeChar, bytes)
         }
     }
+
+    /** What the printer reported back, as something to put in front of the user. */
+    private fun printResultMessage(result: PrintResult): String = context.getString(
+        when (result) {
+            PrintResult.NO_CASSETTE -> R.string.err_no_cassette
+            PrintResult.LOW_BATTERY -> R.string.err_battery_too_low
+            PrintResult.CANCELLED -> R.string.err_print_cancelled
+            else -> R.string.err_print_failed
+        }
+    )
 
     private fun showTransientError(message: String) {
         val error = PrinterState.Error(message)
@@ -328,5 +349,14 @@ class PrinterManager(
         connection = null
         statusClient = null
         _printerInfo.value = null
+    }
+
+    private companion object {
+        /**
+         * How long to wait for a printer that reports back. It only answers once the tape is
+         * through, and a long label takes its time, so this is generous; running out is treated
+         * as a print that went fine rather than as a failure.
+         */
+        const val PRINT_RESULT_TIMEOUT_MS = 60_000L
     }
 }

@@ -62,7 +62,8 @@ import kotlinx.coroutines.withContext
  * dialog: icon+name, version, description, clickable source-code line, thanks line),
  * accent via colorScheme.primary (teal, as in "Compressed"). At the bottom in one row,
  * the language switcher on the left and close on the right. The app deliberately says
- * nothing about the origin of the commands; BleWebler appears only as a thanks link.
+ * nothing about the origin of the commands; the projects that made the protocols accessible
+ * appear only as thanks links.
  */
 @Composable
 fun InfoDialog(onDismiss: () -> Unit) {
@@ -82,6 +83,7 @@ fun InfoDialog(onDismiss: () -> Unit) {
     val cardColor = MaterialTheme.colorScheme.surfaceContainerLow
     val repoUrl = stringResource(R.string.about_repo)
     val bleweblerUrl = stringResource(R.string.about_link)
+    val dymoUrl = stringResource(R.string.about_link_dymo)
 
     val scope = rememberCoroutineScope()
     val backup = remember(context) { (context.applicationContext as App).container.backup }
@@ -240,32 +242,37 @@ fun InfoDialog(onDismiss: () -> Unit) {
                     }
                 }
 
-                // Thanks to BleWebler, name as inline link, plus license. No origin information.
+                // One thanks line per project that made a protocol accessible, its name as an
+                // inline link, plus the license. No origin information.
                 val linkStyles = TextLinkStyles(
                     style = SpanStyle(
                         color = MaterialTheme.colorScheme.primary,
                         textDecoration = TextDecoration.Underline
                     )
                 )
-                // Whole sentence as one string with placeholder %1$s; the link covers only "BleWebler".
-                val thanksParts = stringResource(R.string.about_thanks).split("%1\$s", limit = 2)
-                val credit = buildAnnotatedString {
-                    append(thanksParts[0])
-                    withLink(LinkAnnotation.Url(url = bleweblerUrl, styles = linkStyles)) {
-                        append("BleWebler")
-                    }
-                    if (thanksParts.size > 1) append(thanksParts[1])
+                // Whole sentence as one string with placeholder %1$s; the link covers only the name.
+                fun credit(template: String, name: String, url: String) = buildAnnotatedString {
+                    val parts = template.split("%1\$s", limit = 2)
+                    append(parts[0])
+                    withLink(LinkAnnotation.Url(url = url, styles = linkStyles)) { append(name) }
+                    if (parts.size > 1) append(parts[1])
                 }
+                val credits = listOf(
+                    credit(stringResource(R.string.about_thanks), "BleWebler", bleweblerUrl),
+                    credit(stringResource(R.string.about_thanks_dymo), "dymo-bluetooth", dymoUrl),
+                )
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    Text(
-                        credit,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = muted,
-                        textAlign = TextAlign.Center
-                    )
+                    credits.forEach { line ->
+                        Text(
+                            line,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = muted,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                     Text(
                         stringResource(R.string.about_license),
                         style = MaterialTheme.typography.labelSmall,

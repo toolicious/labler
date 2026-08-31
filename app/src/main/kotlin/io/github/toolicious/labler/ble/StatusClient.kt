@@ -1,9 +1,14 @@
 package io.github.toolicious.labler.ble
 
-import io.github.toolicious.labler.printer.StatusQueries
+import io.github.toolicious.labler.printer.PrintResult
+import io.github.toolicious.labler.printer.PrinterProtocol
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.withTimeout
 
@@ -15,21 +20,20 @@ data class PrinterInfo(
 )
 
 /**
- * Status queries (battery, model, firmware, serial number, hardware). The commands go to the
- * print characteristic, the responses arrive as notifications on the notify characteristic of
- * the same service. Strictly optional: if the characteristic is missing or the printer does not
- * respond, all methods return null; printing remains unaffected.
+ * Everything the printer says about itself, over the notify characteristic of its print service.
  *
- * Only created for a family whose protocol declares [StatusQueries]; a printer that cannot be
- * asked simply has none.
+ * Two families use that channel differently. One answers questions put to it (battery, model,
+ * firmware, serial, hardware), the other stays quiet until a job is through and then reports how
+ * it went. Both are strictly optional: with the characteristic missing or the printer silent,
+ * every method here returns null and printing is unaffected.
  */
 class StatusClient(
     private val client: GattClient,
     private val uuids: PrinterUuids,
-    private val queries: StatusQueries,
-    private val queryGapMs: Long,
+    private val protocol: PrinterProtocol,
 ) {
 
+    private val queries = protocol.statusQueries
     private var ready = false
 
     /** Enables notifications. false if the characteristic is missing. */
@@ -62,9 +66,10 @@ class StatusClient(
      * plausible (>0) value. If it stays 0, 0 is accepted (genuinely empty).
      */
     suspend fun batteryPercent(): Int? {
+        val q = queries ?: return null
         var last: Int? = null
         repeat(4) { attempt ->
-            val pct = query(queries.battery)?.let { resp ->
+            val pct = query(q.battery)?.let { resp ->
                 if (resp.size >= 2) (resp[1].toInt() and 0xFF).coerceIn(0, 100) else null
             }
             if (pct != null) last = pct
@@ -74,12 +79,45 @@ class StatusClient(
         return last
     }
 
-    suspend fun printerInfo(): PrinterInfo = PrinterInfo(
-        model = queryText(queries.model),
-        firmware = queryText(queries.firmware),
-        serial = queryText(queries.serial),
-        hardware = queryText(queries.hardware),
-    )
+    suspend fun printerInfo(): PrinterInfo {
+        val q = queries ?: return PrinterInfo(null, null, null, null)
+        return PrinterInfo(
+            model = queryText(q.model),
+            firmware = queryText(q.firmware),
+            serial = queryText(q.serial),
+            hardware = queryText(q.hardware),
+        )
+    }
+
+    /**
+     * Runs [send] and waits for the printer's verdict on the job it just received.
+     *
+     * The write happens from inside the collector, so a printer that answers the instant the last
+     * byte lands cannot beat the subscription to it. The first reply only says printing has begun,
+     * the one after it carries the result. Null on a timeout, which is deliberately not an error:
+     * the tape has most likely come out fine and a job is not worth failing over a missing receipt.
+     */
+    suspend fun awaitPrintResult(timeoutMs: Long, send: suspend () -> Unit): PrintResult? {
+        val notifyUuid = uuids.notify
+        if (!ready || notifyUuid == null) {
+            send()
+            return null
+        }
+        return try {
+            withTimeout(timeoutMs) {
+                client.events
+                    .onSubscription { send() }
+                    .filterIsInstance<GattEvent.Notification>()
+                    .filter { it.uuid == notifyUuid }
+                    .mapNotNull { protocol.parsePrintResult(it.value) }
+                    .drop(1)
+                    .first()
+            }
+        } catch (timeout: TimeoutCancellationException) {
+            // Only the wait ran out. A failed write throws out of here instead.
+            null
+        }
+    }
 
     private suspend fun queryText(cmd: ByteArray): String? =
         query(cmd)
@@ -89,7 +127,7 @@ class StatusClient(
             ?.takeIf { it.isNotEmpty() }
 
     private suspend fun query(cmd: ByteArray, timeoutMs: Long = 1000): ByteArray? {
-        if (!ready) return null
+        if (!ready || queries == null) return null
         val notifyUuid = uuids.notify ?: return null
         val writeChar = client.findCharacteristic(uuids.service, uuids.write) ?: return null
         val response = runCatching {
@@ -100,7 +138,7 @@ class StatusClient(
                     .first { it.uuid == notifyUuid }
             }
         }.getOrNull()
-        delay(queryGapMs)
+        delay(protocol.transport.queryGapMs)
         return response?.value
     }
 }

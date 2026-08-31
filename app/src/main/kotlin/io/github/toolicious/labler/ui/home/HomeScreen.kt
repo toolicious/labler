@@ -86,6 +86,7 @@ import io.github.toolicious.labler.model.LabelSpec
 import io.github.toolicious.labler.model.LabelTemplate
 import io.github.toolicious.labler.model.LengthMode
 import io.github.toolicious.labler.printer.MediaType
+import io.github.toolicious.labler.printer.PrinterFamily
 import kotlin.math.roundToInt
 import io.github.toolicious.labler.render.FontRegistry
 import io.github.toolicious.labler.render.LabelRenderer
@@ -283,7 +284,7 @@ fun HomeScreen(
         LabelDialog(
             title = stringResource(R.string.dialog_new_title),
             initialName = "",
-            initialSpec = LabelSpec(),
+            initialSpec = LabelSpec.forFamily(savedPrinter?.family ?: PrinterFamily.DEFAULT),
             onDismiss = { showNewDialog = false },
             onConfirm = { name, spec ->
                 showNewDialog = false
@@ -490,8 +491,13 @@ internal fun LabelDialog(
     }
     var widthText by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.tapeWidthMm.toString()) }
     var lengthText by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.lengthMm.toString()) }
-    var marginText by rememberSaveable(initialSpec) { mutableStateOf(mmText(initialSpec.marginPx, geometry.dotsPerMm)) }
-    var dieCut by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.media == MediaType.DIE_CUT) }
+    var marginText by rememberSaveable(initialSpec) {
+        mutableStateOf(mmText(initialSpec.marginPx, geometry.dotsPerMm))
+    }
+    val supportsDieCut = MediaType.DIE_CUT in initialSpec.supportedMedia
+    var dieCut by rememberSaveable(initialSpec) {
+        mutableStateOf(supportsDieCut && initialSpec.media == MediaType.DIE_CUT)
+    }
     var lengthMode by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.lengthMode) }
     // Picking a mode leaves the label exactly as long as it is now. In the variable mode the
     // number is a lower bound rather than the length, so leaving it hands the field the length the
@@ -532,27 +538,30 @@ internal fun LabelDialog(
                 // The paper comes first, because it decides what the rest of the dialog means:
                 // a die-cut label takes both dimensions from the stock in the printer, while
                 // continuous tape only fixes the width and leaves the length to the design.
-                Text(stringResource(R.string.field_media), style = MaterialTheme.typography.bodySmall)
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    FilterChip(
-                        selected = dieCut,
-                        onClick = { dieCut = true },
-                        label = { Text(stringResource(R.string.media_die_cut), maxLines = 1, softWrap = false) }
-                    )
-                    FilterChip(
-                        selected = !dieCut,
-                        onClick = {
-                            // Switching over defaults to a variable length, because that is what
-                            // continuous tape is for. An already-continuous label keeps its choice.
-                            if (dieCut) {
-                                dieCut = false
-                                lengthMode = LengthMode.VARIABLE
-                            }
-                        },
-                        label = { Text(stringResource(R.string.media_continuous), maxLines = 1, softWrap = false) }
-                    )
+                // A printer that only knows one of the two is not asked.
+                if (supportsDieCut) {
+                    Text(stringResource(R.string.field_media), style = MaterialTheme.typography.bodySmall)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        FilterChip(
+                            selected = dieCut,
+                            onClick = { dieCut = true },
+                            label = { Text(stringResource(R.string.media_die_cut), maxLines = 1, softWrap = false) }
+                        )
+                        FilterChip(
+                            selected = !dieCut,
+                            onClick = {
+                                // Switching over defaults to a variable length, because that is what
+                                // continuous tape is for. An already-continuous label keeps its choice.
+                                if (dieCut) {
+                                    dieCut = false
+                                    lengthMode = LengthMode.VARIABLE
+                                }
+                            },
+                            label = { Text(stringResource(R.string.media_continuous), maxLines = 1, softWrap = false) }
+                        )
+                    }
+                    Spacer(Modifier.height(12.dp))
                 }
-                Spacer(Modifier.height(12.dp))
 
                 if (dieCut) {
                     // Stock sizes: these presets are commercially available die-cut labels, so

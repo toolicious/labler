@@ -40,8 +40,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.toolicious.labler.R
 import io.github.toolicious.labler.ble.PrinterState
 import io.github.toolicious.labler.printer.MediaType
-import io.github.toolicious.labler.printer.HeadGeometry
 import io.github.toolicious.labler.printer.MonoImage
+import io.github.toolicious.labler.printer.PrinterFamily
+import io.github.toolicious.labler.printer.PrinterProtocols
 import io.github.toolicious.labler.render.MonoConverter
 
 /**
@@ -52,7 +53,7 @@ import io.github.toolicious.labler.render.MonoConverter
 @Composable
 fun PrintSheet(
     image: MonoImage,
-    geometry: HeadGeometry,
+    family: PrinterFamily,
     initialMedia: MediaType,
     onDismiss: () -> Unit,
     onPrinted: (copies: Int, media: MediaType) -> Unit = { _, _ -> },
@@ -64,8 +65,11 @@ fun PrintSheet(
     val printerState by vm.printerState.collectAsState()
     val savedPrinter by vm.savedPrinter.collectAsState(initial = null)
 
+    val protocol = PrinterProtocols.of(family)
     var copies by remember { mutableIntStateOf(1) }
-    var media by remember { mutableStateOf(initialMedia) }
+    var media by remember {
+        mutableStateOf(initialMedia.takeIf { it in protocol.supportedMedia } ?: MediaType.CONTINUOUS)
+    }
     val preview = remember(image) { MonoConverter.toBitmap(image).asImageBitmap() }
 
     val view = LocalView.current
@@ -88,7 +92,7 @@ fun PrintSheet(
             Spacer(Modifier.height(12.dp))
 
             Text(
-                stringResource(R.string.print_preview, geometry.dotsToMm(image.width)),
+                stringResource(R.string.print_preview, protocol.geometry.dotsToMm(image.width)),
                 style = MaterialTheme.typography.bodySmall
             )
             Spacer(Modifier.height(4.dp))
@@ -104,25 +108,28 @@ fun PrintSheet(
             )
             Spacer(Modifier.height(12.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(stringResource(R.string.print_paper), style = MaterialTheme.typography.bodyMedium)
-                FilterChip(
-                    selected = media == MediaType.DIE_CUT,
-                    onClick = { media = MediaType.DIE_CUT },
-                    label = { Text(stringResource(R.string.media_die_cut)) },
-                    enabled = !working
-                )
-                FilterChip(
-                    selected = media == MediaType.CONTINUOUS,
-                    onClick = { media = MediaType.CONTINUOUS },
-                    label = { Text(stringResource(R.string.media_continuous)) },
-                    enabled = !working
-                )
+            // A printer that knows only one paper type is not asked which one to use.
+            if (protocol.supportedMedia.size > 1) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(stringResource(R.string.print_paper), style = MaterialTheme.typography.bodyMedium)
+                    FilterChip(
+                        selected = media == MediaType.DIE_CUT,
+                        onClick = { media = MediaType.DIE_CUT },
+                        label = { Text(stringResource(R.string.media_die_cut)) },
+                        enabled = !working
+                    )
+                    FilterChip(
+                        selected = media == MediaType.CONTINUOUS,
+                        onClick = { media = MediaType.CONTINUOUS },
+                        label = { Text(stringResource(R.string.media_continuous)) },
+                        enabled = !working
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
             }
-            Spacer(Modifier.height(8.dp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,

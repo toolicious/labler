@@ -1,0 +1,2 @@
+- Support for the Dymo LetraTag 200B, untested on a device so far (#19)
+- A label remembers the printer it was designed for, so the two head sizes stay apart (#19)

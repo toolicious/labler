@@ -113,6 +113,7 @@ import io.github.toolicious.labler.model.ImageElement
 import io.github.toolicious.labler.model.LabelElement
 import io.github.toolicious.labler.model.LabelFont
 import io.github.toolicious.labler.printer.HeadGeometry
+import io.github.toolicious.labler.model.LabelSpec
 import io.github.toolicious.labler.model.LabelTextAlign
 import io.github.toolicious.labler.model.QrPayload
 import io.github.toolicious.labler.model.QrPayloadType
@@ -172,10 +173,15 @@ fun EditorScreen(
                         pngBase64 = loaded.pngBase64,
                         srcWidth = loaded.width,
                         srcHeight = loaded.height,
-                        // Default to fit within the label height (no clipping), so the box matches the
-                        // image. The lower bound is capped so a very tall/narrow image cannot exceed 96 px.
-                        widthPx = (76f * loaded.width / loaded.height)
-                            .coerceIn(minOf(16f, 96f * loaded.width / loaded.height), 480f),
+                        // Default to fit within the label height (no clipping), so the box matches
+                        // the image. The lower bound is capped so a very tall/narrow image cannot
+                        // exceed the head. In reference dots; the view model scales it to this
+                        // label's head, like every other element default.
+                        widthPx = run {
+                            val head = LabelSpec.DEFAULT_ELEMENT_HEAD_DOTS.toFloat()
+                            val ratio = loaded.width.toFloat() / loaded.height
+                            (76f * ratio).coerceIn(minOf(16f, head * ratio), 480f)
+                        },
                     )
                 )
             }

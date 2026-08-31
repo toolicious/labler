@@ -10,6 +10,9 @@ package io.github.toolicious.labler.printer
 enum class PrinterFamily {
     /** Phomemo/Marklife P15, P12, L13: 96-dot head, "0x10" protocol around an ESC/POS GS v 0 raster. */
     PHOMEMO,
+
+    /** Dymo LetraTag 200B: 30-dot head on 12 mm tape, escape directives in a checksummed frame. */
+    DYMO,
     ;
 
     companion object {

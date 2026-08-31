@@ -1,4 +1,4 @@
-LaBLEr ist eine App zum Bedrucken von Bluetooth-Low-Energy-Thermo-Etikettendruckern der Marklife-Familie (P15, P12, L13). Gestalte deine Etiketten direkt am Handy, speichere sie als Vorlagen und drucke sie jederzeit wieder. Die App spricht den Drucker direkt über Bluetooth LE an, ohne Konto, ohne Cloud, ohne Hersteller-App.
+LaBLEr ist eine App zum Bedrucken von Bluetooth-Low-Energy-Etikettendruckern: der Marklife-Familie (P15, P12, L13) und dem Dymo LetraTag 200B. Gestalte deine Etiketten direkt am Handy, speichere sie als Vorlagen und drucke sie jederzeit wieder. Die App spricht den Drucker direkt über Bluetooth LE an, ohne Konto, ohne Cloud, ohne Hersteller-App.
 
 Funktionen:
 
@@ -11,4 +11,4 @@ Funktionen:
 
 Datenschutz: LaBLEr ist eine vollständig lokale App. Sie deklariert keine INTERNET-Berechtigung, der Prozess kann also gar keine Netzwerkverbindung öffnen. Kein Konto, keine Cloud, keine Analyse, kein Tracking. Vorlagen, Druckverlauf und Einstellungen bleiben im privaten Speicher der App und verlassen das Gerät nie.
 
-Bislang ist nur der P15 am Gerät verifiziert; P12 und L13 nutzen dasselbe Protokoll und denselben 12-mm-Druckkopf (96 Punkte).
+Bislang ist nur der P15 am Gerät verifiziert. P12 und L13 nutzen dasselbe Protokoll und denselben 12-mm-Druckkopf (96 Punkte). Der Dymo LetraTag 200B (12-mm-Band, 30 Punkte) ist nach der veröffentlichten Protokollbeschreibung gebaut und noch nicht am Gerät getestet.

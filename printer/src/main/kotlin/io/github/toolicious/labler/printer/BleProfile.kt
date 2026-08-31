@@ -13,9 +13,12 @@ data class BleProfile(
     val namePrefixes: List<String>,
     /** Suffix of the advertised name that is noise to the user, e.g. "_BLE". */
     val nameSuffix: String? = null,
+    /** Set where a printer is not consistent about how it capitalises its own name. */
+    val ignoreNameCase: Boolean = false,
 ) {
     /** Whether an advertised name (already run through [DeviceNames.clean]) is this family. */
-    fun matches(name: String): Boolean = namePrefixes.any { name.startsWith(it) }
+    fun matches(name: String): Boolean =
+        namePrefixes.any { name.startsWith(it, ignoreCase = ignoreNameCase) }
 
     /** The advertised name as it should be shown to the user. */
     fun displayName(name: String): String =

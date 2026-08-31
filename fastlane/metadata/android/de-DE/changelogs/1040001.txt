@@ -1,0 +1,2 @@
+- Unterstützung für den Dymo LetraTag 200B, bislang ungetestet am Gerät (#19)
+- Ein Etikett merkt sich seinen Drucker, damit die zwei Kopfbreiten getrennt bleiben (#19)

@@ -52,9 +52,13 @@ fun TestPrintScreen(onOpenSettings: () -> Unit, vm: TestPrintViewModel = viewMod
     // A test print is about the printer in front of the user, so it uses that one's geometry
     // rather than a label's. With nothing connected there is nothing better than the default.
     val family = (printerState as? PrinterState.Ready)?.family ?: PrinterFamily.DEFAULT
-    val geometry = PrinterProtocols.of(family).geometry
+    val protocol = PrinterProtocols.of(family)
     var text by remember { mutableStateOf("Ää Üü ß 0123 iIlL1") }
-    var media by remember { mutableStateOf(MediaType.DIE_CUT) }
+    var media by remember(family) {
+        mutableStateOf(
+            MediaType.DIE_CUT.takeIf { it in protocol.supportedMedia } ?: MediaType.CONTINUOUS
+        )
+    }
     var sheetImage by remember { mutableStateOf<MonoImage?>(null) }
     val withBlePermissions = rememberBlePermissionRunner()
 
@@ -77,24 +81,30 @@ fun TestPrintScreen(onOpenSettings: () -> Unit, vm: TestPrintViewModel = viewMod
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(stringResource(R.string.print_paper), style = MaterialTheme.typography.bodyMedium)
-                FilterChip(
-                    selected = media == MediaType.DIE_CUT,
-                    onClick = { media = MediaType.DIE_CUT },
-                    label = { Text(stringResource(R.string.media_die_cut)) }
-                )
-                FilterChip(
-                    selected = media == MediaType.CONTINUOUS,
-                    onClick = { media = MediaType.CONTINUOUS },
-                    label = { Text(stringResource(R.string.media_continuous)) }
-                )
+            // A printer that knows only one paper type is not asked which one to use.
+            if (protocol.supportedMedia.size > 1) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Text(stringResource(R.string.print_paper), style = MaterialTheme.typography.bodyMedium)
+                    FilterChip(
+                        selected = media == MediaType.DIE_CUT,
+                        onClick = { media = MediaType.DIE_CUT },
+                        label = { Text(stringResource(R.string.media_die_cut)) }
+                    )
+                    FilterChip(
+                        selected = media == MediaType.CONTINUOUS,
+                        onClick = { media = MediaType.CONTINUOUS },
+                        label = { Text(stringResource(R.string.media_continuous)) }
+                    )
+                }
+                Spacer(Modifier.height(16.dp))
             }
-            Spacer(Modifier.height(16.dp))
 
             Text(stringResource(R.string.testprint_geometry), style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(8.dp))
-            Button(onClick = { withBlePermissions { sheetImage = TestPattern.create(geometry) } }) {
+            Button(onClick = { withBlePermissions { sheetImage = TestPattern.create(protocol.geometry) } }) {
                 Text(stringResource(R.string.testprint_show))
             }
 
@@ -122,7 +132,7 @@ fun TestPrintScreen(onOpenSettings: () -> Unit, vm: TestPrintViewModel = viewMod
     sheetImage?.let { image ->
         PrintSheet(
             image = image,
-            geometry = geometry,
+            family = family,
             initialMedia = media,
             onDismiss = { sheetImage = null }
         )

@@ -31,8 +31,8 @@ android {
         // literals, not computed, so F-Droid can parse them for automatic update detection. Update
         // both by hand when bumping. 1.4.0 = 1*1_000_000 + 4*10_000 + 0*100 + 0 = 1040000;
         // the first local change after a release becomes a dev build, 1.4.0-dev01 = 1040001.
-        versionCode = 1040000
-        versionName = "1.4.0"
+        versionCode = 1040001
+        versionName = "1.4.0-dev01"
         manifestPlaceholders["appName"] = "LaBLEr"
     }
 

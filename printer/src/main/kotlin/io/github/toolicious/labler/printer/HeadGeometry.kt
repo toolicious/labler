@@ -25,11 +25,11 @@ data class HeadGeometry(
     /** Bounds for the tape width in mm. */
     val minTapeMm: Int,
     val maxTapeMm: Int,
-    /** Commercially available die-cut labels (tape width x length in mm). */
+    /** Tape widths available as cartridges. */
+    val tapeWidthsMm: List<Int>,
+    /** Commercially available die-cut labels (tape width x length in mm), empty if none. */
     val diecutPresets: List<Pair<Int, Int>>,
 ) {
-    /** Tape widths available as continuous cartridges, derived from the die-cut stock. */
-    val tapeWidthsMm: List<Int> = diecutPresets.map { it.first }.distinct()
 
     val maxLengthDots: Int get() = mmToDots(maxLengthMm)
 

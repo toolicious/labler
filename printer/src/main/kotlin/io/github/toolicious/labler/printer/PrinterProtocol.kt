@@ -20,6 +20,9 @@ interface PrinterProtocol {
     /** Status commands, or null if the printer cannot be queried. */
     val statusQueries: StatusQueries?
 
+    /** Whether the printer reports how a job went once it is through. */
+    val awaitsPrintResult: Boolean get() = false
+
     /** Packs a label into the family's raster format. */
     fun packColumns(image: MonoImage): ByteArray
 
@@ -32,4 +35,10 @@ interface PrinterProtocol {
      */
     fun framePayload(job: ByteArray, chunkSize: Int): List<ByteArray> =
         Chunker.chunk(job, chunkSize)
+
+    /**
+     * Reads a message the printer pushed on its notify characteristic as a print result,
+     * or null if it is something else.
+     */
+    fun parsePrintResult(bytes: ByteArray): PrintResult? = null
 }

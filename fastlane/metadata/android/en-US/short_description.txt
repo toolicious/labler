@@ -1,1 +1,1 @@
-Design labels and print them on a P15/P12/L13 Bluetooth thermal printer
+Design and print labels on Marklife P15/P12/L13 or Dymo LetraTag 200B

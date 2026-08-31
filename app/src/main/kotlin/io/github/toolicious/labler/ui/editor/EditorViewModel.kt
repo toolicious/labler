@@ -223,9 +223,40 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
      */
     fun addElement(element: LabelElement, place: Boolean = true) {
         mutate(null) { t ->
-            t.copy(elements = t.elements + if (place) placed(t, element) else element)
+            // place = false means the caller already sized and positioned the element against
+            // this very label, so it needs neither of the two.
+            val added = if (place) placed(t, fittedToHead(t.spec, element)) else element
+            t.copy(elements = t.elements + added)
         }
         _selectedId.value = element.id
+    }
+
+    /**
+     * The element defaults in Label.kt are written for a print head of
+     * [LabelSpec.DEFAULT_ELEMENT_HEAD_DOTS] dots. On a shorter one every new element would hang
+     * over both edges of the tape, so everything measured across it shrinks with the head.
+     * Positions are left alone, [placed] puts the element on the tape afterwards, and so is the
+     * stroke of a frame, which below a whole dot would print as nothing at all.
+     */
+    private fun fittedToHead(spec: LabelSpec, element: LabelElement): LabelElement {
+        val factor = spec.printHeightPx.toFloat() / LabelSpec.DEFAULT_ELEMENT_HEAD_DOTS
+        if (factor >= 1f) return element
+        return when (element) {
+            is TextElement -> element.copy(fontSizePx = element.fontSizePx * factor)
+            is IconElement -> element.copy(sizePx = element.sizePx * factor)
+            is FrameElement -> element.copy(
+                widthPx = element.widthPx * factor,
+                heightPx = element.heightPx * factor,
+                cornerRadiusPx = element.cornerRadiusPx * factor,
+            )
+            // Both sides, so a code that has to stay square stays square.
+            is BarcodeElement -> element.copy(
+                widthPx = element.widthPx * factor,
+                heightPx = element.heightPx * factor,
+            )
+            // The height follows the width through the aspect ratio.
+            is ImageElement -> element.copy(widthPx = element.widthPx * factor)
+        }
     }
 
     fun updateElement(element: LabelElement) = mutate(element.id) { t ->

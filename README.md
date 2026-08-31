@@ -47,7 +47,12 @@ Pick one source and stay with it: the F-Droid build is signed with F-Droid's key
 
 ## Supported printers
 
-Marklife-family thermal label printers that share the same protocol: **P15, P12, L13**. Only the P15 is verified on-device so far; the others use the same protocol and 12 mm (96-dot) print head.
+Two families, each with its own protocol:
+
+- **Marklife P15, P12, L13** thermal label printers, 12 mm tape and a 96-dot print head. Only the P15 is verified on-device so far; the other two use the same protocol.
+- **Dymo LetraTag 200B**, 12 mm tape and a 30-dot print head. Implemented from the published protocol description and not yet verified on-device, so treat it as untested.
+
+A label remembers which printer it was designed for, because the two print heads are different sizes. Existing labels stay Marklife labels and are unaffected.
 
 Requires Android 8.0 (API 26) or newer and a device with Bluetooth Low Energy.
 
@@ -113,4 +118,4 @@ Beyond those, you can add your own TTF and OTF files under Settings, Fonts. They
 
 ## Thanks
 
-With thanks to the open-source Chrome web app [BleWebler](https://github.com/josb25/BleWebler), which made the P15 protocol accessible.
+With thanks to the open-source Chrome web app [BleWebler](https://github.com/josb25/BleWebler), which made the P15 protocol accessible, and to [dymo-bluetooth](https://github.com/ysfchn/dymo-bluetooth) for documenting the LetraTag 200B protocol.

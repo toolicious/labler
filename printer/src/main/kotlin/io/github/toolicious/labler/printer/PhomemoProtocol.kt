@@ -23,6 +23,7 @@ object PhomemoProtocol : PrinterProtocol {
         maxLengthMm = 500,
         minTapeMm = 10,
         maxTapeMm = 15,
+        tapeWidthsMm = listOf(12, 14, 15),
         // Commercially available die-cut labels (tape width x length in mm).
         diecutPresets = listOf(
             12 to 40,

@@ -110,7 +110,7 @@ fun HistoryScreen(onBack: () -> Unit, vm: HistoryViewModel = viewModel()) {
     reprint?.let { (image, entry) ->
         PrintSheet(
             image = image,
-            geometry = entry.spec.geometry,
+            family = entry.spec.family,
             initialMedia = entry.spec.media,
             onDismiss = { reprint = null }
         )

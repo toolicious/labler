@@ -56,6 +56,7 @@ import io.github.toolicious.labler.BuildConfig
 import io.github.toolicious.labler.R
 import io.github.toolicious.labler.ble.BlePermissions
 import io.github.toolicious.labler.ble.PrinterState
+import io.github.toolicious.labler.printer.PrinterFamily
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -203,53 +204,59 @@ fun SettingsScreen(
             Spacer(Modifier.height(4.dp))
             TextButton(onClick = onOpenTestPrint) { Text(stringResource(R.string.settings_testtools)) }
 
-            Spacer(Modifier.height(16.dp))
-            Text(stringResource(R.string.settings_experimental), style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(4.dp))
-            Text(
-                stringResource(R.string.settings_experimental_hint),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(Modifier.height(8.dp))
-            val commandFeedback by vm.commandFeedback.collectAsState()
-            OutlinedButton(
-                onClick = { vm.learnGap() },
-                enabled = state is PrinterState.Ready
-            ) { Text(stringResource(R.string.exp_learn_gap)) }
-            commandFeedback?.let {
-                Spacer(Modifier.height(4.dp))
-                Text(it, style = MaterialTheme.typography.bodySmall)
-            }
-
-            // Debug builds only: the 0x1F density command is documented but still unverified on
-            // the P15, so it stays a probe for development instead of something a release offers.
-            // The protocol side is untouched, and a level saved in a debug build keeps working.
-            if (BuildConfig.DEBUG) {
+            // Everything in here is a Phomemo command, so it is only offered to one.
+            val printerFamily = (state as? PrinterState.Ready)?.family
+                ?: saved?.family
+                ?: PrinterFamily.DEFAULT
+            if (printerFamily == PrinterFamily.PHOMEMO) {
                 Spacer(Modifier.height(16.dp))
-                val savedDensity by vm.printDensity.collectAsState()
-                // Local slider position; persisted only when the drag ends, so DataStore is not
-                // hammered on every tick. remember(savedDensity) re-syncs if it changes elsewhere.
-                var densitySlider by remember(savedDensity) { mutableFloatStateOf(savedDensity.toFloat()) }
-                val densityLevel = densitySlider.roundToInt()
-                val densityText =
-                    if (densityLevel == 0) stringResource(R.string.exp_density_off) else densityLevel.toString()
+                Text(stringResource(R.string.settings_experimental), style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(4.dp))
                 Text(
-                    stringResource(R.string.exp_density_value, densityText),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Slider(
-                    value = densitySlider,
-                    onValueChange = { densitySlider = it },
-                    onValueChangeFinished = { vm.setPrintDensity(densitySlider.roundToInt()) },
-                    valueRange = 0f..15f,
-                    steps = 14,
-                )
-                Text(
-                    stringResource(R.string.exp_density_hint),
+                    stringResource(R.string.settings_experimental_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                Spacer(Modifier.height(8.dp))
+                val commandFeedback by vm.commandFeedback.collectAsState()
+                OutlinedButton(
+                    onClick = { vm.learnGap() },
+                    enabled = state is PrinterState.Ready
+                ) { Text(stringResource(R.string.exp_learn_gap)) }
+                commandFeedback?.let {
+                    Spacer(Modifier.height(4.dp))
+                    Text(it, style = MaterialTheme.typography.bodySmall)
+                }
+
+                // Debug builds only: the 0x1F density command is documented but still unverified on
+                // the P15, so it stays a probe for development instead of something a release offers.
+                // The protocol side is untouched, and a level saved in a debug build keeps working.
+                if (BuildConfig.DEBUG) {
+                    Spacer(Modifier.height(16.dp))
+                    val savedDensity by vm.printDensity.collectAsState()
+                    // Local slider position; persisted only when the drag ends, so DataStore is not
+                    // hammered on every tick. remember(savedDensity) re-syncs if it changes elsewhere.
+                    var densitySlider by remember(savedDensity) { mutableFloatStateOf(savedDensity.toFloat()) }
+                    val densityLevel = densitySlider.roundToInt()
+                    val densityText =
+                        if (densityLevel == 0) stringResource(R.string.exp_density_off) else densityLevel.toString()
+                    Text(
+                        stringResource(R.string.exp_density_value, densityText),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Slider(
+                        value = densitySlider,
+                        onValueChange = { densitySlider = it },
+                        onValueChangeFinished = { vm.setPrintDensity(densitySlider.roundToInt()) },
+                        valueRange = 0f..15f,
+                        steps = 14,
+                    )
+                    Text(
+                        stringResource(R.string.exp_density_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
 
             Spacer(Modifier.height(24.dp))

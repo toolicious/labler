@@ -3,7 +3,7 @@ package io.github.toolicious.labler.printer
 /** Registry of the printer families the app supports. */
 object PrinterProtocols {
 
-    val ALL: List<PrinterProtocol> = listOf(PhomemoProtocol)
+    val ALL: List<PrinterProtocol> = listOf(PhomemoProtocol, DymoProtocol)
 
     val DEFAULT: PrinterProtocol = PhomemoProtocol
 

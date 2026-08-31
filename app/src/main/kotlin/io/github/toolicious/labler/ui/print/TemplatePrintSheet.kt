@@ -153,25 +153,28 @@ fun TemplatePrintSheet(
             )
             Spacer(Modifier.height(12.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(stringResource(R.string.print_paper), style = MaterialTheme.typography.bodyMedium)
-                FilterChip(
-                    selected = media == MediaType.DIE_CUT,
-                    onClick = { media = MediaType.DIE_CUT },
-                    label = { Text(stringResource(R.string.media_die_cut)) },
-                    enabled = !working
-                )
-                FilterChip(
-                    selected = media == MediaType.CONTINUOUS,
-                    onClick = { media = MediaType.CONTINUOUS },
-                    label = { Text(stringResource(R.string.media_continuous)) },
-                    enabled = !working
-                )
+            // A printer that knows only one paper type is not asked which one to use.
+            if (template.spec.supportedMedia.size > 1) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(stringResource(R.string.print_paper), style = MaterialTheme.typography.bodyMedium)
+                    FilterChip(
+                        selected = media == MediaType.DIE_CUT,
+                        onClick = { media = MediaType.DIE_CUT },
+                        label = { Text(stringResource(R.string.media_die_cut)) },
+                        enabled = !working
+                    )
+                    FilterChip(
+                        selected = media == MediaType.CONTINUOUS,
+                        onClick = { media = MediaType.CONTINUOUS },
+                        label = { Text(stringResource(R.string.media_continuous)) },
+                        enabled = !working
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
             }
-            Spacer(Modifier.height(8.dp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,

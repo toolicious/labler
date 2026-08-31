@@ -61,6 +61,9 @@ data class LabelSpec(
     /** Height of every label of this family, in dots. */
     val printHeightPx: Int get() = geometry.headDots
 
+    /** Paper types the printer this label is for understands. */
+    val supportedMedia: Set<MediaType> get() = PrinterProtocols.of(family).supportedMedia
+
     /**
      * How the length of this label comes about. Die-cut is always FIXED whatever the flags say,
      * because its length is the physical label, dictated by the gap the form feed advances to.
@@ -94,6 +97,28 @@ data class LabelSpec(
         /** Bounds for the margin an auto edge keeps from the content, in whole millimetres. */
         const val MIN_MARGIN_MM = 0
         const val MAX_MARGIN_MM = 10
+
+        /**
+         * Head height the element defaults further down this file are written for. A family
+         * with a shorter head scales them down; see EditorViewModel.fittedToHead.
+         */
+        const val DEFAULT_ELEMENT_HEAD_DOTS = 96
+
+        /** A blank label for [family], on the tape and paper that family actually has. */
+        fun forFamily(family: PrinterFamily): LabelSpec {
+            val protocol = PrinterProtocols.of(family)
+            val dieCut = MediaType.DIE_CUT in protocol.supportedMedia
+            return LabelSpec(
+                tapeWidthMm = protocol.geometry.tapeWidthsMm.firstOrNull() ?: 12,
+                // Die-cut stock where it exists, continuous tape where it does not. Tape has no
+                // length of its own, so it starts out growing with whatever is put on it.
+                media = if (dieCut) MediaType.DIE_CUT else MediaType.CONTINUOUS,
+                autoLength = !dieCut,
+                // A millimetre of this family's own grid, not of the one the default assumes.
+                marginPx = protocol.geometry.mmToDots(1),
+                family = family,
+            )
+        }
     }
 }
 
