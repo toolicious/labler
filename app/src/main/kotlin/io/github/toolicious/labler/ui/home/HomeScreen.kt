@@ -171,7 +171,9 @@ fun HomeScreen(
                                 .width(24.dp)
                                 .height(30.dp)
                         )
-                        Text(stringResource(R.string.app_name))
+                        // The gap survives even when the chip has taken everything else, so the
+                        // two never end up touching on a narrow screen.
+                        Text(stringResource(R.string.app_name), Modifier.padding(end = 8.dp))
                         Spacer(Modifier.weight(1f))
                         // Tapping opens the printer settings, or requests the Bluetooth permission when
                         // a printer is remembered but the permission is missing (so it can never connect).

@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.toolicious.labler.R
 import io.github.toolicious.labler.ble.PrinterState
@@ -34,6 +35,11 @@ import io.github.toolicious.labler.ble.PrinterState
  * Printer status shown as a small "pill". Deliberately not an AssistChip so that the
  * left/right inner padding stays controllable. Background per state, white contents, and in
  * the Ready state with a battery value a battery icon directly before the percentage.
+ *
+ * The pill takes the width it is given and no more. Everything but the printer name has a fixed
+ * size and is measured first, so on a narrow screen the name is the one thing that gives way, and
+ * it does so by being cut short rather than by wrapping. Wrapping is what the pill must never do:
+ * it would grow taller than the app bar it sits in and be cut off top and bottom.
  */
 @Composable
 fun PrinterStatusChip(state: PrinterState, permissionMissing: Boolean = false, onClick: () -> Unit) {
@@ -67,28 +73,43 @@ fun PrinterStatusChip(state: PrinterState, permissionMissing: Boolean = false, o
                 .padding(start = 8.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-        if (permissionMissing) {
-            Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
-        } else when (state) {
-            is PrinterState.Connecting, is PrinterState.Printing ->
-                CircularProgressIndicator(Modifier.size(14.dp), strokeWidth = 2.dp, color = Color.White)
-            is PrinterState.Ready ->
-                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
-            is PrinterState.Error ->
+            if (permissionMissing) {
                 Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
-            is PrinterState.Disconnected ->
-                Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
-        }
-        Spacer(Modifier.width(6.dp))
-        Text(text, color = Color.White, style = MaterialTheme.typography.labelLarge)
-        if (battery != null) {
-            Icon(
-                painterResource(R.drawable.ic_battery),
-                contentDescription = null,
-                modifier = Modifier.padding(start = 6.dp, end = 1.dp).size(15.dp),
-                tint = Color.White,
+            } else when (state) {
+                is PrinterState.Connecting, is PrinterState.Printing ->
+                    CircularProgressIndicator(Modifier.size(14.dp), strokeWidth = 2.dp, color = Color.White)
+                is PrinterState.Ready ->
+                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
+                is PrinterState.Error ->
+                    Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
+                is PrinterState.Disconnected ->
+                    Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
+            }
+            Spacer(Modifier.width(6.dp))
+            // The only flexible part, and it asks for no more than it needs: a weighted child is
+            // measured after all the fixed ones, so it gets whatever they left over.
+            Text(
+                text,
+                color = Color.White,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false),
             )
-            Text("$battery %", color = Color.White, style = MaterialTheme.typography.labelLarge)
+            if (battery != null) {
+                Icon(
+                    painterResource(R.drawable.ic_battery),
+                    contentDescription = null,
+                    modifier = Modifier.padding(start = 6.dp, end = 1.dp).size(15.dp),
+                    tint = Color.White,
+                )
+                Text(
+                    "$battery %",
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelLarge,
+                    maxLines = 1,
+                    softWrap = false,
+                )
             }
         }
     }
