@@ -174,6 +174,60 @@ class SnappingTest {
         assertEquals(listOf(48f, 0f, 96f), t.map { it.line })
     }
 
+    // ----- rotatedAround -----
+
+    @Test
+    fun `around its own center it matches rotatedBounds`() {
+        val box = Rect(10f, 20f, 50f, 28f)
+        val a = rotatedAround(box, box.center.x, box.center.y, 90)
+        val b = rotatedBounds(10f, 20f, 40f, 8f, 90)
+        assertEquals(b.left, a.left, eps)
+        assertEquals(b.top, a.top, eps)
+        assertEquals(b.right, a.right, eps)
+        assertEquals(b.bottom, a.bottom, eps)
+    }
+
+    @Test
+    fun `a box off the pivot travels around it`() {
+        // A quarter turn clockwise about the origin puts (10, 0) at (0, 10).
+        val b = rotatedAround(Rect(10f, 0f, 20f, 4f), 0f, 0f, 90)
+        assertEquals(-4f, b.left, eps)
+        assertEquals(10f, b.top, eps)
+        assertEquals(0f, b.right, eps)
+        assertEquals(20f, b.bottom, eps)
+    }
+
+    // ----- merging a second box -----
+
+    @Test
+    fun `a line of its own survives the merge`() {
+        val primary = listOf(target(100f))
+        val merged = mergeTargets(primary, listOf(target(120f)))
+        assertEquals(listOf(100f, 120f), merged.map { it.line })
+    }
+
+    @Test
+    fun `a line within the tolerance of one already there is dropped`() {
+        val primary = listOf(target(100f))
+        val merged = mergeTargets(primary, listOf(target(102f), target(97f)))
+        assertEquals(listOf(100f, 97f), merged.map { it.line })
+    }
+
+    @Test
+    fun `features merge the same way`() {
+        val merged = mergeFeatures(floatArrayOf(0f, 50f, 100f), floatArrayOf(2f, 60f))
+        assertEquals(listOf(0f, 50f, 100f, 60f), merged.toList())
+    }
+
+    @Test
+    fun `an element locks on by a line of its second box`() {
+        // Box 0..100, ink 8..92: only the ink edge reaches the target at 108.
+        val features = mergeFeatures(boxFeatures(0f, 100f), boxFeatures(8f, 84f))
+        val snap = bestSnapAxis(features, listOf(target(93f)))
+        assertNotNull(snap)
+        assertEquals(1f, snap!!.shift, eps)
+    }
+
     @Test
     fun `every element contributes three lines per axis, each carrying its box`() {
         val a = Rect(10f, 20f, 50f, 28f)

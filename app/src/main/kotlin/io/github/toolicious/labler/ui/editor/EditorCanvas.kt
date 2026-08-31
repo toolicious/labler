@@ -1,5 +1,7 @@
 package io.github.toolicious.labler.ui.editor
 
+import android.graphics.Bitmap
+import android.graphics.Canvas as PixelCanvas
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -54,6 +56,7 @@ import io.github.toolicious.labler.render.FontRegistry
 import io.github.toolicious.labler.render.MonoConverter
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
@@ -81,6 +84,83 @@ private val EDGE_FLAG_ARROW_GAP = 5.dp  // between the word and the arrow beside
 internal fun elementBounds(el: LabelElement): Rect {
     val s = LabelRenderer.measure(el)
     return rotatedBounds(el.x, el.y, s.width, s.height, el.rotation)
+}
+
+/**
+ * The box around the dots an element really prints, or null when it prints none.
+ *
+ * [elementBounds] is the room an element reserves, and for two kinds of element that is knowingly
+ * more than they fill. A text is as tall as the line box of its font, from the ascent line down to
+ * the descent line, and a font declares those so that its tallest and lowest glyphs fit between
+ * them, accents included; a word without them leaves the rest as air. A symbol is as large as the
+ * em square of its font, and a glyph drawn small inside that square keeps the room around it. Both
+ * are deliberate, because a box that followed the content would change under every keystroke and
+ * two texts of one size would no longer be the same height.
+ *
+ * This is the other half of that trade: the box a reader sees. It is not measured from font
+ * metrics, which describe outlines rather than dots and would count a curve that dips a third of a
+ * dot below the baseline as a whole dot of ink. The element is rendered instead, and a dot counts
+ * exactly when it counts for the printer, at a gray below 128. What comes out is therefore on the
+ * dot grid and holds for every kind of element, glyph or barcode or picture alike.
+ */
+internal fun inkBounds(el: LabelElement): Rect? {
+    val rel = inkOffsets(el) ?: return null
+    val b = elementBounds(el)
+    return Rect(b.left + rel.left, b.top + rel.top, b.left + rel.right, b.top + rel.bottom)
+}
+
+// The last measurement, kept because a drag asks for the same one on every frame: the element
+// moves, but what it prints does not. Custom fonts are part of the key, they finish loading after
+// the editor is already up and change what a text puts on the tape.
+private var inkKey: Pair<LabelElement, Int>? = null
+private var inkValue: Rect? = null
+
+/** [inkBounds] relative to the element's own bounding box, so it survives the element moving. */
+private fun inkOffsets(el: LabelElement): Rect? {
+    val at0 = el.moved(-el.x, -el.y)
+    val key = at0 to FontRegistry.revision
+    if (key == inkKey) return inkValue
+    inkKey = key
+    inkValue = measureInk(at0)
+    return inkValue
+}
+
+private fun measureInk(el: LabelElement): Rect? {
+    val b = elementBounds(el)
+    val w = ceil(b.width).toInt()
+    val h = ceil(b.height).toInt()
+    // The cap is far above any real element and only stops a corrupt template from asking for a
+    // bitmap that cannot be allocated.
+    if (w <= 0 || h <= 0 || w.toLong() * h > 4_000_000L) return null
+    val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+    val canvas = PixelCanvas(bmp)
+    canvas.drawColor(android.graphics.Color.WHITE)
+    canvas.translate(-b.left, -b.top)
+    LabelRenderer.drawElementInto(canvas, el)
+    val px = IntArray(w * h)
+    bmp.getPixels(px, 0, w, 0, 0, w, h)
+    bmp.recycle()
+    var left = w
+    var top = h
+    var right = -1
+    var bottom = -1
+    for (y in 0 until h) {
+        val row = y * w
+        for (x in 0 until w) {
+            val p = px[row + x]
+            // The printer's own rule, from MonoConverter: the mean of the channels below 128.
+            val gray = (((p shr 16) and 0xFF) + ((p shr 8) and 0xFF) + (p and 0xFF)) / 3
+            if (gray < 128) {
+                if (x < left) left = x
+                if (x > right) right = x
+                if (y < top) top = y
+                if (y > bottom) bottom = y
+            }
+        }
+    }
+    if (right < 0) return null
+    // A dot at column x covers x to x + 1, so the far edges take the whole last dot with them.
+    return Rect(left.toFloat(), top.toFloat(), right + 1f, bottom + 1f)
 }
 
 /**
@@ -120,6 +200,9 @@ fun EditorCanvas(
     // True while a drag that came out of a double tap is running, so the selection
     // frame can show that this move ignores the snap lines.
     var snapFreeDrag by remember { mutableStateOf(false) }
+    // The ink frame is a moving aid, so it comes and goes with the move and never sits in the way
+    // while the element is only selected.
+    var movingDrag by remember { mutableStateOf(false) }
 
     // On an auto-length tape the canvas is as long as its content (at least the minimum), so it
     // grows while typing. The editor holds the unresolved placeholders, so this is the design
@@ -199,6 +282,7 @@ fun EditorCanvas(
     val background = Color(0xFF3A3A3A)
     val selectionColor = Color(0xFFE53935)
     val guideColor = Color(0xFF2979FF)
+    val inkColor = Color(0xFFFF8F00)
     val handleRadiusLabel = 18f
 
     val edgeColor = MaterialTheme.colorScheme.primary
@@ -288,6 +372,7 @@ fun EditorCanvas(
                             sel != null && hitTest(lp, sel) -> {
                                 mode = 1
                                 snapFreeDrag = snapFree
+                                movingDrag = true
                                 onDragStart(sel.id, snapFree)
                             }
                             else -> {
@@ -295,6 +380,7 @@ fun EditorCanvas(
                                 if (hit != null) {
                                     mode = 1
                                     snapFreeDrag = snapFree
+                                    movingDrag = true
                                     onDragStart(hit.id, snapFree)
                                 } else {
                                     mode = 0
@@ -319,6 +405,7 @@ fun EditorCanvas(
                         }
                         mode = 0
                         snapFreeDrag = false
+                        movingDrag = false
                     },
                     onDoubleTap = { pos -> edgeHandleAt(pos)?.let(onEdgeFit) },
                 )
@@ -414,6 +501,27 @@ fun EditorCanvas(
                         end = elToScreen(ax, b.bottom),
                         strokeWidth = 3f,
                     )
+                }
+                // Second frame while moving: where the glyphs really are, as opposed to the
+                // line box of their font. Both are snapped by, so both are shown, and neither is
+                // shown in the free drag out of a double tap, where nothing snaps at all.
+                if (movingDrag && !snapFreeDrag) {
+                    // Not drawn when it lands within a dot of the element box: two frames on
+                    // top of each other say nothing and only look like a drawing error.
+                    inkBounds(sel)?.takeIf {
+                        abs(it.left - b.left) > 1f || abs(it.top - b.top) > 1f ||
+                            abs(it.right - b.right) > 1f || abs(it.bottom - b.bottom) > 1f
+                    }?.let { ink ->
+                        drawRect(
+                            color = inkColor,
+                            topLeft = elToScreen(ink.left, ink.top),
+                            size = Size(ink.width * total, ink.height * total),
+                            style = Stroke(
+                                width = 2f,
+                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 5f)),
+                            ),
+                        )
+                    }
                 }
                 val handle = elToScreen(b.right, b.bottom)
                 drawCircle(Color.White, radius = 13f, center = handle)

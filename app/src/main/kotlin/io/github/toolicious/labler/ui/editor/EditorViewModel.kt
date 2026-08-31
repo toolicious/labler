@@ -280,6 +280,8 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
     private var dragAutoCenter: Float? = null
     private var dragOthersLeft = Float.POSITIVE_INFINITY
     private var dragYTargets: List<SnapTarget> = emptyList()
+    // The ink box of the dragged element, relative to its origin, or null when it has none.
+    private var dragInk: Rect? = null
 
     fun beginDrag(id: String, snapFree: Boolean) {
         val t = _template.value ?: return
@@ -294,9 +296,11 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
             dragYTargets = emptyList()
             dragAutoCenter = null
             dragOthersLeft = Float.POSITIVE_INFINITY
+            dragInk = null
             _guides.value = SnapGuides()
             return
         }
+        dragInk = inkBounds(el)?.translate(-el.x, -el.y)
         dragAutoCenter = autoCenterPx(t, el)
         dragOthersLeft = t.elements
             .filter { it.id != id }
@@ -308,14 +312,15 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         // element leaves it outside, where it is not printed and cannot be seen, and a guide from
         // it would point at nothing.
         val tape = tapeRect(t)
-        val (xt, yt) = elementTargets(
-            t.elements
-                .filter { it.id != id }
-                .map { elementBounds(it) }
-                .filter { it.overlaps(tape) }
-        )
-        dragXTargets = xt
-        dragYTargets = yt
+        val visible = t.elements
+            .filter { it.id != id }
+            .filter { elementBounds(it).overlaps(tape) }
+        val (xt, yt) = elementTargets(visible.map { elementBounds(it) })
+        // A text element offers a second box around its glyphs, and that one is worth a line
+        // wherever it does not fall on the first one anyway.
+        val (xi, yi) = elementTargets(visible.mapNotNull { inkBounds(it) })
+        dragXTargets = mergeTargets(xt, xi)
+        dragYTargets = mergeTargets(yt, yi)
     }
 
     fun dragBy(delta: Offset) {
@@ -346,9 +351,16 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         if (!dragSnapFree) {
             // The label's own lines first, then the cached lines of the other elements, so a line
             // they share is credited to the label.
+            val ink = dragInk
+            var xFeatures = boxFeatures(raw.x + offX, box.width)
+            var yFeatures = boxFeatures(raw.y + offY, box.height)
+            if (ink != null) {
+                xFeatures = mergeFeatures(xFeatures, boxFeatures(raw.x + ink.left, ink.width))
+                yFeatures = mergeFeatures(yFeatures, boxFeatures(raw.y + ink.top, ink.height))
+            }
             val snapX =
-                bestSnapAxis(raw.x + offX, box.width, labelXTargets(spec, dragAutoCenter) + dragXTargets)
-            val snapY = bestSnapAxis(raw.y + offY, box.height, labelYTargets() + dragYTargets)
+                bestSnapAxis(xFeatures, labelXTargets(spec, dragAutoCenter) + dragXTargets)
+            val snapY = bestSnapAxis(yFeatures, labelYTargets() + dragYTargets)
             nx += snapX?.shift ?: 0f
             ny += snapY?.shift ?: 0f
             xGuide = snapX?.guide
@@ -420,6 +432,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
     fun endDrag() {
         dragId = null
         dragAutoCenter = null
+        dragInk = null
         dragRaw = null
         dragSnapFree = false
         dragXTargets = emptyList()
