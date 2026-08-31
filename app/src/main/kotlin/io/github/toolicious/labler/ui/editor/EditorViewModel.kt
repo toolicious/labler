@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -173,8 +174,16 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
      * particular and, on the two shifted layouts, not even on the tape.
      */
     private fun placed(t: LabelTemplate, element: LabelElement): LabelElement {
+        // Twice, because on a variable label the tape is partly made by the element being placed:
+        // the first round gives the tape without it, the second the tape it will be on.
+        var out = element
+        repeat(2) { out = placedOnce(t, out) }
+        return out
+    }
+
+    private fun placedOnce(t: LabelTemplate, element: LabelElement): LabelElement {
         val size = LabelRenderer.measure(element)
-        val tape = tapeRect(t)
+        val tape = tapeRect(t.copy(elements = t.elements + element))
         val beside = t.elements.find { it.id == _selectedId.value }?.let { elementBounds(it) }
         val x = if (beside != null) beside.right else tape.left + (tape.width - size.width) / 2f
         val y = if (beside != null) beside.center.y - size.height / 2f
@@ -266,6 +275,10 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
     private var dragSnapFree = false
     // Snap lines from the other elements, cached at drag start (they do not move during the drag).
     private var dragXTargets: List<SnapTarget> = emptyList()
+    // Both worked out once per drag: they depend on the other elements and on the size of the
+    // dragged one, and neither changes while it is being moved.
+    private var dragAutoCenter: Float? = null
+    private var dragOthersLeft = Float.POSITIVE_INFINITY
     private var dragYTargets: List<SnapTarget> = emptyList()
 
     fun beginDrag(id: String, snapFree: Boolean) {
@@ -279,9 +292,15 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         if (snapFree) {
             dragXTargets = emptyList()
             dragYTargets = emptyList()
+            dragAutoCenter = null
+            dragOthersLeft = Float.POSITIVE_INFINITY
             _guides.value = SnapGuides()
             return
         }
+        dragAutoCenter = autoCenterPx(t, el)
+        dragOthersLeft = t.elements
+            .filter { it.id != id }
+            .minOfOrNull { elementBounds(it).left } ?: Float.POSITIVE_INFINITY
         // Each line comes from the rotated box, the same one the canvas outlines, and the box is
         // carried along with it so the canvas can highlight exactly the geometry a snap used.
         //
@@ -327,7 +346,8 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         if (!dragSnapFree) {
             // The label's own lines first, then the cached lines of the other elements, so a line
             // they share is credited to the label.
-            val snapX = bestSnapAxis(raw.x + offX, box.width, labelXTargets(spec) + dragXTargets)
+            val snapX =
+                bestSnapAxis(raw.x + offX, box.width, labelXTargets(spec, dragAutoCenter) + dragXTargets)
             val snapY = bestSnapAxis(raw.y + offY, box.height, labelYTargets() + dragYTargets)
             nx += snapX?.shift ?: 0f
             ny += snapY?.shift ?: 0f
@@ -336,11 +356,17 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         }
 
         // Keep at least 8 px grabbable. This is placement, not snapping, so it always applies.
-        // A variable label has no edge to stop at in either direction, it moves along with whatever
-        // is dragged, so the only bound there is the largest length the printer and the UI accept.
-        // That is what lets an element be put in front of all the others.
+        // A variable label grows rather than stopping anything, so the only bound to the right is
+        // the longest label the printer and the UI accept. To the left it depends on company: with
+        // others on the tape, going past the front pushes them along and the label grows, so there
+        // is something to see; on its own an element would only run its coordinates out under a
+        // picture that has already stopped, and it is held at the margin instead.
         val bound = LabelSpec.MAX_LENGTH_PX.toFloat()
-        val minX = if (spec.lengthIsAuto) -bound else labelStart + 8f - box.width
+        val minX = when {
+            !spec.lengthIsAuto -> labelStart + 8f - box.width
+            dragOthersLeft.isFinite() -> -bound
+            else -> LabelRenderer.AUTO_LENGTH_MARGIN_PX
+        }
         val maxX = if (spec.lengthIsAuto) bound else labelStart + spec.lengthPx
         val boxX = (nx + offX).coerceIn(minX, maxX - 8f)
         val boxY = (ny + offY).coerceIn(8f - box.height, LabelSpec.PRINT_HEIGHT_PX - 8f)
@@ -358,8 +384,42 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         applyWithoutHistory(el.moved(nx - el.x, ny - el.y))
     }
 
+    /**
+     * The center of a variable-length label, or null when it would not stay put for this drag.
+     *
+     * Such a label is laid out from its content, so the element being dragged can be the one
+     * deciding where the tape begins and how long it is. Its center is the one line that can
+     * survive that: an element parked in the middle usually decides neither, and even one wide
+     * enough to stick out at both ends ends up centered on the label it made.
+     *
+     * Rather than work out which of those cases applies, the center is simply checked: it is taken
+     * from the other elements, the dragged one is put on it, and it is taken again. Only a center
+     * that has not moved is offered, so a line is never shown that the snap itself would undo.
+     */
+    private fun autoCenterPx(t: LabelTemplate, dragged: LabelElement): Float? {
+        if (!t.spec.lengthIsAuto) return null
+        val others = t.elements.filter { it.id != dragged.id }
+
+        fun center(elements: List<LabelElement>): Float =
+            -LabelRenderer.contentOffsetPx(t.spec, elements) +
+                LabelRenderer.effectiveLengthPx(t.spec, elements) / 2f
+
+        // Starts from the frame the label really has and settles from there: an element that
+        // currently sticks out is holding the frame open, so the first answer is still the old one
+        // and only the next round gives the frame it would leave behind.
+        var candidate = center(t.elements)
+        repeat(3) {
+            val centered = dragged.moved(candidate - elementBounds(dragged).center.x, 0f)
+            val next = center(others + centered)
+            if (abs(next - candidate) < 0.5f) return candidate
+            candidate = next
+        }
+        return null
+    }
+
     fun endDrag() {
         dragId = null
+        dragAutoCenter = null
         dragRaw = null
         dragSnapFree = false
         dragXTargets = emptyList()

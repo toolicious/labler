@@ -130,12 +130,23 @@ class SnappingTest {
     }
 
     @Test
-    fun `a variable label offers no line of its own along the tape`() {
-        // Both edges follow whatever is dragged, so every line derived from the frame would chase
+    fun `a variable label offers no border of its own along the tape`() {
+        // Both edges follow whatever is dragged, so a border derived from the frame would chase
         // itself. Only the other elements' lines are left, and the tape's height is unaffected.
         val variable = LabelSpec(lengthMm = 40, media = MediaType.CONTINUOUS, autoLength = true)
         assertEquals(emptyList<SnapTarget>(), labelXTargets(variable))
         assertEquals(3, labelYTargets().size)
+    }
+
+    @Test
+    fun `a variable label offers the center it was given, and nothing else`() {
+        // The caller decides whether the center holds still; here it only has to come through as
+        // the one line, without either border tagging along.
+        val variable = LabelSpec(lengthMm = 40, media = MediaType.CONTINUOUS, autoLength = true)
+        val t = labelXTargets(variable, autoCenter = 130f)
+        assertEquals(listOf(130f), t.map { it.line })
+        assertEquals(listOf(SnapAnchor.CENTER), t.map { it.anchor })
+        assertEquals("the label is never a reference box", listOf(null), t.map { it.refBounds })
     }
 
     @Test

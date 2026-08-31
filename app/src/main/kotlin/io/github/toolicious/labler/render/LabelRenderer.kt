@@ -82,15 +82,15 @@ object LabelRenderer {
     /**
      * The length the label is actually rendered and printed at.
      *
-     * A fixed label always uses its own length. An auto-length tape grows to hold its content
-     * but never falls below [LabelSpec.lengthMm], which acts as the minimum there. The result is
-     * rounded up to a whole millimetre, so the length shown to the user is exact rather than a
-     * fraction, and so a job stays on the dot grid.
+     * A fixed label always uses its own length. An auto-length tape grows to hold its content,
+     * the gap in front of it included, but never falls below [LabelSpec.lengthMm], which acts as
+     * the minimum there. The result is rounded up to a whole millimetre, so the length shown to the
+     * user is exact rather than a fraction, and so a job stays on the dot grid.
      */
     fun effectiveLengthPx(spec: LabelSpec, elements: List<LabelElement>): Int {
         if (!spec.lengthIsAuto) return spec.lengthPx
-        val span = (elements.maxOfOrNull { rightEdge(it) } ?: 0f) - contentLeft(elements)
-        val contentMm = ceil((span + 2 * AUTO_LENGTH_MARGIN_PX) / Protocol.DOTS_PER_MM).toInt()
+        val used = frontGapPx(elements) + (contentRight(elements) - contentLeft(elements))
+        val contentMm = ceil((used + AUTO_LENGTH_MARGIN_PX) / Protocol.DOTS_PER_MM).toInt()
         // coerceAtMost rather than coerceIn, so an out-of-range minimum from hand-edited JSON
         // caps out instead of throwing.
         return maxOf(spec.lengthMm, contentMm)
@@ -105,6 +105,23 @@ object LabelRenderer {
     private fun contentLeft(elements: List<LabelElement>): Float =
         elements.minOfOrNull { leftEdge(it) } ?: 0f
 
+    /** Rightmost point any element reaches. Zero on an empty label. */
+    private fun contentRight(elements: List<LabelElement>): Float =
+        elements.maxOfOrNull { rightEdge(it) } ?: 0f
+
+    /**
+     * Blank tape a variable label keeps in front of its content: whatever gap the content leaves
+     * itself, and never less than the margin.
+     *
+     * So the front edge follows the content the way the back one does, growing and shrinking with
+     * it, while an element can still be put anywhere on a label that is longer than its content
+     * needs. Forcing the gap to the margin instead would pin the content to the front of the tape,
+     * and a label holding a single element could not be arranged at all: that one element is always
+     * the leftmost, so the layout would follow it wherever it went.
+     */
+    private fun frontGapPx(elements: List<LabelElement>): Float =
+        maxOf(AUTO_LENGTH_MARGIN_PX, contentLeft(elements))
+
     private fun leftEdge(element: LabelElement): Float {
         val size = measure(element)
         if (element.rotation == 0) return element.x
@@ -116,16 +133,19 @@ object LabelRenderer {
     /**
      * How far every element moves when the label is drawn.
      *
-     * A fixed label keeps its coordinates, the tape starting at x = 0. A variable one is laid out
-     * from its content instead, putting the leftmost element on the margin, which is what lets
-     * something be placed in front of everything else without having to move everything else out of
-     * the way first. A manual label shifts by its leading edge and by nothing else, so moving an
-     * element there never moves an edge. Whole pixels, so the dot grid the drawing snaps to stays
-     * intact.
+     * A fixed label keeps its coordinates, the tape starting at x = 0. A manual one shifts by its
+     * leading edge and by nothing else, so moving an element there never moves an edge.
+     *
+     * A variable label is laid out from its content, by [frontGapPx]: the content keeps its own
+     * coordinates until it would run off the front of the tape, and only then is it pushed back on.
+     * That is what lets something be placed in front of everything else without having to move
+     * everything else out of the way first, while everything else stays where it was put.
+     *
+     * Whole pixels, so the dot grid the drawing snaps to stays intact.
      */
     fun contentOffsetPx(spec: LabelSpec, elements: List<LabelElement>): Float = when (spec.lengthMode) {
         LengthMode.FIXED -> 0f
-        LengthMode.VARIABLE -> (AUTO_LENGTH_MARGIN_PX - contentLeft(elements)).roundToInt().toFloat()
+        LengthMode.VARIABLE -> (frontGapPx(elements) - contentLeft(elements)).roundToInt().toFloat()
         LengthMode.MANUAL -> spec.leadingPx.toFloat()
     }
 
