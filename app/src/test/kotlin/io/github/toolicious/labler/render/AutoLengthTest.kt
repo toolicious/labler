@@ -75,6 +75,15 @@ class AutoLengthTest {
     }
 
     @Test
+    fun `the length follows the content by the dot, not by the millimetre`() {
+        val s = spec(minMm = 10)
+        // 100 dots of content plus two margins is 116, and 116 it stays: rounding that up to the
+        // next whole millimetre is what made the label jump while its content was dragged.
+        assertEquals("len=116 front=8 back=8", layout(s, listOf(box("a", 8f, 100f))))
+        assertEquals("len=117 front=8 back=8", layout(s, listOf(box("a", 8f, 101f))))
+    }
+
+    @Test
     fun `a margin of zero trims the label to the content`() {
         val s = spec(minMm = 10, marginPx = 0)
         assertEquals("len=176 front=0 back=0", layout(s, listOf(box("a", 40f, 176f))))

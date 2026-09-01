@@ -80,22 +80,22 @@ object LabelRenderer {
      * plus [LabelSpec.marginMm] at each end, and never shorter than [LabelSpec.lengthMm], which
      * acts as the minimum there. Only how far the content reaches counts, never where it sits, so
      * moving something around inside a label that is longer than its content leaves the length
-     * alone. The result is rounded up to a whole millimetre, so the length shown to the user is
-     * exact rather than a fraction, and so a job stays on the dot grid.
+     * alone. Measured to the dot rather than to the millimetre: a label that grew in whole
+     * millimetres would jump a millimetre at a time under a finger dragging its content outwards,
+     * and the gap at that end would pulse between one and two millimetres on the way.
      */
     fun effectiveLengthPx(spec: LabelSpec, elements: List<LabelElement>): Int {
         if (!spec.lengthIsAuto) return spec.lengthPx
         val span = contentRight(elements) - contentLeft(elements)
-        val contentMm = ceil((span + 2 * spec.marginPx) / Protocol.DOTS_PER_MM).toInt()
+        val needed = ceil(span + 2 * spec.marginPx).toInt()
         // coerceAtMost rather than coerceIn, so an out-of-range minimum from hand-edited JSON
         // caps out instead of throwing.
-        return maxOf(spec.lengthMm, contentMm)
-            .coerceAtMost(LabelSpec.MAX_LENGTH_MM) * Protocol.DOTS_PER_MM
+        return maxOf(spec.lengthPx, needed).coerceAtMost(LabelSpec.MAX_LENGTH_PX)
     }
 
-    /** [effectiveLengthPx] in whole millimetres, for the length shown in the UI. */
+    /** [effectiveLengthPx] in millimetres, rounded up, for the length shown in the UI. */
     fun effectiveLengthMm(spec: LabelSpec, elements: List<LabelElement>): Int =
-        effectiveLengthPx(spec, elements) / Protocol.DOTS_PER_MM
+        ceil(effectiveLengthPx(spec, elements) / Protocol.DOTS_PER_MM.toFloat()).toInt()
 
     /** Leftmost point any element reaches, mirroring [rightEdge]. Zero on an empty label. */
     private fun contentLeft(elements: List<LabelElement>): Float =

@@ -69,7 +69,9 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
     val canRedo = _canRedo.asStateFlow()
 
     init {
-        viewModelScope.launch { _template.value = repo.get(templateId) }
+        // Through set(), so a template written before the coordinates carried the shift starts
+        // out in one piece rather than being corrected on the first edit.
+        viewModelScope.launch { repo.get(templateId)?.let { set(it) } }
     }
 
     fun select(id: String?) {
@@ -127,20 +129,37 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
 
     private fun applyElements(elements: List<LabelElement>) {
         val t = _template.value ?: return
-        val updated = t.copy(elements = elements)
-        _template.value = updated
+        val updated = set(t.copy(elements = elements))
         if (_selectedId.value != null && elements.none { it.id == _selectedId.value }) {
             _selectedId.value = null
         }
         scheduleSave(updated)
     }
 
+    /**
+     * Puts [t] into the state, with the content of a variable label moved back onto its tape.
+     *
+     * The drawing would do that shift anyway, but only for the picture, and then the coordinates
+     * drift away from what is on screen: dragging past an end keeps counting while nothing moves,
+     * and the way back is dead for exactly that distance. Worse, the shift is worked out afresh
+     * from the room the label has, so it changes when something else on the label is resized or
+     * moved, and content that was pushed against one end then wanders off it on its own.
+     *
+     * Carrying it into the coordinates instead keeps element and tape in one system: what the
+     * numbers say is what is drawn, and there is nothing left to drift.
+     */
+    private fun set(t: LabelTemplate): LabelTemplate {
+        val shift = LabelRenderer.contentOffsetPx(t.spec, t.elements)
+        val fixed = if (t.spec.lengthMode != LengthMode.VARIABLE || shift == 0f) t
+        else t.copy(elements = t.elements.map { it.moved(shift, 0f) })
+        _template.value = fixed
+        return fixed
+    }
+
     private fun mutate(coalesceKey: String?, transform: (LabelTemplate) -> LabelTemplate) {
         val current = _template.value ?: return
         pushHistory(coalesceKey)
-        val updated = transform(current)
-        _template.value = updated
-        scheduleSave(updated)
+        scheduleSave(set(transform(current)))
     }
 
     /**
@@ -272,13 +291,13 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
     private var dragRaw: Offset? = null
     // Set for a drag started out of a double tap: that one moves freely, without snapping.
     private var dragSnapFree = false
-    // Snap lines from the other elements, cached at drag start (they do not move during the drag).
+    // Snap lines from the other elements, worked out at drag start. They are carried along when
+    // the label puts its content back, and the center is redone when the label changes length.
     private var dragXTargets: List<SnapTarget> = emptyList()
-    // Both worked out once per drag: they depend on the other elements and on the size of the
-    // dragged one, and neither changes while it is being moved.
     private var dragAutoCenter: Float? = null
-    private var dragOthersLeft = Float.POSITIVE_INFINITY
     private var dragYTargets: List<SnapTarget> = emptyList()
+    // Length the label had when the center above was worked out.
+    private var dragLength = 0
     // The ink box of the dragged element, relative to its origin, or null when it has none.
     private var dragInk: Rect? = null
 
@@ -294,16 +313,13 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
             dragXTargets = emptyList()
             dragYTargets = emptyList()
             dragAutoCenter = null
-            dragOthersLeft = Float.POSITIVE_INFINITY
             dragInk = null
             _guides.value = SnapGuides()
             return
         }
         dragInk = inkBounds(el)?.translate(-el.x, -el.y)
         dragAutoCenter = autoCenterPx(t, el)
-        dragOthersLeft = t.elements
-            .filter { it.id != id }
-            .minOfOrNull { elementBounds(it).left } ?: Float.POSITIVE_INFINITY
+        dragLength = LabelRenderer.effectiveLengthPx(t.spec, t.elements)
         // Each line comes from the rotated box, the same one the canvas outlines, and the box is
         // carried along with it so the canvas can highlight exactly the geometry a snap used.
         //
@@ -366,27 +382,14 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
             yGuide = snapY?.guide
         }
 
-        // Where the element may go, as the left edge of its box.
-        //
-        // A fixed or manual label has edges, and 8 px of the element stay on the tape so it can be
-        // grabbed again. A variable one has none: moving an element changes how far the content
-        // reaches, so the label follows and there is nothing to run into, up to the longest label
-        // the printer and the UI accept.
-        //
-        // Alone on a variable label an element is the whole content, so moving it changes neither
-        // the extent nor the length. Past the slack the label would only slide along underneath a
-        // picture that no longer changes, and the coordinates would run away from what is drawn,
-        // leaving the way back dead for exactly as far as it was overdragged. So there, and only
-        // there, it stops at the two ends of the room it has.
+        // Where the element may go, as the left edge of its box. A fixed or manual label has
+        // edges, and 8 px of the element stay on the tape so it can be grabbed again. A variable
+        // one has none: moving an element changes how far the content reaches, so the label
+        // follows, and what will not fit is put back by set() rather than stopped here.
         val bound = LabelSpec.MAX_LENGTH_PX.toFloat()
-        val elements = _template.value?.elements.orEmpty()
-        val (minX, maxX) = when {
-            !spec.lengthIsAuto ->
-                (labelStart + 8f - box.width) to (labelStart + spec.lengthPx - 8f)
-            dragOthersLeft.isFinite() -> -bound to bound
-            else -> spec.marginPx.toFloat() to
-                (spec.marginPx + LabelRenderer.slackPx(spec, elements))
-        }
+        val (minX, maxX) =
+            if (spec.lengthIsAuto) -bound to bound
+            else (labelStart + 8f - box.width) to (labelStart + spec.lengthPx - 8f)
         val boxX = (nx + offX).coerceIn(minX, maxX)
         val boxY = (ny + offY).coerceIn(8f - box.height, LabelSpec.PRINT_HEIGHT_PX - 8f)
         // A guide would point at a line the element is no longer on once the bound had to move it.
@@ -401,7 +404,37 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
 
         if (!dragSnapFree) _guides.value = SnapGuides(xGuide, yGuide)
         applyWithoutHistory(el.moved(nx - el.x, ny - el.y))
+        val t = _template.value ?: return
+        val placed = t.elements.find { it.id == id } ?: return
+        // Putting the content back on the tape moved every element on it, the dragged one and the
+        // lines worked out from the others alike. Each of them is carried the same distance: the
+        // finger, because otherwise the next frame would put the element back where the finger is
+        // and undo the correction, and the lines, because otherwise they would point at where the
+        // other elements used to be, and the canvas would outline them there.
+        val shift = placed.x - nx
+        if (shift != 0f) {
+            dragRaw = dragRaw?.plus(Offset(shift, 0f))
+            dragXTargets = dragXTargets.map {
+                it.copy(line = it.line + shift, refBounds = it.refBounds?.translate(shift, 0f))
+            }
+            dragYTargets = dragYTargets.map { it.copy(refBounds = it.refBounds?.translate(shift, 0f)) }
+            dragAutoCenter = dragAutoCenter?.plus(shift)
+            if (!dragSnapFree) _guides.value = _guides.value.shifted(shift)
+        }
+        // The center of a variable label is half its length, so it is worked out again whenever
+        // the label has grown or shrunk under the drag.
+        val length = LabelRenderer.effectiveLengthPx(t.spec, t.elements)
+        if (length != dragLength) {
+            dragLength = length
+            dragAutoCenter = autoCenterPx(t, placed)
+        }
     }
+
+    /** The same guides, moved along the tape. */
+    private fun SnapGuides.shifted(dx: Float): SnapGuides = SnapGuides(
+        x = x?.let { it.copy(line = it.line + dx, refBounds = it.refBounds?.translate(dx, 0f)) },
+        y = y?.let { it.copy(refBounds = it.refBounds?.translate(dx, 0f)) },
+    )
 
     /**
      * The center of a variable-length label, or null when it would not stay put for this drag.
@@ -501,9 +534,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
 
     private fun applyWithoutHistory(element: LabelElement) {
         val t = _template.value ?: return
-        val updated = t.copy(elements = t.elements.map { if (it.id == element.id) element else it })
-        _template.value = updated
-        scheduleSave(updated)
+        scheduleSave(set(t.copy(elements = t.elements.map { if (it.id == element.id) element else it })))
     }
 
     // ----- Label edges (manual length only) -----
@@ -628,9 +659,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         if (history) {
             updateSpec(spec)
         } else {
-            val updated = t.copy(spec = spec)
-            _template.value = updated
-            scheduleSave(updated)
+            scheduleSave(set(t.copy(spec = spec)))
         }
     }
 
