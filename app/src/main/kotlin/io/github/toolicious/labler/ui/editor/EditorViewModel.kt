@@ -43,7 +43,6 @@ import kotlin.math.roundToInt
 enum class LabelEdge { LEFT, RIGHT }
 
 /** Blank tape an edge keeps to the content when it is fitted to it (double tap on its handle). */
-private const val FIT_GAP_MM = 1
 
 class EditorViewModel(app: Application, private val templateId: String) : AndroidViewModel(app) {
 
@@ -367,20 +366,28 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
             yGuide = snapY?.guide
         }
 
-        // Keep at least 8 px grabbable. This is placement, not snapping, so it always applies.
-        // A variable label grows rather than stopping anything, so the only bound to the right is
-        // the longest label the printer and the UI accept. To the left it depends on company: with
-        // others on the tape, going past the front pushes them along and the label grows, so there
-        // is something to see; on its own an element would only run its coordinates out under a
-        // picture that has already stopped, and it is held at the margin instead.
+        // Where the element may go, as the left edge of its box.
+        //
+        // A fixed or manual label has edges, and 8 px of the element stay on the tape so it can be
+        // grabbed again. A variable one has none: moving an element changes how far the content
+        // reaches, so the label follows and there is nothing to run into, up to the longest label
+        // the printer and the UI accept.
+        //
+        // Alone on a variable label an element is the whole content, so moving it changes neither
+        // the extent nor the length. Past the slack the label would only slide along underneath a
+        // picture that no longer changes, and the coordinates would run away from what is drawn,
+        // leaving the way back dead for exactly as far as it was overdragged. So there, and only
+        // there, it stops at the two ends of the room it has.
         val bound = LabelSpec.MAX_LENGTH_PX.toFloat()
-        val minX = when {
-            !spec.lengthIsAuto -> labelStart + 8f - box.width
-            dragOthersLeft.isFinite() -> -bound
-            else -> LabelRenderer.AUTO_LENGTH_MARGIN_PX
+        val elements = _template.value?.elements.orEmpty()
+        val (minX, maxX) = when {
+            !spec.lengthIsAuto ->
+                (labelStart + 8f - box.width) to (labelStart + spec.lengthPx - 8f)
+            dragOthersLeft.isFinite() -> -bound to bound
+            else -> spec.marginPx.toFloat() to
+                (spec.marginPx + LabelRenderer.slackPx(spec, elements))
         }
-        val maxX = if (spec.lengthIsAuto) bound else labelStart + spec.lengthPx
-        val boxX = (nx + offX).coerceIn(minX, maxX - 8f)
+        val boxX = (nx + offX).coerceIn(minX, maxX)
         val boxY = (ny + offY).coerceIn(8f - box.height, LabelSpec.PRINT_HEIGHT_PX - 8f)
         // A guide would point at a line the element is no longer on once the bound had to move it.
         if (boxX != nx + offX) {
@@ -569,13 +576,17 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         edgeRawPx = 0f
     }
 
-    /** Double tap on an edge: pulls it up to [FIT_GAP_MM] from the content. */
+    /**
+     * Double tap on an edge: pulls it up to [LabelSpec.marginPx] from the content. A manual edge
+     * only knows whole millimetres, so a margin between two of them is rounded to the nearer.
+     */
     fun fitEdge(edge: LabelEdge) {
         val t = _template.value ?: return
         val (left, right) = contentBoundsMm(t.spec, t.elements) ?: return
+        val gap = t.spec.marginMm.roundToInt()
         when (edge) {
-            LabelEdge.LEFT -> setLeadingMm(t.spec.leadingMm + FIT_GAP_MM - left)
-            LabelEdge.RIGHT -> setLengthMm(right + FIT_GAP_MM)
+            LabelEdge.LEFT -> setLeadingMm(t.spec.leadingMm + gap - left)
+            LabelEdge.RIGHT -> setLengthMm(right + gap)
         }
     }
 

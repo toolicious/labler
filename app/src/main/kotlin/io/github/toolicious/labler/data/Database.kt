@@ -32,6 +32,9 @@ data class TemplateEntity(
     val manualEdges: Boolean = false,
     @ColumnInfo(defaultValue = "0")
     val leadingMm: Int = 0,
+    /** Blank tape in dots between the content and an edge the app places itself; see LabelSpec. */
+    @ColumnInfo(defaultValue = "8")
+    val marginPx: Int = 8,
     val elementsJson: String,
     val schemaVersion: Int,
     val favorite: Boolean,
@@ -139,9 +142,16 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
     }
 }
 
+/** Configurable margin at an automatic label edge (issue #2). Eight dots is the millimetre it was fixed at. */
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `templates` ADD COLUMN `marginPx` INTEGER NOT NULL DEFAULT 8")
+    }
+}
+
 @Database(
     entities = [TemplateEntity::class, PrintHistoryEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {

@@ -73,6 +73,12 @@ android {
         compose = true
         buildConfig = true
     }
+
+    // Unmocked android.jar calls hand back defaults instead of throwing, so plain JVM tests can
+    // reach code that merely constructs an Android object on the way (LabelRenderer's Paint).
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 ksp {

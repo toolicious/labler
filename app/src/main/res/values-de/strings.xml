@@ -71,6 +71,7 @@
     <string name="edge_start">Start</string>
     <string name="edge_end">Ende</string>
     <string name="field_min_length_mm">Mindestlänge (mm)</string>
+    <string name="field_margin_mm">Randabstand (mm)</string>
 
     <!-- Editor -->
     <string name="group_add">Hinzufügen</string>

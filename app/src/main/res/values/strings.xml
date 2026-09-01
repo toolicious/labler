@@ -74,6 +74,7 @@
     <string name="edge_start">Start</string>
     <string name="edge_end">End</string>
     <string name="field_min_length_mm">Minimum length (mm)</string>
+    <string name="field_margin_mm">Margin (mm)</string>
 
     <!-- Editor -->
     <string name="group_add">Add</string>

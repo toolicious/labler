@@ -30,9 +30,19 @@ data class LabelSpec(
      * it prints cut off.
      */
     val leadingMm: Int = 0,
+    /**
+     * Blank tape the app keeps between the content and a label edge it works out itself: at both
+     * ends of a variable label, and where a double tap fits a manual edge to the content. Zero
+     * prints flush to the edge, which is what someone trimming to the content exactly wants.
+     *
+     * In dots rather than millimetres, so half a millimetre is a value like any other. The tape
+     * has eight dots to the millimetre and nothing finer can be printed anyway.
+     */
+    val marginPx: Int = Protocol.DOTS_PER_MM,
 ) {
     val lengthPx: Int get() = lengthMm * Protocol.DOTS_PER_MM
     val leadingPx: Int get() = leadingMm * Protocol.DOTS_PER_MM
+    val marginMm: Float get() = marginPx / Protocol.DOTS_PER_MM.toFloat()
 
     /**
      * How the length of this label comes about. Die-cut is always FIXED whatever the flags say,
@@ -67,6 +77,10 @@ data class LabelSpec(
         const val MIN_LENGTH_MM = 10
         const val MAX_LENGTH_MM = 500
         const val MAX_LENGTH_PX = MAX_LENGTH_MM * Protocol.DOTS_PER_MM
+
+        /** Bounds for the margin an auto edge keeps from the content, in whole millimetres. */
+        const val MIN_MARGIN_MM = 0
+        const val MAX_MARGIN_MM = 10
 
         /** Bounds for the tape width in mm. */
         const val MIN_TAPE_MM = 10

@@ -62,12 +62,6 @@ object LabelRenderer {
     private val nnPaint = Paint().apply { isAntiAlias = false; isFilterBitmap = false }
 
     /**
-     * Trailing margin on an auto-length label, mirroring the 8 px inset that new elements start
-     * at, so the content does not end flush with the cut edge.
-     */
-    const val AUTO_LENGTH_MARGIN_PX = 8f
-
-    /**
      * Right edge of an element in label px. Elements are rotated around their own center
      * (see [drawElementInto]), so a rotated one reaches further than its plain width.
      */
@@ -82,15 +76,17 @@ object LabelRenderer {
     /**
      * The length the label is actually rendered and printed at.
      *
-     * A fixed label always uses its own length. An auto-length tape grows to hold its content,
-     * the gap in front of it included, but never falls below [LabelSpec.lengthMm], which acts as
-     * the minimum there. The result is rounded up to a whole millimetre, so the length shown to the
-     * user is exact rather than a fraction, and so a job stays on the dot grid.
+     * A fixed label always uses its own length. An auto-length tape is as long as its content
+     * plus [LabelSpec.marginMm] at each end, and never shorter than [LabelSpec.lengthMm], which
+     * acts as the minimum there. Only how far the content reaches counts, never where it sits, so
+     * moving something around inside a label that is longer than its content leaves the length
+     * alone. The result is rounded up to a whole millimetre, so the length shown to the user is
+     * exact rather than a fraction, and so a job stays on the dot grid.
      */
     fun effectiveLengthPx(spec: LabelSpec, elements: List<LabelElement>): Int {
         if (!spec.lengthIsAuto) return spec.lengthPx
-        val used = frontGapPx(elements) + (contentRight(elements) - contentLeft(elements))
-        val contentMm = ceil((used + AUTO_LENGTH_MARGIN_PX) / Protocol.DOTS_PER_MM).toInt()
+        val span = contentRight(elements) - contentLeft(elements)
+        val contentMm = ceil((span + 2 * spec.marginPx) / Protocol.DOTS_PER_MM).toInt()
         // coerceAtMost rather than coerceIn, so an out-of-range minimum from hand-edited JSON
         // caps out instead of throwing.
         return maxOf(spec.lengthMm, contentMm)
@@ -109,18 +105,29 @@ object LabelRenderer {
     private fun contentRight(elements: List<LabelElement>): Float =
         elements.maxOfOrNull { rightEdge(it) } ?: 0f
 
-    /**
-     * Blank tape a variable label keeps in front of its content: whatever gap the content leaves
-     * itself, and never less than the margin.
-     *
-     * So the front edge follows the content the way the back one does, growing and shrinking with
-     * it, while an element can still be put anywhere on a label that is longer than its content
-     * needs. Forcing the gap to the margin instead would pin the content to the front of the tape,
-     * and a label holding a single element could not be arranged at all: that one element is always
-     * the leftmost, so the layout would follow it wherever it went.
+/**
+     * Blank tape left over on a variable label once its content and the two margins are placed.
+     * This is the room the content has to be arranged in; it comes from a minimum length longer
+     * than the content needs, and is zero as soon as the content is what decides the length.
      */
-    private fun frontGapPx(elements: List<LabelElement>): Float =
-        maxOf(AUTO_LENGTH_MARGIN_PX, contentLeft(elements))
+    fun slackPx(spec: LabelSpec, elements: List<LabelElement>): Float {
+        if (!spec.lengthIsAuto) return 0f
+        val span = contentRight(elements) - contentLeft(elements)
+        return (effectiveLengthPx(spec, elements) - span - 2 * spec.marginPx).coerceAtLeast(0f)
+    }
+
+    /**
+     * Blank tape a variable label keeps in front of its content: where the leftmost element sits,
+     * held between the margin and the far end of the slack.
+     *
+     * Inside that range the content keeps its own coordinates, so it can be arranged anywhere on a
+     * label that is longer than it needs, the middle included. Outside it the label has no room
+     * left, and pushing further only moves the whole label along, which is why it stops there.
+     */
+    private fun frontGapPx(spec: LabelSpec, elements: List<LabelElement>): Float {
+        val margin = spec.marginPx.toFloat()
+        return contentLeft(elements).coerceIn(margin, margin + slackPx(spec, elements))
+    }
 
     private fun leftEdge(element: LabelElement): Float {
         val size = measure(element)
@@ -137,15 +144,16 @@ object LabelRenderer {
      * leading edge and by nothing else, so moving an element there never moves an edge.
      *
      * A variable label is laid out from its content, by [frontGapPx]: the content keeps its own
-     * coordinates until it would run off the front of the tape, and only then is it pushed back on.
-     * That is what lets something be placed in front of everything else without having to move
-     * everything else out of the way first, while everything else stays where it was put.
+     * coordinates while the label has room for them, and is pulled back onto the tape once it has
+     * not. Moving an element then slides the whole label along rather than resizing it, which is
+     * what keeps the length a matter of the content alone.
      *
      * Whole pixels, so the dot grid the drawing snaps to stays intact.
      */
     fun contentOffsetPx(spec: LabelSpec, elements: List<LabelElement>): Float = when (spec.lengthMode) {
         LengthMode.FIXED -> 0f
-        LengthMode.VARIABLE -> (frontGapPx(elements) - contentLeft(elements)).roundToInt().toFloat()
+        LengthMode.VARIABLE ->
+            (frontGapPx(spec, elements) - contentLeft(elements)).roundToInt().toFloat()
         LengthMode.MANUAL -> spec.leadingPx.toFloat()
     }
 

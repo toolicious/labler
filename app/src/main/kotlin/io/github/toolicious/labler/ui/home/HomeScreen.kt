@@ -83,6 +83,7 @@ import io.github.toolicious.labler.model.LabelTemplate
 import io.github.toolicious.labler.model.LengthMode
 import io.github.toolicious.labler.printer.MediaType
 import io.github.toolicious.labler.printer.Protocol
+import kotlin.math.roundToInt
 import io.github.toolicious.labler.render.FontRegistry
 import io.github.toolicious.labler.render.LabelRenderer
 import io.github.toolicious.labler.ui.components.ClearButton
@@ -483,6 +484,7 @@ internal fun LabelDialog(
     }
     var widthText by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.tapeWidthMm.toString()) }
     var lengthText by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.lengthMm.toString()) }
+    var marginText by rememberSaveable(initialSpec) { mutableStateOf(mmText(initialSpec.marginPx)) }
     var dieCut by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.media == MediaType.DIE_CUT) }
     var lengthMode by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.lengthMode) }
     // Picking a mode leaves the label exactly as long as it is now. In the variable mode the
@@ -639,19 +641,34 @@ internal fun LabelDialog(
                         )
                     }
                     Spacer(Modifier.height(8.dp))
-                    // One field in every mode; only its meaning changes, from exact to lower
-                    // bound. In the manual mode it is the same number the edges carry, so typing
-                    // one moves the trailing edge, which is the one the length belongs to.
-                    MmField(
-                        value = lengthText,
-                        onValueChange = { lengthText = it },
-                        label = stringResource(
-                            if (lengthMode == LengthMode.VARIABLE) R.string.field_min_length_mm
-                            else R.string.field_length_mm
-                        ),
-                        maxDigits = 3,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    // One length field in every mode; only its meaning changes, from exact to
+                    // lower bound. In the manual mode it is the same number the edges carry, so
+                    // typing one moves the trailing edge, which is the one the length belongs to.
+                    //
+                    // The margin sits beside it wherever the app places an edge itself, which is
+                    // both ends of a variable label and the double tap fit of a manual one. A
+                    // fixed length has no such edge and the field would do nothing there.
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MmField(
+                            value = lengthText,
+                            onValueChange = { lengthText = it },
+                            label = stringResource(
+                                if (lengthMode == LengthMode.VARIABLE) R.string.field_min_length_mm
+                                else R.string.field_length_mm
+                            ),
+                            maxDigits = 3,
+                            modifier = Modifier.weight(1f),
+                        )
+                        if (lengthMode != LengthMode.FIXED) {
+                            MmField(
+                                value = marginText,
+                                onValueChange = { marginText = it },
+                                label = stringResource(R.string.field_margin_mm),
+                                maxDigits = 2,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                    }
                     Spacer(Modifier.height(4.dp))
                     // Spells out what the selected mode does, since the chip labels alone leave the
                     // difference between a minimum and a fixed length to guesswork. Always shown,
@@ -683,8 +700,12 @@ internal fun LabelDialog(
                     ?.coerceIn(LabelSpec.MIN_LENGTH_MM, LabelSpec.MAX_LENGTH_MM) ?: 40
                 val media = if (dieCut) MediaType.DIE_CUT else MediaType.CONTINUOUS
                 val mode = if (dieCut) LengthMode.FIXED else lengthMode
+                val margin = mmPx(marginText)
                 // A die-cut label is always fixed, its length belongs to the stock.
-                onConfirm(name, LabelSpec(width, length, media).withLengthMode(mode))
+                onConfirm(
+                    name,
+                    LabelSpec(width, length, media, marginPx = margin).withLengthMode(mode),
+                )
             }
             if (onImport != null) {
                 Row(
@@ -711,6 +732,25 @@ internal fun LabelDialog(
 }
 
 /** Numeric millimetre field of the label dialog (digits only, capped length). */
+/** Millimetres of [px] dots, without the trailing zeros a plain conversion leaves behind. */
+private fun mmText(px: Int): String {
+    val mm = px / Protocol.DOTS_PER_MM.toFloat()
+    return if (mm == mm.toInt().toFloat()) mm.toInt().toString() else mm.toString().trimEnd('0')
+}
+
+/**
+ * Dots of a typed millimetre value, snapped to the dot grid and held inside the allowed range.
+ * Anything unreadable falls back to the default margin rather than to zero, which would silently
+ * print flush to the edge.
+ */
+private fun mmPx(text: String): Int {
+    val mm = text.replace(',', '.').toFloatOrNull() ?: return Protocol.DOTS_PER_MM
+    return (mm * Protocol.DOTS_PER_MM).roundToInt().coerceIn(
+        LabelSpec.MIN_MARGIN_MM * Protocol.DOTS_PER_MM,
+        LabelSpec.MAX_MARGIN_MM * Protocol.DOTS_PER_MM,
+    )
+}
+
 @Composable
 private fun MmField(
     value: String,
