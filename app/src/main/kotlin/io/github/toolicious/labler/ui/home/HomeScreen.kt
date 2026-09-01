@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -38,6 +39,8 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +67,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
@@ -578,6 +582,7 @@ internal fun LabelDialog(
                                 onValueChange = { widthText = it },
                                 label = stringResource(R.string.field_tape_mm),
                                 maxDigits = 2,
+                                range = LabelSpec.MIN_TAPE_MM..LabelSpec.MAX_TAPE_MM,
                                 modifier = Modifier.weight(1f),
                             )
                             MmField(
@@ -585,6 +590,7 @@ internal fun LabelDialog(
                                 onValueChange = { lengthText = it },
                                 label = stringResource(R.string.field_length_mm),
                                 maxDigits = 3,
+                                range = LabelSpec.MIN_LENGTH_MM..LabelSpec.MAX_LENGTH_MM,
                                 modifier = Modifier.weight(1f),
                             )
                         }
@@ -616,6 +622,7 @@ internal fun LabelDialog(
                             onValueChange = { widthText = it },
                             label = stringResource(R.string.field_tape_mm),
                             maxDigits = 2,
+                            range = LabelSpec.MIN_TAPE_MM..LabelSpec.MAX_TAPE_MM,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -657,6 +664,7 @@ internal fun LabelDialog(
                                 else R.string.field_length_mm
                             ),
                             maxDigits = 3,
+                            range = LabelSpec.MIN_LENGTH_MM..LabelSpec.MAX_LENGTH_MM,
                             modifier = Modifier.weight(1f),
                         )
                         if (lengthMode != LengthMode.FIXED) {
@@ -664,7 +672,9 @@ internal fun LabelDialog(
                                 value = marginText,
                                 onValueChange = { marginText = it },
                                 label = stringResource(R.string.field_margin_mm),
-                                maxDigits = 2,
+                                maxDigits = 5,
+                                range = LabelSpec.MIN_MARGIN_MM..LabelSpec.MAX_MARGIN_MM,
+                                fraction = true,
                                 modifier = Modifier.weight(1f),
                             )
                         }
@@ -732,11 +742,57 @@ internal fun LabelDialog(
 }
 
 /** Numeric millimetre field of the label dialog (digits only, capped length). */
-/** Millimetres of [px] dots, without the trailing zeros a plain conversion leaves behind. */
-private fun mmText(px: Int): String {
-    val mm = px / Protocol.DOTS_PER_MM.toFloat()
-    return if (mm == mm.toInt().toFloat()) mm.toInt().toString() else mm.toString().trimEnd('0')
+@Composable
+private fun MmField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    maxDigits: Int,
+    range: IntRange,
+    modifier: Modifier = Modifier,
+    fraction: Boolean = false,
+) {
+    val step = { by: Int ->
+        val now = value.replace(',', '.').toFloatOrNull() ?: range.first.toFloat()
+        val next = (now + by).coerceIn(range.first.toFloat(), range.last.toFloat())
+        onValueChange(if (fraction) trimmed(next) else next.toInt().toString())
+    }
+    OutlinedTextField(
+        value = value,
+        onValueChange = { typed ->
+            val cleaned = if (!fraction) {
+                typed.filter(Char::isDigit)
+            } else {
+                // One separator, kept where it was typed, so ".5" and "0,5" both work out.
+                val dotted = typed.replace(',', '.').filter { it.isDigit() || it == '.' }
+                val first = dotted.indexOf('.')
+                if (first < 0) dotted
+                else dotted.substring(0, first + 1) + dotted.substring(first + 1).filter(Char::isDigit)
+            }
+            onValueChange(cleaned.take(maxDigits))
+        },
+        label = { Text(label) },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = if (fraction) KeyboardType.Decimal else KeyboardType.Number
+        ),
+        // Two arrows stacked inside the field rather than buttons beside it: two of these fields
+        // share a dialog row, and anything wider would leave no room for the number.
+        trailingIcon = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                StepArrow(Icons.Default.KeyboardArrowUp, R.string.cd_more) { step(1) }
+                StepArrow(Icons.Default.KeyboardArrowDown, R.string.cd_less) { step(-1) }
+            }
+        },
+        modifier = modifier,
+    )
 }
+
+/** Millimetres of [px] dots, without the trailing zeros a plain conversion leaves behind. */
+private fun mmText(px: Int): String = trimmed(px / Protocol.DOTS_PER_MM.toFloat())
+
+private fun trimmed(mm: Float): String =
+    if (mm == mm.toInt().toFloat()) mm.toInt().toString() else mm.toString().trimEnd('0')
 
 /**
  * Dots of a typed millimetre value, snapped to the dot grid and held inside the allowed range.
@@ -745,26 +801,25 @@ private fun mmText(px: Int): String {
  */
 private fun mmPx(text: String): Int {
     val mm = text.replace(',', '.').toFloatOrNull() ?: return Protocol.DOTS_PER_MM
-    return (mm * Protocol.DOTS_PER_MM).roundToInt().coerceIn(
-        LabelSpec.MIN_MARGIN_MM * Protocol.DOTS_PER_MM,
-        LabelSpec.MAX_MARGIN_MM * Protocol.DOTS_PER_MM,
-    )
+    return (mm * Protocol.DOTS_PER_MM).roundToInt()
+        .coerceIn(LabelSpec.MIN_MARGIN_MM * Protocol.DOTS_PER_MM, LabelSpec.MAX_MARGIN_MM * Protocol.DOTS_PER_MM)
 }
 
+/** One half of the spinner in [MmField]. Half the height of the field, so both halves fit in it. */
 @Composable
-private fun MmField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    maxDigits: Int,
-    modifier: Modifier = Modifier,
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = { onValueChange(it.filter(Char::isDigit).take(maxDigits)) },
-        label = { Text(label) },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        modifier = modifier,
-    )
+private fun StepArrow(icon: ImageVector, description: Int, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(width = 32.dp, height = 26.dp)
+            .clip(RoundedCornerShape(4.dp))
+            .clickable(onClick = onClick, role = Role.Button),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            icon,
+            contentDescription = stringResource(description),
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
