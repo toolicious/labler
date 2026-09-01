@@ -1,0 +1,4 @@
+- A margem de uma borda automática é ajustável e aceita meios milímetros (#2)
+- A etiqueta variável acompanha o conteúdo de forma uniforme, sem saltos (#2)
+- Setas nos campos em milímetros do diálogo de etiqueta, um milímetro por toque
+- Texto ou código vazio ganha um contorno no editor em vez de ficar invisível

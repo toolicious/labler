@@ -1,0 +1,4 @@
+- Otomatik kenarın boşluğu artık ayarlanabilir ve yarım milimetre kabul eder (#2)
+- Değişken etiket içeriğini düzgün izler, sıçramadan ve geriden gelmeden (#2)
+- Etiket iletişiminde milimetre alanlarında oklar, dokunuş başına bir milimetre
+- Boş metin veya kod, görünmez kalmak yerine düzenleyicide çerçevelenir

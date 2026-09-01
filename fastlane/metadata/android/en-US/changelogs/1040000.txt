@@ -1,0 +1,4 @@
+- The margin at an automatic label edge is a field now, half millimetres included (#2)
+- A variable label follows its content evenly, without jumping or drifting (#2)
+- Arrows on the millimetre fields in the label dialog, one millimetre per tap
+- An emptied text or code is outlined in the editor instead of being invisible

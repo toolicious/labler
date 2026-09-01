@@ -1,0 +1,4 @@
+- El margen de un borde automático es ajustable y admite medios milímetros (#2)
+- La etiqueta variable sigue su contenido de forma pareja, sin saltos ni desfases (#2)
+- Flechas en los campos de milímetros del diálogo de etiqueta, un milímetro por toque
+- Un texto o código vacío se marca con un recuadro en el editor en vez de ser invisible

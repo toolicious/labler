@@ -1,0 +1,4 @@
+- La marge d'un bord automatique est réglable et accepte les demi-millimètres (#2)
+- L'étiquette variable suit son contenu régulièrement, sans sauts ni décalage (#2)
+- Des flèches sur les champs en millimètres du dialogue, un millimètre par appui
+- Un texte ou un code vide est encadré dans l'éditeur au lieu d'être invisible

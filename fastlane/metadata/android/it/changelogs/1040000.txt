@@ -1,0 +1,4 @@
+- Il margine di un bordo automatico è regolabile e accetta mezzi millimetri (#2)
+- L'etichetta variabile segue il contenuto in modo regolare, senza salti né scarti (#2)
+- Frecce sui campi in millimetri del dialogo etichetta, un millimetro per tocco
+- Un testo o un codice vuoto viene incorniciato nell'editor invece di sparire

@@ -1,0 +1,4 @@
+- Margines automatycznej krawędzi jest ustawialny i przyjmuje pół milimetra (#2)
+- Etykieta zmienna podąża za treścią równomiernie, bez skoków i opóźnień (#2)
+- Strzałki przy polach milimetrowych w oknie etykiety, milimetr na stuknięcie
+- Pusty tekst lub kod dostaje w edytorze ramkę zamiast pozostawać niewidoczny

@@ -1,0 +1,4 @@
+- Margin tepi otomatis kini bisa diatur dan menerima setengah milimeter (#2)
+- Label variabel mengikuti isinya secara rata, tanpa lompatan atau ketertinggalan (#2)
+- Panah pada kolom milimeter di dialog label, satu milimeter per ketukan
+- Teks atau kode kosong diberi bingkai di editor alih-alih tak terlihat

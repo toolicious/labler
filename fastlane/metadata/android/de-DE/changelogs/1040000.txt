@@ -1,0 +1,4 @@
+- Der Randabstand automatischer Kanten ist einstellbar und nimmt halbe Millimeter (#2)
+- Variable Etiketten folgen dem Inhalt gleichmäßig, ohne Sprünge und Nachlaufen (#2)
+- Pfeile an den Millimeterfeldern im Etikett-Dialog, ein Millimeter pro Tipp
+- Leerer Text oder Code wird im Editor umrandet statt unsichtbar zu bleiben

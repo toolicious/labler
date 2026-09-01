@@ -1,0 +1,4 @@
+- De marge van een automatische rand is instelbaar en neemt halve millimeters (#2)
+- Een variabel label volgt zijn inhoud gelijkmatig, zonder sprongen of nalopen (#2)
+- Pijlen op de millimetervelden in het labelvenster, één millimeter per tik
+- Lege tekst of code krijgt een kader in de editor in plaats van onzichtbaar te zijn
