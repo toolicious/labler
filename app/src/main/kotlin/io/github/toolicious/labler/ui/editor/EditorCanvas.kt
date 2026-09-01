@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.toolicious.labler.model.BarcodeElement
 import io.github.toolicious.labler.model.FrameElement
 import io.github.toolicious.labler.R
 import io.github.toolicious.labler.model.FrameStyle
@@ -280,6 +281,7 @@ fun EditorCanvas(
     val manualState = rememberUpdatedState(isManual)
 
     val background = Color(0xFF3A3A3A)
+    val emptyColor = Color(0xFF9E9E9E)
     val selectionColor = Color(0xFFE53935)
     val guideColor = Color(0xFF2979FF)
     val inkColor = Color(0xFFFF8F00)
@@ -471,6 +473,34 @@ fun EditorCanvas(
 
             // Element coordinates, which the anchored modes shift against the frame.
             fun elToScreen(lx: Float, ly: Float) = toScreen(lx + offsetPx, ly)
+
+            // Elements that print nothing are invisible on the tape, but they still take up
+            // room, hold an auto-length label open and offer lines to align to. A hairline box
+            // says where they are, with the diagonals a code has always had when selected. Drawn
+            // here rather than by the renderer, so that neither the tape nor the print preview can
+            // ever carry it.
+            val emptyDash = PathEffect.dashPathEffect(floatArrayOf(3f, 4f))
+            elements.filter { LabelRenderer.printsNothing(it) }.forEach { el ->
+                val b = elementBounds(el)
+                val tl = elToScreen(b.left, b.top)
+                val br = elToScreen(b.right, b.bottom)
+                drawRect(
+                    color = emptyColor,
+                    topLeft = tl,
+                    size = Size(br.x - tl.x, br.y - tl.y),
+                    style = Stroke(width = 1.5f, pathEffect = emptyDash),
+                )
+                if (el is BarcodeElement) {
+                    drawLine(emptyColor, tl, br, strokeWidth = 1.5f, pathEffect = emptyDash)
+                    drawLine(
+                        emptyColor,
+                        Offset(br.x, tl.y),
+                        Offset(tl.x, br.y),
+                        strokeWidth = 1.5f,
+                        pathEffect = emptyDash,
+                    )
+                }
+            }
 
             drawSnapOverlay(
                 guides, contentTL, labelW, labelH, total, offsetPx, isDieCut, cornerR, guideColor,

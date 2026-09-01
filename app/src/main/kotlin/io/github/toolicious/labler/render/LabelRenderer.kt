@@ -110,7 +110,7 @@ object LabelRenderer {
      * This is the room the content has to be arranged in; it comes from a minimum length longer
      * than the content needs, and is zero as soon as the content is what decides the length.
      */
-    fun slackPx(spec: LabelSpec, elements: List<LabelElement>): Float {
+    private fun slackPx(spec: LabelSpec, elements: List<LabelElement>): Float {
         if (!spec.lengthIsAuto) return 0f
         val span = contentRight(elements) - contentLeft(elements)
         return (effectiveLengthPx(spec, elements) - span - 2 * spec.marginPx).coerceAtLeast(0f)
@@ -219,6 +219,21 @@ object LabelRenderer {
         canvas.translate(offsetPx, 0f)
         elements.forEach { drawElementInto(canvas, it) }
         canvas.restoreToCount(save)
+    }
+
+    /**
+     * Whether this element puts nothing on the tape, however large its box is.
+     *
+     * Emptying the text of a label, or a code, leaves an element that is invisible in print and in
+     * the editor alike, while it still holds its room, stretches an auto-length label and offers
+     * lines to align to. The editor marks those, and needs a cheap way to spot them: this looks at
+     * the content rather than at what a rendering of it would come out as.
+     */
+    fun printsNothing(element: LabelElement): Boolean = when (element) {
+        is TextElement -> element.text.isBlank()
+        is BarcodeElement -> element.data.isBlank()
+        is ImageElement -> element.pngBase64.isBlank()
+        else -> false
     }
 
     fun measure(element: LabelElement): ElementSize = when (element) {
@@ -502,11 +517,9 @@ object LabelRenderer {
     }
 
     private fun drawBarcode(canvas: Canvas, e: BarcodeElement) {
-        val matrix = barcodeMatrix(e)
-        if (matrix == null) {
-            drawCodePlaceholder(canvas, e)
-            return
-        }
+        // A code without readable data prints nothing at all. The editor marks the empty box so it
+        // can still be found and moved; see LabelRenderer.printsNothing.
+        val matrix = barcodeMatrix(e) ?: return
         val mw = matrix.width
         val mh = matrix.height
         val px = IntArray(mw * mh) { i -> if (matrix.get(i % mw, i / mw)) Color.BLACK else Color.TRANSPARENT }
@@ -529,22 +542,6 @@ object LabelRenderer {
             }
             canvas.drawText(e.data, e.x + frameW / 2f, e.y + codeAreaH + captionH * 0.75f, tp)
         }
-    }
-
-    private fun drawCodePlaceholder(canvas: Canvas, e: BarcodeElement) {
-        val p = Paint().apply {
-            isAntiAlias = false
-            color = Color.LTGRAY
-            style = Paint.Style.STROKE
-            strokeWidth = 2f
-        }
-        val left = snap(e.x)
-        val top = snap(e.y)
-        val right = snap(e.x + e.widthPx)
-        val bottom = snap(e.y + e.heightPx)
-        canvas.drawRect(left, top, right, bottom, p)
-        canvas.drawLine(left, top, right, bottom, p)
-        canvas.drawLine(right, top, left, bottom, p)
     }
 
     // ----- Image (imported, dithered) -----
