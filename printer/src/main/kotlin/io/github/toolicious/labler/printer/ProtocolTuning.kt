@@ -11,7 +11,7 @@ package io.github.toolicious.labler.printer
  */
 enum class Tunable(val kind: Kind, val availability: Availability) {
     /**
-     * Dots per millimetre along the tape, which is how far the printer really feeds per
+     * Dots per millimeter along the tape, which is how far the printer really feeds per
      * printed line. Not the pitch of the print head: that one is a specified property of a
      * bought-in part, while the feed comes out of motor, gearing and platen roller and lands
      * wherever those put it. Off by a per cent or two, a printed scale is useless, so this is

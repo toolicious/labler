@@ -147,7 +147,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
     }
 }
 
-/** Configurable margin at an automatic label edge (issue #2). Eight dots is the millimetre it was fixed at. */
+/** Configurable margin at an automatic label edge (issue #2). Eight dots is the millimeter it was fixed at. */
 val MIGRATION_4_5 = object : Migration(4, 5) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE `templates` ADD COLUMN `marginPx` INTEGER NOT NULL DEFAULT 8")

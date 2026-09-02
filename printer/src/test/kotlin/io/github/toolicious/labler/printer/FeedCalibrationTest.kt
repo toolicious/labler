@@ -34,21 +34,21 @@ class FeedCalibrationTest {
     fun `a label asks for the dots that really cover its length once calibrated`() {
         val truth = 240 / measuredMm
         assertEquals(40.0f, calibrated(measuredMm).geometry.mmToDots(40) / truth, 0.1f)
-        // Without the correction the same label runs almost a millimetre long.
+        // Without the correction the same label runs almost a millimeter long.
         assertEquals(40.8f, declared.mmToDots(40) / truth, 0.1f)
     }
 
     @Test
-    fun `every tick of the next printout lands on the millimetre it is named after`() {
+    fun `every tick of the next printout lands on the millimeter it is named after`() {
         val corrected = calibrated(measuredMm).geometry
         val truth = 240 / measuredMm
         val ticks = TestPattern.tickColumns(corrected)
         // A coarser grid fits one more tick into the same 320 dots, which is the point: the
-        // pattern follows the millimetres, not a fixed dot spacing.
+        // pattern follows the millimeters, not a fixed dot spacing.
         assertEquals(8, ticks.size)
         ticks.forEach { (mm, x) ->
             // Where the tick really ends up on the tape, not where the assumed grid puts it.
-            assertEquals(mm.toFloat(), x / truth, 0.1f, "tick labelled $mm mm")
+            assertEquals(mm.toFloat(), x / truth, 0.1f, "tick labeled $mm mm")
         }
     }
 

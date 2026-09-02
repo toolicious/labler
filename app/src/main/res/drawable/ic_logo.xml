@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- LaBLEr-Logo (monochrom), aus Design/LaBLEr-mylogo.svg. Die Gruppe normalisiert
-     das Original-Koordinatensystem (viewBox-Offset + SVG-Gruppen-Translate) auf den
-     Ursprung, sodass der Pfad 1:1 uebernommen werden kann. -->
+<!-- LaBLEr logo (monochrome), from Design/LaBLEr-mylogo.svg. The group moves the
+     original coordinate system (viewBox offset plus the SVG group translate) back to the
+     origin, so the path can be taken over unchanged. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="23dp"
     android:height="28dp"

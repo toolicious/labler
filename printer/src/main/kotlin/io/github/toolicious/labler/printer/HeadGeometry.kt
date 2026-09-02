@@ -4,7 +4,7 @@ import kotlin.math.roundToInt
 
 /**
  * Print geometry of one printer family: everything the editor, the renderer and the job builder
- * need in order to map a label given in millimetres onto printer dots.
+ * need in order to map a label given in millimeters onto printer dots.
  *
  * A label carries the family it was designed for, so a design keeps the geometry it was drawn
  * with instead of following whichever printer happens to be connected.
@@ -13,7 +13,7 @@ data class HeadGeometry(
     /** Dots across the print head, which is the fixed height of every rendered label. */
     val headDots: Int,
     /**
-     * Dots per millimetre along the tape. Not a whole number on every family, hence the Float.
+     * Dots per millimeter along the tape. Not a whole number on every family, hence the Float.
      * Where it is one, the conversions below reproduce the plain integer arithmetic exactly.
      */
     val dotsPerMm: Float,
@@ -33,9 +33,9 @@ data class HeadGeometry(
 
     val maxLengthDots: Int get() = mmToDots(maxLengthMm)
 
-    /** Whole millimetres to dots. */
+    /** Whole millimeters to dots. */
     fun mmToDots(mm: Int): Int = (mm * dotsPerMm).roundToInt()
 
-    /** Dots back to whole millimetres, cutting off what does not fill one. */
+    /** Dots back to whole millimeters, cutting off what does not fill one. */
     fun dotsToMm(dots: Int): Int = (dots / dotsPerMm).toInt()
 }

@@ -70,7 +70,7 @@ fun rememberBlePermissionState(): BlePermissionState {
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { _ ->
-        // Trust the actual permission state, not the result map (an empty/cancelled map would make
+        // Trust the actual permission state, not the result map (an empty/canceled map would make
         // `all { it }` vacuously true and wrongly report granted).
         granted = BlePermissions.allGranted(context)
         if (!granted) {

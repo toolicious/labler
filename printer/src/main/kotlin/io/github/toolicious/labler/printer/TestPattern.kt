@@ -54,7 +54,7 @@ object TestPattern {
         }
 
         // Two marks at the bottom edge whose distance is fixed in dots. The ticks above
-        // follow millimetres and therefore shift with every correction, which makes them a
+        // follow millimeters and therefore shift with every correction, which makes them a
         // good check and a useless reference; these are the reference.
         val (left, right) = calibrationMarks(lengthDots)
         for (y in h - h / 4 until h - 2) {
@@ -73,9 +73,9 @@ object TestPattern {
     }
 
     /**
-     * Millimetre mark and its column, for every tick [create] draws.
+     * Millimeter mark and its column, for every tick [create] draws.
      *
-     * The ticks follow millimetres, not a fixed number of dots, so a corrected feed shows up
+     * The ticks follow millimeters, not a fixed number of dots, so a corrected feed shows up
      * on the tape as ticks that really are [TICK_STEP_MM] apart. A coarser grid then fits one
      * more of them into the same label, which is why the distance to measure is quoted as a
      * tick count rather than as a constant.
@@ -118,7 +118,7 @@ object TestPattern {
 
     /**
      * Where the calibration marks sit from either end. Chosen so the distance between them
-     * is the 240 dots the first and last tick used to span at 8 dots per millimetre, which
+     * is the 240 dots the first and last tick used to span at 8 dots per millimeter, which
      * keeps a measurement taken before these marks existed valid.
      */
     private const val CALIBRATION_INSET = 40

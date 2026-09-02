@@ -80,9 +80,9 @@ object LabelRenderer {
      * plus [LabelSpec.marginMm] at each end, and never shorter than [LabelSpec.lengthMm], which
      * acts as the minimum there. Only how far the content reaches counts, never where it sits, so
      * moving something around inside a label that is longer than its content leaves the length
-     * alone. Measured to the dot rather than to the millimetre: a label that grew in whole
-     * millimetres would jump a millimetre at a time under a finger dragging its content outwards,
-     * and the gap at that end would pulse between one and two millimetres on the way.
+     * alone. Measured to the dot rather than to the millimeter: a label that grew in whole
+     * millimeters would jump a millimeter at a time under a finger dragging its content outwards,
+     * and the gap at that end would pulse between one and two millimeters on the way.
      */
     fun effectiveLengthPx(spec: LabelSpec, elements: List<LabelElement>): Int {
         if (!spec.lengthIsAuto) return spec.lengthPx
@@ -93,7 +93,7 @@ object LabelRenderer {
         return maxOf(spec.lengthPx, needed).coerceAtMost(spec.geometry.maxLengthDots)
     }
 
-    /** [effectiveLengthPx] in millimetres, rounded up, for the length shown in the UI. */
+    /** [effectiveLengthPx] in millimeters, rounded up, for the length shown in the UI. */
     fun effectiveLengthMm(spec: LabelSpec, elements: List<LabelElement>): Int =
         ceil(effectiveLengthPx(spec, elements) / spec.geometry.dotsPerMm).toInt()
 

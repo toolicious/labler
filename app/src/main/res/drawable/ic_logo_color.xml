@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- LaBLEr-Logo in den Icon-Farben (fuers In-App-Logo in der Pille).
-     Linkes Element = heller Beige-Verlauf, unteres Element = heller Grau-Weiss-Verlauf. -->
+<!-- LaBLEr logo in the icon colors, for the logo inside the app pill.
+     Left element is a light beige gradient, lower element a light gray to white one. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="24dp"

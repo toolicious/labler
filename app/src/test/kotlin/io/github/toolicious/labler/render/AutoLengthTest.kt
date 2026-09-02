@@ -9,7 +9,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
- * How a variable label lays itself out. Everything is in dots, 8 to the millimetre.
+ * How a variable label lays itself out. Everything is in dots, 8 to the millimeter.
  *
  * Auto length only exists on continuous tape; a die-cut spec is FIXED whatever the flags say.
  */
@@ -65,9 +65,9 @@ class AutoLengthTest {
         fun withText(x: Float) = listOf(box("symbol", 88f, 64f), box("text", x, 80f))
 
         assertEquals("len=240 front=88 back=8", layout(s, withText(152f)))
-        // One millimetre to the right: the text stays at the edge, the symbol comes along.
+        // One millimeter to the right: the text stays at the edge, the symbol comes along.
         assertEquals("len=240 front=80 back=8", layout(s, withText(160f)))
-        // Ten millimetres in, the symbol has reached the margin and the room is used up.
+        // Ten millimeters in, the symbol has reached the margin and the room is used up.
         assertEquals("len=240 front=8 back=8", layout(s, withText(232f)))
         // From there the label grows by whatever the text is dragged further.
         assertEquals("len=248 front=8 back=8", layout(s, withText(240f)))
@@ -75,10 +75,10 @@ class AutoLengthTest {
     }
 
     @Test
-    fun `the length follows the content by the dot, not by the millimetre`() {
+    fun `the length follows the content by the dot, not by the millimeter`() {
         val s = spec(minMm = 10)
         // 100 dots of content plus two margins is 116, and 116 it stays: rounding that up to the
-        // next whole millimetre is what made the label jump while its content was dragged.
+        // next whole millimeter is what made the label jump while its content was dragged.
         assertEquals("len=116 front=8 back=8", layout(s, listOf(box("a", 8f, 100f))))
         assertEquals("len=117 front=8 back=8", layout(s, listOf(box("a", 8f, 101f))))
     }

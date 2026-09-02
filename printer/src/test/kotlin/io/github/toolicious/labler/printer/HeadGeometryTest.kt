@@ -13,7 +13,7 @@ class HeadGeometryTest {
     private val phomemo = PhomemoProtocol.geometry
 
     @Test
-    fun `millimetres to dots stays exactly mm times 8 over the whole length range`() {
+    fun `millimeters to dots stays exactly mm times 8 over the whole length range`() {
         for (mm in 0..PhomemoProtocol.geometry.maxLengthMm) {
             assertEquals(mm * 8, phomemo.mmToDots(mm), "at $mm mm")
         }
@@ -27,7 +27,7 @@ class HeadGeometryTest {
     }
 
     @Test
-    fun `dots back to millimetres truncates like the former integer division`() {
+    fun `dots back to millimeters truncates like the former integer division`() {
         for (dots in 0..4000) {
             assertEquals(dots / 8, phomemo.dotsToMm(dots), "at $dots dots")
         }

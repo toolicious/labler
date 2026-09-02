@@ -216,9 +216,8 @@
     <string name="calib_dots_per_mm">Punkte pro mm</string>
     <string name="calib_length_title">Drucklänge kalibrieren</string>
     <string name="calib_length_action">Kalibrieren</string>
-    <string name="calib_length_body">Miss zwischen den beiden Marken am unteren Rand, jeweils von Mitte zu Mitte. Es sollten ungefähr %1$s mm sein, aber trage die exakt gemessene Länge ein (z. B. %2$s mm), damit der Druck genauer wird.</string>
+    <string name="calib_length_body">Miss zwischen den beiden Marken am unteren Rand, jeweils von Mitte zu Mitte. Es sollten ungefähr %1$s mm sein, aber trage die exakt gemessene Länge ein (z.B. %2$s mm), damit der Druck genauer wird.</string>
     <string name="calib_length_field">Gemessen in mm</string>
-    <string name="calib_length_note">Etiketten drucken danach in ihrer wahren Größe. Ihr Inhalt kann sich dabei leicht zur Etikettenkante verschieben.</string>
     <string name="calib_length_implausible">Das liegt weit von den erwarteten %1$s mm entfernt. Hast du vielleicht die Millimeterstriche am oberen Rand gemessen statt der beiden Marken unten?</string>
     <string name="calib_length_current">%1$s statt %2$s Punkte pro mm</string>
     <string name="calib_length_measured">Zuletzt gemessen: %1$s mm</string>
@@ -330,5 +329,5 @@
     <string name="err_mtu_too_small">Dieses Handy hat für diesen Drucker eine zu kleine Bluetooth-Paketgröße ausgehandelt (%1$d Byte nötig)</string>
     <string name="err_no_cassette">Keine Bandkassette im Drucker</string>
     <string name="err_battery_too_low">Akku zu schwach zum Drucken</string>
-    <string name="err_print_cancelled">Druck am Gerät abgebrochen</string>
+    <string name="err_print_canceled">Druck am Gerät abgebrochen</string>
 </resources>

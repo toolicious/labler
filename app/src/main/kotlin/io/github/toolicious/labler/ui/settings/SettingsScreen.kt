@@ -113,17 +113,15 @@ private fun LengthCalibrationDialog(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    if (measured != null && !plausible) {
-                        stringResource(R.string.calib_length_implausible, trimmedMm(expectedMm))
-                    } else {
-                        stringResource(R.string.calib_length_note)
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (measured != null && !plausible) MaterialTheme.colorScheme.error
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                // Only speaks up when there is something wrong with the number typed.
+                if (measured != null && !plausible) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        stringResource(R.string.calib_length_implausible, trimmedMm(expectedMm)),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
             }
         },
         confirmButton = {
@@ -145,7 +143,7 @@ private const val DOT = '.'
  * The example reading in the calibration dialog, always with two decimals showing.
  *
  * Trimming it would be the wrong kindness here: the whole point of the example is that this is a
- * measurement worth taking to a hundredth of a millimetre, and a number ending in a round tenth
+ * measurement worth taking to a hundredth of a millimeter, and a number ending in a round tenth
  * says the opposite. A zero in the last place is therefore nudged rather than dropped.
  */
 private fun exampleMm(value: Float): String {
@@ -153,7 +151,7 @@ private fun exampleMm(value: Float): String {
     return if (twoPlaces.endsWith("0")) twoPlaces.dropLast(1) + "1" else twoPlaces
 }
 
-/** Millimetres without the trailing zeros a plain conversion leaves behind. */
+/** Millimeters without the trailing zeros a plain conversion leaves behind. */
 private fun trimmedMm(value: Float): String =
     if (value == value.toInt().toFloat()) value.toInt().toString()
     else String.format(Locale.US, "%.2f", value).trimEnd('0').trimEnd('.')
@@ -343,7 +341,7 @@ fun SettingsScreen(
                     val declaredValue = declared.tunableValue(tunable).orEmpty()
                     val stored = calibration.values[tunable]
                     when {
-                        // Asking for dots per millimetre would be asking the wrong question. What
+                        // Asking for dots per millimeter would be asking the wrong question. What
                         // the user has is a ruler and a printed pattern, so that is what is asked.
                         tunable == Tunable.DOTS_PER_MM -> Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -355,7 +353,7 @@ fun SettingsScreen(
                             Column(Modifier.weight(1f)) {
                                 Text(label, style = MaterialTheme.typography.bodyMedium)
                                 // What the user typed, kept in front of them so the step from it
-                                // to the dots per millimetre is there to follow, with the way back
+                                // to the dots per millimeter is there to follow, with the way back
                                 // right beside it.
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(

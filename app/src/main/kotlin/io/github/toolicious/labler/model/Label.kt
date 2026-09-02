@@ -40,7 +40,7 @@ data class LabelSpec(
      * ends of a variable label, and where a double tap fits a manual edge to the content. Zero
      * prints flush to the edge, which is what someone trimming to the content exactly wants.
      *
-     * In dots rather than millimetres, so half a millimetre is a value like any other, and
+     * In dots rather than millimeters, so half a millimeter is a value like any other, and
      * nothing finer than a dot can be printed anyway.
      */
     val marginPx: Int = DEFAULT_MARGIN_PX,
@@ -51,7 +51,7 @@ data class LabelSpec(
      */
     val family: PrinterFamily = PrinterFamily.DEFAULT,
 ) {
-    /** Print geometry of [family]: head height, dots per millimetre and the bounds. */
+    /** Print geometry of [family]: head height, dots per millimeter and the bounds. */
     val geometry: HeadGeometry get() = PrinterProtocols.of(family).geometry
 
     val lengthPx: Int get() = geometry.mmToDots(lengthMm)
@@ -91,10 +91,10 @@ data class LabelSpec(
     )
 
     companion object {
-        /** One millimetre on the head the app was built around, and the stored column default. */
+        /** One millimeter on the head the app was built around, and the stored column default. */
         const val DEFAULT_MARGIN_PX = 8
 
-        /** Bounds for the margin an auto edge keeps from the content, in whole millimetres. */
+        /** Bounds for the margin an auto edge keeps from the content, in whole millimeters. */
         const val MIN_MARGIN_MM = 0
         const val MAX_MARGIN_MM = 10
 
@@ -114,7 +114,7 @@ data class LabelSpec(
                 // length of its own, so it starts out growing with whatever is put on it.
                 media = if (dieCut) MediaType.DIE_CUT else MediaType.CONTINUOUS,
                 autoLength = !dieCut,
-                // A millimetre of this family's own grid, not of the one the default assumes.
+                // A millimeter of this family's own grid, not of the one the default assumes.
                 marginPx = protocol.geometry.mmToDots(1),
                 family = family,
             )

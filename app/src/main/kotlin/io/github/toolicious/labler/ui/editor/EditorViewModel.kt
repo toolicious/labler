@@ -571,14 +571,14 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
     // ----- Label edges (manual length only) -----
 
     private var edgeDrag: LabelEdge? = null
-    // Raw movement since the drag started, in label px. The spec only knows whole millimetres, so
+    // Raw movement since the drag started, in label px. The spec only knows whole millimeters, so
     // the fractional remainder has to live here instead of being rounded away every frame.
     private var edgeRawPx = 0f
     private var edgeStartLeadingMm = 0
     private var edgeStartLengthMm = 0
 
     /**
-     * Where the content starts and ends on the label, in whole millimetres, rounded outwards so a
+     * Where the content starts and ends on the label, in whole millimeters, rounded outwards so a
      * rounding step can never cut anything off. Uses the same bounding box the canvas draws around
      * a selected element, which is where the rotation of an element is accounted for. Null on an
      * empty label, which has nothing to measure against.
@@ -619,7 +619,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
 
     /**
      * Moves the grabbed edge by [dxPx] label pixels. The result is always computed from the values
-     * the drag started with, so the rounding to whole millimetres cannot drift over a long drag.
+     * the drag started with, so the rounding to whole millimeters cannot drift over a long drag.
      */
     fun dragEdgeBy(dxPx: Float) {
         val edge = edgeDrag ?: return
@@ -641,7 +641,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
 
     /**
      * Double tap on an edge: pulls it up to [LabelSpec.marginPx] from the content. A manual edge
-     * only knows whole millimetres, so a margin between two of them is rounded to the nearer.
+     * only knows whole millimeters, so a margin between two of them is rounded to the nearer.
      */
     fun fitEdge(edge: LabelEdge) {
         val t = _template.value ?: return

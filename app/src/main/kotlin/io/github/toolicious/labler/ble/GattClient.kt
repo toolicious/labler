@@ -31,7 +31,7 @@ import java.util.UUID
  *
  * Deliberately NOT a CancellationException, unlike the TimeoutCancellationException that
  * withTimeout throws: a timed-out radio operation is an I/O failure, and callers must be
- * able to tell it apart from a coroutine that was genuinely cancelled. Handlers of the
+ * able to tell it apart from a coroutine that was genuinely canceled. Handlers of the
  * shape `catch (c: CancellationException) { throw c }` would otherwise swallow it and
  * leave the caller hanging with no error at all.
  *

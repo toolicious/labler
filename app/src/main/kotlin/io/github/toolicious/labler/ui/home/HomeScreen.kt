@@ -758,7 +758,7 @@ internal fun LabelDialog(
     )
 }
 
-/** Numeric millimetre field of the label dialog (digits only, capped length). */
+/** Numeric millimeter field of the label dialog (digits only, capped length). */
 @Composable
 private fun MmField(
     value: String,
@@ -805,14 +805,14 @@ private fun MmField(
     )
 }
 
-/** Millimetres of [px] dots, without the trailing zeros a plain conversion leaves behind. */
+/** Millimeters of [px] dots, without the trailing zeros a plain conversion leaves behind. */
 private fun mmText(px: Int, dotsPerMm: Float): String = trimmed(px / dotsPerMm)
 
 private fun trimmed(mm: Float): String =
     if (mm == mm.toInt().toFloat()) mm.toInt().toString() else mm.toString().trimEnd('0')
 
 /**
- * Dots of a typed millimetre value, snapped to the dot grid and held inside the allowed range.
+ * Dots of a typed millimeter value, snapped to the dot grid and held inside the allowed range.
  * Anything unreadable falls back to the default margin rather than to zero, which would silently
  * print flush to the edge.
  */

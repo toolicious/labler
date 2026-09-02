@@ -5,7 +5,7 @@ package io.github.toolicious.labler.printer
  *
  * Only sound for a family whose command bytes do not themselves depend on [geometry]: the
  * delegated methods run on [base] and would read its original value. That holds for the Phomemo
- * family, where the raster header counts dots and never millimetres. A family that needs more
+ * family, where the raster header counts dots and never millimeters. A family that needs more
  * than this implements [PrinterProtocol.withTuning] itself, the way the Dymo does.
  */
 internal class RegaugedFeed(

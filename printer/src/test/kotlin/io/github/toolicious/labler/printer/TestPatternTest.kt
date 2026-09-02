@@ -59,7 +59,7 @@ class TestPatternTest {
     fun `the calibration marks hold their distance whatever the resolution is`() {
         val span = TestPattern.calibrationSpanDots()
         assertEquals(240, span)
-        // A coarser grid moves every millimetre tick, and leaves the two marks exactly where
+        // A coarser grid moves every millimeter tick, and leaves the two marks exactly where
         // they were. That is what makes them something to measure against twice.
         val coarse = PhomemoProtocol.geometry.copy(dotsPerMm = 6f)
         assertEquals(span, TestPattern.calibrationSpanDots())

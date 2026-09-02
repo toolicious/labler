@@ -260,7 +260,7 @@ fun SymbolPickerSheet(
                 IconTab(
                     recent = recentIcons,
                     // Written on the application scope: picking closes the sheet, and a scope tied
-                    // to this composable would be cancelled before the store is through.
+                    // to this composable would be canceled before the store is through.
                     onForget = { entry ->
                         container.applicationScope.launch { settings.removeRecentIcon(entry.name) }
                         // The icon name, not the glyph: a toast is drawn in the system font, where

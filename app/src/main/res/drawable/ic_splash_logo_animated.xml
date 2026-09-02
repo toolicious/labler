@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Splash-Animation: der Drucker-Koerper steht sofort. Die Label-Karte liegt hinter dem
-     Koerper und ist in dessen Aussparung eingezogen (translateX -20, siehe
-     ic_splash_logo.xml). Nach einem kurzen Versatz schiebt sie sich aus der Aussparung
-     heraus; die Koerper-Aussparung maskiert sie dabei in der richtigen Form. Nur
-     API 31+; der Splash wird dafuer in der MainActivity kurz gehalten. -->
+<!-- Splash animation: the printer body is there from the start. The label card sits
+     behind it, pulled into its cutout (translateX -20, see ic_splash_logo.xml). After a
+     short delay it slides out of the cutout, which masks it into the right shape on the
+     way. API 31+ only; MainActivity holds the splash a moment for it. -->
 <animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:drawable="@drawable/ic_splash_logo">

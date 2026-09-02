@@ -165,7 +165,7 @@ class PrinterManager(
             } catch (c: CancellationException) {
                 connection?.close()
                 connection = null
-                // Do not leave a cancelled active attempt stuck as "Connecting".
+                // Do not leave a canceled active attempt stuck as "Connecting".
                 if (!autoConnect && _state.value is PrinterState.Connecting) {
                     _state.value = PrinterState.Disconnected
                 }
@@ -179,7 +179,7 @@ class PrinterManager(
         }
         if (!autoConnect) {
             showTransientError(lastError?.message ?: context.getString(R.string.err_connect_failed))
-            // connect() cancelled the background reconnect before trying actively, so restore it
+            // connect() canceled the background reconnect before trying actively, so restore it
             // after a failure. Otherwise one failed tap leaves the app deaf to the printer
             // returning. Cannot recurse: the retry it starts runs with autoConnect = true.
             startBackgroundReconnect()
@@ -273,7 +273,7 @@ class PrinterManager(
         when (result) {
             PrintResult.NO_CASSETTE -> R.string.err_no_cassette
             PrintResult.LOW_BATTERY -> R.string.err_battery_too_low
-            PrintResult.CANCELLED -> R.string.err_print_cancelled
+            PrintResult.CANCELLED -> R.string.err_print_canceled
             else -> R.string.err_print_failed
         }
     )

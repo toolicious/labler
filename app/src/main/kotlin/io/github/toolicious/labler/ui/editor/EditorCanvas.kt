@@ -768,7 +768,7 @@ private suspend fun PointerInputScope.detectDragGesturesWithDoubleTap(
         onDrag(change.positionChange())
         change.consume()
     }
-    // A cancelled drag ends like a finished one: the move is already applied element by element.
+    // A canceled drag ends like a finished one: the move is already applied element by element.
     onEnd()
 }
 

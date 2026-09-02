@@ -37,7 +37,7 @@
     <string name="home_no_results">No matches.</string>
     <string name="template_size">%1$d x %2$d mm</string>
     <!-- Overview card: deliberately language-neutral and short, so it stays on one line next to
-         the favourite star in a narrow grid cell. Not translated on purpose. -->
+         the favorite star in a narrow grid cell. Not translated on purpose. -->
     <string name="template_size_auto">%1$d x var:%2$d mm</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_duplicate">Duplicate</string>
@@ -219,10 +219,9 @@
     <string name="calib_dots_per_mm">Dots per mm</string>
     <string name="calib_length_title">Calibrate printed length</string>
     <string name="calib_length_action">Calibrate</string>
-    <string name="calib_length_body">Measure between the two marks at the bottom edge, middle to middle. It should be roughly %1$s mm, but enter the exact length you measured (say %2$s mm) so the print comes out more accurate.</string>
+    <string name="calib_length_body">Measure between the two marks at the bottom edge, middle to middle. It should be roughly %1$s mm, but enter the exact length you measured (e.g. %2$s mm) so the print comes out more accurate.</string>
     <string name="calib_length_field">Measured in mm</string>
-    <string name="calib_length_note">Labels then print at their true size. Their content can shift slightly against the label edge.</string>
-    <string name="calib_length_implausible">That is far from the expected %1$s mm. Did you measure the millimetre ticks along the top instead of the two marks at the bottom?</string>
+    <string name="calib_length_implausible">That is far from the expected %1$s mm. Did you measure the millimeter ticks along the top instead of the two marks at the bottom?</string>
     <string name="calib_length_current">%1$s instead of %2$s dots per mm</string>
     <string name="calib_length_measured">Last measured: %1$s mm</string>
     <string name="calib_length_none">Not calibrated, using the stated resolution</string>
@@ -290,7 +289,7 @@
     <string name="err_mtu_too_small">This phone negotiated too small a Bluetooth packet size for this printer (%1$d bytes needed)</string>
     <string name="err_no_cassette">No tape cassette in the printer</string>
     <string name="err_battery_too_low">Battery too low to print</string>
-    <string name="err_print_cancelled">Printing cancelled at the printer</string>
+    <string name="err_print_canceled">Printing canceled at the printer</string>
     <!-- Barcode / QR -->
     <string name="add_barcode">Code</string>
     <string name="prop_barcode_data">Content</string>
