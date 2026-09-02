@@ -220,6 +220,7 @@
     <string name="calib_length_field">Gemessen in mm</string>
     <string name="calib_length_implausible">Das liegt weit von den erwarteten %1$s mm entfernt. Hast du vielleicht die Millimeterstriche am oberen Rand gemessen statt der beiden Marken unten?</string>
     <string name="calib_length_current">%1$s statt %2$s Punkte pro mm</string>
+    <string name="calib_length_dpi">(%1$s statt %2$s dpi)</string>
     <string name="calib_length_measured">Zuletzt gemessen: %1$s mm</string>
     <string name="calib_length_none">Nicht kalibriert, es gilt die angegebene Auflösung</string>
     <string name="calib_head_dots">Druckbare Punkte über den Kopf</string>

@@ -223,6 +223,7 @@
     <string name="calib_length_field">Measured in mm</string>
     <string name="calib_length_implausible">That is far from the expected %1$s mm. Did you measure the millimeter ticks along the top instead of the two marks at the bottom?</string>
     <string name="calib_length_current">%1$s instead of %2$s dots per mm</string>
+    <string name="calib_length_dpi">(%1$s instead of %2$s dpi)</string>
     <string name="calib_length_measured">Last measured: %1$s mm</string>
     <string name="calib_length_none">Not calibrated, using the stated resolution</string>
     <string name="calib_head_dots">Printable dots across the head</string>

@@ -68,7 +68,9 @@ object TestPatternRenderer {
      */
     private fun caption(protocol: PrinterProtocol, lengthDots: Int): String {
         val parts = mutableListOf(
-            String.format(Locale.US, "%.3f d/mm", protocol.geometry.dotsPerMm),
+            // Dots per inch rather than per millimeter: it is the unit the printers are
+            // sold in, and it is shorter, which matters on a strip this narrow.
+            String.format(Locale.US, "%.1fdpi", protocol.geometry.dpi),
             "${protocol.geometry.headDots}x$lengthDots",
         )
         protocol.tunables.forEach { tunable ->

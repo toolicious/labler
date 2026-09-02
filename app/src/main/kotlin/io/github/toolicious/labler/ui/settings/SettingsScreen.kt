@@ -62,6 +62,7 @@ import io.github.toolicious.labler.ble.BlePermissions
 import io.github.toolicious.labler.ble.PrinterState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
+import io.github.toolicious.labler.printer.HeadGeometry
 import io.github.toolicious.labler.printer.PrinterFamily
 import io.github.toolicious.labler.printer.PrinterProtocols
 import io.github.toolicious.labler.printer.TestPattern
@@ -98,7 +99,7 @@ private fun LengthCalibrationDialog(
                 Text(
                     stringResource(
                         R.string.calib_length_body,
-                        trimmedMm(expectedMm),
+                        trimmedNumber(expectedMm),
                         // An example near enough the expected value to read as a plausible
                         // reading rather than as a second instruction.
                         exampleMm(expectedMm * 1.02f),
@@ -117,7 +118,7 @@ private fun LengthCalibrationDialog(
                 if (measured != null && !plausible) {
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        stringResource(R.string.calib_length_implausible, trimmedMm(expectedMm)),
+                        stringResource(R.string.calib_length_implausible, trimmedNumber(expectedMm)),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error,
                     )
@@ -151,8 +152,8 @@ private fun exampleMm(value: Float): String {
     return if (twoPlaces.endsWith("0")) twoPlaces.dropLast(1) + "1" else twoPlaces
 }
 
-/** Millimeters without the trailing zeros a plain conversion leaves behind. */
-private fun trimmedMm(value: Float): String =
+/** A measurement without the trailing zeros a plain conversion leaves behind. */
+private fun trimmedNumber(value: Float): String =
     if (value == value.toInt().toFloat()) value.toInt().toString()
     else String.format(Locale.US, "%.2f", value).trimEnd('0').trimEnd('.')
 
@@ -358,7 +359,7 @@ fun SettingsScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         measured?.toFloatOrNull()?.let {
-                                            stringResource(R.string.calib_length_measured, trimmedMm(it))
+                                            stringResource(R.string.calib_length_measured, trimmedNumber(it))
                                         } ?: stringResource(R.string.calib_length_none),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -376,13 +377,24 @@ fun SettingsScreen(
                                         )
                                     }
                                 }
-                                // Only worth a line once the two differ.
+                                // Only worth a line once the two differ. Both units, because
+                                // the app computes in dots per millimeter while every data
+                                // sheet quotes dpi.
                                 if (stored != null) {
                                     Text(
                                         stringResource(
                                             R.string.calib_length_current,
-                                            trimmedMm(pitch),
-                                            trimmedMm(declaredPitch),
+                                            trimmedNumber(pitch),
+                                            trimmedNumber(declaredPitch),
+                                        ),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    Text(
+                                        stringResource(
+                                            R.string.calib_length_dpi,
+                                            trimmedNumber(pitch * HeadGeometry.MM_PER_INCH),
+                                            trimmedNumber(declaredPitch * HeadGeometry.MM_PER_INCH),
                                         ),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,

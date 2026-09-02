@@ -33,9 +33,19 @@ data class HeadGeometry(
 
     val maxLengthDots: Int get() = mmToDots(maxLengthMm)
 
+    /**
+     * [dotsPerMm] in the unit the manufacturers print on their boxes, so a measured value
+     * can be held against a data sheet without doing the arithmetic first.
+     */
+    val dpi: Float get() = dotsPerMm * MM_PER_INCH
+
     /** Whole millimeters to dots. */
     fun mmToDots(mm: Int): Int = (mm * dotsPerMm).roundToInt()
 
     /** Dots back to whole millimeters, cutting off what does not fill one. */
     fun dotsToMm(dots: Int): Int = (dots / dotsPerMm).toInt()
+
+    companion object {
+        const val MM_PER_INCH = 25.4f
+    }
 }
