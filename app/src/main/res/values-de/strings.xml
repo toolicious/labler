@@ -247,7 +247,7 @@
 
     <!-- Testdruck -->
     <string name="testprint_title">Testdruck</string>
-    <string name="testprint_geometry">Geometrie-Testmuster (40 mm)</string>
+    <string name="testprint_geometry">Geometrie-Testmuster (%1$d mm)</string>
     <string name="testprint_text_label">Text-Probedruck</string>
     <string name="testprint_show">Vorschau anzeigen</string>
 
