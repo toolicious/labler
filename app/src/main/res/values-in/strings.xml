@@ -208,7 +208,6 @@
     <string name="settings_testtools">Alat cetak uji (pola geometri)</string>
     <string name="settings_experimental">Eksperimental</string>
     <string name="settings_experimental_hint">Perintah printer eksperimental, belum diverifikasi pada P15. Hanya dengan printer yang tersambung; abaikan jika ragu.</string>
-    <string name="exp_learn_gap">Kalibrasi celah label</string>
     <string name="exp_density_value">Kepekatan cetak: %1$s</string>
     <string name="exp_density_off">mati</string>
     <string name="exp_density_hint">Menguji apakah P15 menerima perintah kepekatan 0x1F. 0 = mati (pencetakan standar tidak berubah), 1 sampai 15 = lebih pekat. Berlaku pada pencetakan berikutnya.</string>

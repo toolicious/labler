@@ -191,7 +191,6 @@
     <string name="settings_testtools">Інструменти тестового друку (геометричний шаблон)</string>
     <string name="settings_experimental">Експериментально</string>
     <string name="settings_experimental_hint">Експериментальні команди принтера, не перевірені на P15. Лише за підключеного принтера; якщо сумніваєтеся, просто проігноруйте.</string>
-    <string name="exp_learn_gap">Калібрувати проміжок етикеток</string>
     <string name="exp_density_value">Щільність друку: %1$s</string>
     <string name="exp_density_off">вимкнено</string>
     <string name="exp_density_hint">Перевіряє, чи приймає P15 команду щільності 0x1F. 0 = вимкнено (звичайний друк без змін), від 1 до 15 = темніше. Діє з наступного друку.</string>

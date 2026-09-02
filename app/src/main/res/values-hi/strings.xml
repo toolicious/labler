@@ -203,7 +203,6 @@
     <string name="settings_testtools">परीक्षण प्रिंट उपकरण (ज्यामिति पैटर्न)</string>
     <string name="settings_experimental">प्रयोगात्मक</string>
     <string name="settings_experimental_hint">प्रयोगात्मक प्रिंटर कमांड, P15 पर सत्यापित नहीं। केवल कनेक्टेड प्रिंटर के साथ; संदेह हो तो छोड़ दें।</string>
-    <string name="exp_learn_gap">लेबल गैप कैलिब्रेट करें</string>
     <string name="exp_density_value">प्रिंट घनत्व: %1$s</string>
     <string name="exp_density_off">बंद</string>
     <string name="exp_density_hint">जाँचता है कि P15, 0x1F घनत्व कमांड स्वीकार करता है या नहीं। 0 = बंद (मानक प्रिंटिंग अपरिवर्तित), 1 से 15 = गहरा। अगले प्रिंट से लागू होगा।</string>

@@ -107,9 +107,6 @@ object PhomemoProtocol : PrinterProtocol {
         return byteArrayOf(0x1B, 0x4A, n.toByte())
     }
 
-    // Experimental command (not yet verified on the P15)
-    val LEARN_GAP = byteArrayOf(0x10, 0xFF.toByte(), 0x03)
-
     /**
      * Experimental darkness command from the newer "0x1F" command family: 1F 70 01 n (n = 1..15).
      * Not verified on the P15. Only emitted when the user enables it; besides setting the darkness

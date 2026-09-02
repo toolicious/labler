@@ -7,7 +7,6 @@ import io.github.toolicious.labler.App
 import io.github.toolicious.labler.ble.FoundPrinter
 import io.github.toolicious.labler.ble.PrinterScanner
 import io.github.toolicious.labler.ble.PrinterState
-import io.github.toolicious.labler.printer.PhomemoProtocol
 import io.github.toolicious.labler.printer.PrinterFamily
 import io.github.toolicious.labler.printer.PrinterProtocols
 import io.github.toolicious.labler.printer.ProtocolTuning
@@ -76,14 +75,14 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     /**
      * Works the feed resolution out of a measured distance. The app knows how many dots the
-     * test pattern puts between its first and last tick, the user supplies what the ruler
+     * test pattern puts between its two calibration marks, the user supplies what the ruler
      * showed. The measurement is kept alongside so the settings screen can show what was
      * entered rather than only what was made of it.
      */
     fun calibrateFromMeasurement(measuredMm: Float) {
         if (measuredMm <= 0f) return
         val family = calibrationFamily.value ?: return
-        val span = TestPattern.calibrationSpanDots()
+        val span = TestPattern.calibrationSpanDots(PrinterProtocols.baseOf(family).geometry)
         setCalibration(Tunable.DOTS_PER_MM, (span / measuredMm).toString())
         viewModelScope.launch {
             container.settings.saveCalibrationMeasurement(family, measuredMm.toString())
@@ -164,23 +163,6 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun forget() {
         viewModelScope.launch { manager.forget() }
-    }
-
-    private val _commandFeedback = MutableStateFlow<String?>(null)
-    val commandFeedback = _commandFeedback.asStateFlow()
-
-    /** Experimental: teach the gap detection. A Phomemo command, so only sent to one. */
-    fun learnGap() {
-        val connected = (manager.state.value as? PrinterState.Ready)?.family
-        if (connected != PrinterFamily.PHOMEMO) return
-        viewModelScope.launch {
-            _commandFeedback.value = runCatching {
-                manager.sendCommand(PhomemoProtocol.LEARN_GAP)
-            }.fold(
-                onSuccess = { "Teach command sent. The printer may feed a few labels." },
-                onFailure = { "Error: ${it.message}" },
-            )
-        }
     }
 
     /** Experimental 0x1F print density (0 = off, 1..15 = darkness). Takes effect on the next print. */

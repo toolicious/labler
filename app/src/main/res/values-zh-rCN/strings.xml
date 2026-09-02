@@ -191,7 +191,6 @@
     <string name="settings_testtools">测试打印工具（几何图案）</string>
     <string name="settings_experimental">实验性</string>
     <string name="settings_experimental_hint">实验性打印机命令，未在 P15 上验证。仅在已连接打印机时使用；不确定就忽略。</string>
-    <string name="exp_learn_gap">校准标签间隙</string>
     <string name="exp_density_value">打印浓度：%1$s</string>
     <string name="exp_density_off">关闭</string>
     <string name="exp_density_hint">测试 P15 是否接受 0x1F 浓度命令。0 = 关闭（标准打印不变），1 到 15 = 更深。下次打印时生效。</string>

@@ -17,7 +17,11 @@ import kotlin.math.roundToInt
  */
 object TestPattern {
 
-    fun create(geometry: HeadGeometry, lengthDots: Int = DEFAULT_LENGTH_DOTS): MonoImage {
+    fun create(
+        geometry: HeadGeometry,
+        lengthDots: Int = defaultLengthDots(geometry),
+        calibrationSpan: Int = calibrationSpanDots(geometry),
+    ): MonoImage {
         val img = MonoImage.blank(lengthDots, geometry.headDots)
         val w = lengthDots
         val h = geometry.headDots
@@ -53,10 +57,10 @@ object TestPattern {
             img.setBlack(208 - i, cy + 1 + i)
         }
 
-        // Two marks at the bottom edge whose distance is fixed in dots. The ticks above
-        // follow millimeters and therefore shift with every correction, which makes them a
-        // good check and a useless reference; these are the reference.
-        val (left, right) = calibrationMarks(lengthDots)
+        // Two marks at the bottom edge, a stated distance apart. The ticks above are a scale
+        // to read off; these are a pair to put a caliper on, which is a different job and needs
+        // marks of its own rather than a count of ticks.
+        val (left, right) = calibrationMarks(lengthDots, calibrationSpan)
         for (y in h - h / 4 until h - 2) {
             img.setBlack(left, y); img.setBlack(left + 1, y)
             img.setBlack(right, y); img.setBlack(right + 1, y)
@@ -76,11 +80,10 @@ object TestPattern {
      * Millimeter mark and its column, for every tick [create] draws.
      *
      * The ticks follow millimeters, not a fixed number of dots, so a corrected feed shows up
-     * on the tape as ticks that really are [TICK_STEP_MM] apart. A coarser grid then fits one
-     * more of them into the same label, which is why the distance to measure is quoted as a
-     * tick count rather than as a constant.
+     * on the tape as ticks that really are [TICK_STEP_MM] apart. How many of them fit therefore
+     * varies, which is why they are a scale to read off and not the thing to measure.
      */
-    fun tickColumns(geometry: HeadGeometry, lengthDots: Int = DEFAULT_LENGTH_DOTS): List<Pair<Int, Int>> {
+    fun tickColumns(geometry: HeadGeometry, lengthDots: Int = defaultLengthDots(geometry)): List<Pair<Int, Int>> {
         val out = mutableListOf<Pair<Int, Int>>()
         var mm = TICK_STEP_MM
         while (true) {
@@ -93,27 +96,37 @@ object TestPattern {
     }
 
     /**
-     * Columns of the two calibration marks. Fixed in dots and independent of any
-     * resolution, so the distance someone measures is the same before and after a
-     * correction and entering the same reading twice changes nothing.
+     * How long the pattern is, in dots. Worked out from millimeters rather than fixed, because
+     * the pattern is meant to fit a [LENGTH_MM] die-cut label. As a dot count it stopped fitting
+     * the moment the feed resolution was corrected, and nobody noticed because the app was
+     * quoting the same wrong number back to itself.
      */
-    fun calibrationMarks(lengthDots: Int = DEFAULT_LENGTH_DOTS): Pair<Int, Int> =
-        CALIBRATION_INSET to lengthDots - CALIBRATION_INSET
+    fun defaultLengthDots(geometry: HeadGeometry): Int = geometry.mmToDots(LENGTH_MM)
 
-    /** Dots between the two calibration marks, measured from the same edge of each. */
-    fun calibrationSpanDots(lengthDots: Int = DEFAULT_LENGTH_DOTS): Int =
-        lengthDots - 2 * CALIBRATION_INSET
+    /**
+     * Dots between the two calibration marks, which is [CALIBRATION_MM] on the grid the family
+     * declares.
+     *
+     * Always the declared grid, never a corrected one: the marks have to keep their distance
+     * across corrections, otherwise entering the same reading a second time walks the result a
+     * little further instead of leaving it alone.
+     */
+    fun calibrationSpanDots(declared: HeadGeometry): Int = declared.mmToDots(CALIBRATION_MM)
+
+    /** Columns of the two calibration marks, centered on the pattern. */
+    fun calibrationMarks(lengthDots: Int, calibrationSpan: Int): Pair<Int, Int> {
+        val left = ((lengthDots - calibrationSpan) / 2).coerceAtLeast(2)
+        return left to left + calibrationSpan
+    }
 
     /** How far a correction may stray from the declared resolution before it is a typo. */
     const val PLAUSIBLE_FACTOR = 2f
 
-    /**
-     * Where the calibration marks sit from either end. Chosen so the distance between them
-     * is the 240 dots the first and last tick spanned back when the app still assumed 8 dots
-     * per millimeter, which keeps a measurement taken before these marks existed valid.
-     */
-    private const val CALIBRATION_INSET = 40
+    /** Length of the pattern, matching the die-cut label it is meant to be printed on. */
+    const val LENGTH_MM = 40
 
-    const val DEFAULT_LENGTH_DOTS = 320
+    /** What the two marks are apart, and so the distance the user is asked to measure. */
+    const val CALIBRATION_MM = 30
+
     const val TICK_STEP_MM = 5
 }

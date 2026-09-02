@@ -203,7 +203,6 @@
     <string name="settings_testtools">測試列印工具（幾何圖案）</string>
     <string name="settings_experimental">實驗性</string>
     <string name="settings_experimental_hint">實驗性的印表機指令，未在 P15 上驗證。僅在已連線印表機時使用；不確定就略過。</string>
-    <string name="exp_learn_gap">校正標籤間隙</string>
     <string name="exp_density_value">列印濃度：%1$s</string>
     <string name="exp_density_off">關閉</string>
     <string name="exp_density_hint">測試 P15 是否接受 0x1F 濃度指令。0 = 關閉（標準列印不變），1 到 15 = 更深。下次列印時生效。</string>

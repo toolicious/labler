@@ -191,7 +191,6 @@
     <string name="settings_testtools">Narzędzia wydruku testowego (wzór geometryczny)</string>
     <string name="settings_experimental">Eksperymentalne</string>
     <string name="settings_experimental_hint">Eksperymentalne polecenia drukarki, niezweryfikowane na P15. Tylko przy podłączonej drukarce; w razie wątpliwości zignoruj.</string>
-    <string name="exp_learn_gap">Kalibruj odstęp etykiet</string>
     <string name="exp_density_value">Gęstość druku: %1$s</string>
     <string name="exp_density_off">wyłączona</string>
     <string name="exp_density_hint">Sprawdza, czy P15 przyjmuje polecenie gęstości 0x1F. 0 = wyłączona (standardowy druk bez zmian), od 1 do 15 = ciemniej. Działa od następnego wydruku.</string>

@@ -191,7 +191,6 @@
     <string name="settings_testtools">Test yazdırma araçları (geometri deseni)</string>
     <string name="settings_experimental">Deneysel</string>
     <string name="settings_experimental_hint">Deneysel yazıcı komutları, P15\'te doğrulanmadı. Yalnızca yazıcı bağlıyken; emin değilsen yoksay.</string>
-    <string name="exp_learn_gap">Etiket boşluğunu kalibre et</string>
     <string name="exp_density_value">Baskı yoğunluğu: %1$s</string>
     <string name="exp_density_off">kapalı</string>
     <string name="exp_density_hint">P15\'in 0x1F yoğunluk komutunu kabul edip etmediğini sınar. 0 = kapalı (standart baskı değişmez), 1 ile 15 arası = daha koyu. Bir sonraki baskıda geçerli olur.</string>

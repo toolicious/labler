@@ -191,7 +191,6 @@
     <string name="settings_testtools">Инструменты тестовой печати (геометрический шаблон)</string>
     <string name="settings_experimental">Экспериментально</string>
     <string name="settings_experimental_hint">Экспериментальные команды принтера, не проверены на P15. Только при подключённом принтере; если сомневаетесь, просто проигнорируйте.</string>
-    <string name="exp_learn_gap">Калибровать зазор этикеток</string>
     <string name="exp_density_value">Плотность печати: %1$s</string>
     <string name="exp_density_off">выкл.</string>
     <string name="exp_density_hint">Проверяет, принимает ли P15 команду плотности 0x1F. 0 = выключено (обычная печать без изменений), от 1 до 15 = темнее. Действует со следующей печати.</string>

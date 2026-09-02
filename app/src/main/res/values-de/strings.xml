@@ -227,7 +227,6 @@
     <string name="calib_row_bit_offset">Zeilenversatz in der Spalte</string>
     <string name="calib_reverse_column_bytes">Byte-Reihenfolge einer Spalte umdrehen</string>
     <string name="calib_await_print_result">Auf die Rückmeldung des Druckers warten</string>
-    <string name="exp_learn_gap">Banderkennung anlernen</string>
     <string name="exp_density_value">Druckdichte: %1$s</string>
     <string name="exp_density_off">aus</string>
     <string name="exp_density_hint">Testet, ob der P15 den 0x1F-Dichtebefehl annimmt. 0 = aus (Standarddruck unverändert), 1 bis 15 = dunkler. Wirkt beim nächsten Druck.</string>

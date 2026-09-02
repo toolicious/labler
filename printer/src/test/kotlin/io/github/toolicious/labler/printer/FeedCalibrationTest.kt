@@ -6,18 +6,21 @@ import kotlin.test.assertSame
 
 /**
  * The arithmetic behind the calibration dialog: the pattern puts a known number of dots between
- * its first and last tick, the user supplies what the ruler showed, and the feed resolution comes
- * out of the two. Worked through with the figures actually measured on a P15.
+ * its two calibration marks, the user supplies what the ruler showed, and the feed resolution
+ * comes out of the two. Worked through with the figures actually measured on a P15.
  */
 class FeedCalibrationTest {
 
     private val declared = PhomemoProtocol.geometry
 
-    /** The 240 dots between the calibration marks came out 30.61 mm long on the device. */
-    private val measuredMm = 30.61f
+    /**
+     * What the 236 dots between the marks come out as on the device, whose feed measured
+     * 199.15 dpi against the 200 the app now assumes.
+     */
+    private val measuredMm = 30.10f
 
     private fun calibrated(measured: Float): PrinterProtocol {
-        val span = TestPattern.calibrationSpanDots()
+        val span = TestPattern.calibrationSpanDots(declared)
         return PhomemoProtocol.withTuning(
             ProtocolTuning(mapOf(Tunable.DOTS_PER_MM to (span / measured).toString()))
         )
@@ -25,14 +28,14 @@ class FeedCalibrationTest {
 
     @Test
     fun `the pattern offers a span the user can measure`() {
-        assertEquals(240, TestPattern.calibrationSpanDots())
-        // Which is what the app tells them to expect, at the resolution it currently assumes.
-        assertEquals(30.48f, 240 / declared.dotsPerMm, 0.001f)
+        assertEquals(236, TestPattern.calibrationSpanDots(declared))
+        // And it stands for the round number the dialog quotes, to within the odd dot.
+        assertEquals(TestPattern.CALIBRATION_MM.toFloat(), 236 / declared.dotsPerMm, 0.05f)
     }
 
     @Test
     fun `a label asks for the dots that really cover its length once calibrated`() {
-        val truth = 240 / measuredMm
+        val truth = 236 / measuredMm
         assertEquals(40.0f, calibrated(measuredMm).geometry.mmToDots(40) / truth, 0.1f)
         // Without the correction it runs two tenths long, where the 203 dpi the head is sold
         // with used to miss by almost a millimeter.
@@ -42,11 +45,11 @@ class FeedCalibrationTest {
     @Test
     fun `every tick of the next printout lands on the millimeter it is named after`() {
         val corrected = calibrated(measuredMm).geometry
-        val truth = 240 / measuredMm
+        val truth = 236 / measuredMm
         val ticks = TestPattern.tickColumns(corrected)
         // The ticks follow the millimeters rather than a fixed dot spacing, so a correction
-        // moves every one of them. Eight of them fit either way at this size.
-        assertEquals(8, ticks.size)
+        // moves every one of them.
+        assertEquals(7, ticks.size)
         ticks.forEach { (mm, x) ->
             // Where the tick really ends up on the tape, not where the assumed grid puts it.
             assertEquals(mm.toFloat(), x / truth, 0.1f, "tick labeled $mm mm")

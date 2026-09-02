@@ -191,7 +191,6 @@
     <string name="settings_testtools">Ferramentas de impressão de teste (padrão geométrico)</string>
     <string name="settings_experimental">Experimental</string>
     <string name="settings_experimental_hint">Comandos de impressora experimentais, não verificados na P15. Somente com uma impressora conectada; ignore se tiver dúvida.</string>
-    <string name="exp_learn_gap">Calibrar intervalo das etiquetas</string>
     <string name="exp_density_value">Densidade de impressão: %1$s</string>
     <string name="exp_density_off">desativada</string>
     <string name="exp_density_hint">Testa se a P15 aceita o comando de densidade 0x1F. 0 = desativada (impressão padrão inalterada), de 1 a 15 = mais escuro. Vale a partir da próxima impressão.</string>

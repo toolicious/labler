@@ -191,7 +191,6 @@
     <string name="settings_testtools">Strumenti di stampa di prova (motivo geometrico)</string>
     <string name="settings_experimental">Sperimentale</string>
     <string name="settings_experimental_hint">Comandi stampante sperimentali, non verificati sul P15. Solo con una stampante connessa; nel dubbio ignora.</string>
-    <string name="exp_learn_gap">Calibra distanza etichette</string>
     <string name="exp_density_value">Densità di stampa: %1$s</string>
     <string name="exp_density_off">disattivata</string>
     <string name="exp_density_hint">Verifica se la P15 accetta il comando di densità 0x1F. 0 = disattivata (stampa standard invariata), da 1 a 15 = più scuro. Ha effetto dalla stampa successiva.</string>

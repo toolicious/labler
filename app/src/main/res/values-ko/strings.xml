@@ -203,7 +203,6 @@
     <string name="settings_testtools">테스트 인쇄 도구 (기하 패턴)</string>
     <string name="settings_experimental">실험적 기능</string>
     <string name="settings_experimental_hint">P15에서 검증되지 않은 실험적인 프린터 명령입니다. 프린터가 연결된 상태에서만 사용하고, 잘 모르겠다면 그대로 두세요.</string>
-    <string name="exp_learn_gap">라벨 간격 보정</string>
     <string name="exp_density_value">인쇄 농도: %1$s</string>
     <string name="exp_density_off">끔</string>
     <string name="exp_density_hint">P15가 0x1F 농도 명령을 지원하는지 시험합니다. 0 = 끔 (기본 인쇄 그대로), 1에서 15 = 더 진하게. 다음 인쇄부터 적용됩니다.</string>

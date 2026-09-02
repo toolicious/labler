@@ -191,7 +191,6 @@
     <string name="settings_testtools">Testafdrukgereedschap (geometriepatroon)</string>
     <string name="settings_experimental">Experimenteel</string>
     <string name="settings_experimental_hint">Experimentele printeropdrachten, niet geverifieerd op de P15. Alleen met een verbonden printer; negeer bij twijfel.</string>
-    <string name="exp_learn_gap">Labelafstand kalibreren</string>
     <string name="exp_density_value">Afdrukdichtheid: %1$s</string>
     <string name="exp_density_off">uit</string>
     <string name="exp_density_hint">Test of de P15 het 0x1F-dichtheidscommando accepteert. 0 = uit (standaard afdruk ongewijzigd), 1 tot 15 = donkerder. Werkt vanaf de volgende afdruk.</string>

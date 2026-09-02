@@ -258,16 +258,6 @@ class PrinterManager(
         job.await()
     }
 
-    /** Raw command to the print characteristic (for experimental features). */
-    suspend fun sendCommand(bytes: ByteArray) {
-        check(_state.value is PrinterState.Ready) { context.getString(R.string.err_not_connected) }
-        val conn = connection ?: error(context.getString(R.string.err_not_connected))
-        bleLog("command " + bytes.joinToString(" ") { "%02X".format(it) })
-        gattExclusive.withLock {
-            conn.client.writeCharacteristic(conn.writeChar, bytes)
-        }
-    }
-
     /** What the printer reported back, as something to put in front of the user. */
     private fun printResultMessage(result: PrintResult): String = context.getString(
         when (result) {

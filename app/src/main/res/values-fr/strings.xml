@@ -191,7 +191,6 @@
     <string name="settings_testtools">Outils d\'impression test (motif géométrique)</string>
     <string name="settings_experimental">Expérimental</string>
     <string name="settings_experimental_hint">Commandes d\'imprimante expérimentales, non vérifiées sur le P15. Uniquement avec une imprimante connectée ; ignorez en cas de doute.</string>
-    <string name="exp_learn_gap">Calibrer l\'écart des étiquettes</string>
     <string name="exp_density_value">Densité d\'impression : %1$s</string>
     <string name="exp_density_off">désactivée</string>
     <string name="exp_density_hint">Teste si la P15 accepte la commande de densité 0x1F. 0 = désactivée (impression standard inchangée), 1 à 15 = plus foncé. Prend effet à la prochaine impression.</string>

@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import io.github.toolicious.labler.printer.MonoImage
 import io.github.toolicious.labler.printer.PrinterProtocol
+import io.github.toolicious.labler.printer.PrinterProtocols
 import io.github.toolicious.labler.printer.TestPattern
 import io.github.toolicious.labler.printer.Tunable
 import java.util.Locale
@@ -29,10 +30,15 @@ object TestPatternRenderer {
 
     fun render(
         protocol: PrinterProtocol,
-        lengthDots: Int = TestPattern.DEFAULT_LENGTH_DOTS,
+        lengthDots: Int = TestPattern.defaultLengthDots(protocol.geometry),
     ): MonoImage {
         val head = protocol.geometry.headDots
-        val pattern = MonoConverter.toBitmap(TestPattern.create(protocol.geometry, lengthDots))
+        // The ticks follow the grid in use, so a correction shows on them. The two calibration
+        // marks follow the declared one, so they stay something to measure against twice.
+        val declared = PrinterProtocols.baseOf(protocol.family).geometry
+        val pattern = MonoConverter.toBitmap(
+            TestPattern.create(protocol.geometry, lengthDots, TestPattern.calibrationSpanDots(declared))
+        )
         val caption = caption(protocol, lengthDots)
         val inline = head >= MIN_HEAD_FOR_INLINE_CAPTION
 

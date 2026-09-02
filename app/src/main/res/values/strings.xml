@@ -230,7 +230,6 @@
     <string name="calib_row_bit_offset">Row offset inside the column</string>
     <string name="calib_reverse_column_bytes">Reverse the byte order of a column</string>
     <string name="calib_await_print_result">Wait for the printer to report the result</string>
-    <string name="exp_learn_gap">Calibrate label gap</string>
     <string name="exp_density_value">Print density: %1$s</string>
     <string name="exp_density_off">off</string>
     <string name="exp_density_hint">Tests whether the P15 accepts the 0x1F density command. 0 = off (standard printing unchanged), 1 to 15 = darker. Takes effect on the next print.</string>
