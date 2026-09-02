@@ -48,6 +48,10 @@ class SettingsRepository(private val context: Context) {
          */
         fun tuning(family: PrinterFamily, tunable: Tunable) =
             stringPreferencesKey("tuning_${family.name}_${tunable.name}")
+
+        /** The measurement a calibration came from, kept so it can be shown back. */
+        fun calibrationMeasurement(family: PrinterFamily) =
+            stringPreferencesKey("calibration_measured_${family.name}")
     }
 
     val savedPrinter: Flow<SavedPrinter?> = context.dataStore.data.map { prefs ->
@@ -79,6 +83,23 @@ class SettingsRepository(private val context: Context) {
     /** Stores one calibration value, or clears it when [value] is null or blank. */
     suspend fun saveTuning(family: PrinterFamily, tunable: Tunable, value: String?) {
         val key = Keys.tuning(family, tunable)
+        context.dataStore.edit {
+            if (value.isNullOrBlank()) it.remove(key) else it[key] = value
+        }
+    }
+
+    /** What was typed into the calibration dialog, per family, purely for display. */
+    val calibrationMeasurements: Flow<Map<PrinterFamily, String>> =
+        context.dataStore.data.map { prefs ->
+            PrinterFamily.entries.mapNotNull { family ->
+                prefs[Keys.calibrationMeasurement(family)]
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { family to it }
+            }.toMap()
+        }
+
+    suspend fun saveCalibrationMeasurement(family: PrinterFamily, value: String?) {
+        val key = Keys.calibrationMeasurement(family)
         context.dataStore.edit {
             if (value.isNullOrBlank()) it.remove(key) else it[key] = value
         }

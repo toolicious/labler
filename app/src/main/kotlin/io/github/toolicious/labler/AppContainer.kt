@@ -80,12 +80,16 @@ class AppContainer(context: Context) {
     val printerManager = PrinterManager(context, settings, applicationScope)
 
     init {
-        // Calibration values a tester set for a printer nobody here owns. Applied as they
-        // change, so a value can be tried without restarting the app. Never in a release: a
-        // released protocol is one that has been verified on a device.
-        if (BuildConfig.DEBUG) {
-            applicationScope.launch {
-                settings.protocolTuning.collectLatest { PrinterProtocols.applyTuning(it) }
+        // Applied as they change, so a value takes effect without restarting the app. A
+        // release build keeps only what a user has a reason to correct on their own device,
+        // which today is the feed resolution; the rest are guesses about printers nobody here
+        // owns and stay in development builds.
+        applicationScope.launch {
+            settings.protocolTuning.collectLatest { tuning ->
+                PrinterProtocols.applyTuning(
+                    if (BuildConfig.DEBUG) tuning
+                    else tuning.mapValues { (_, family) -> family.releaseOnly() }
+                )
             }
         }
     }

@@ -2,6 +2,8 @@ package io.github.toolicious.labler.ui.settings
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,6 +51,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -61,8 +64,99 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import io.github.toolicious.labler.printer.PrinterFamily
 import io.github.toolicious.labler.printer.PrinterProtocols
+import io.github.toolicious.labler.printer.TestPattern
 import io.github.toolicious.labler.printer.Tunable
+import java.util.Locale
 import kotlin.math.roundToInt
+
+/**
+ * Asks for the distance the user measured on the printed pattern. The dots the pattern puts
+ * between its first and last tick are known, so the feed resolution follows from the one number a
+ * ruler can actually give.
+ */
+@Composable
+private fun LengthCalibrationDialog(
+    declaredPitch: Float,
+    onDismiss: () -> Unit,
+    onMeasured: (Float) -> Unit,
+) {
+    // Fixed in dots, so this distance and the number quoted for it never move.
+    val spanDots = TestPattern.calibrationSpanDots()
+    val expectedMm = spanDots / declaredPitch
+    var text by remember { mutableStateOf("") }
+    val measured = text.replace(COMMA, DOT).toFloatOrNull()
+    // Checked against the resolution the printer claims rather than against whatever is
+    // currently stored, so a bad correction can still be measured away.
+    val plausible = measured != null && measured > 0f &&
+        spanDots / measured > declaredPitch / TestPattern.PLAUSIBLE_FACTOR &&
+        spanDots / measured < declaredPitch * TestPattern.PLAUSIBLE_FACTOR
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.calib_length_title)) },
+        text = {
+            Column {
+                Text(
+                    stringResource(
+                        R.string.calib_length_body,
+                        trimmedMm(expectedMm),
+                        // An example near enough the expected value to read as a plausible
+                        // reading rather than as a second instruction.
+                        exampleMm(expectedMm * 1.02f),
+                    )
+                )
+                Spacer(Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    label = { Text(stringResource(R.string.calib_length_field)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    if (measured != null && !plausible) {
+                        stringResource(R.string.calib_length_implausible, trimmedMm(expectedMm))
+                    } else {
+                        stringResource(R.string.calib_length_note)
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (measured != null && !plausible) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { measured?.let(onMeasured) },
+                enabled = plausible,
+            ) { Text(stringResource(R.string.action_save)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
+}
+
+private const val COMMA = ','
+private const val DOT = '.'
+
+/**
+ * The example reading in the calibration dialog, always with two decimals showing.
+ *
+ * Trimming it would be the wrong kindness here: the whole point of the example is that this is a
+ * measurement worth taking to a hundredth of a millimetre, and a number ending in a round tenth
+ * says the opposite. A zero in the last place is therefore nudged rather than dropped.
+ */
+private fun exampleMm(value: Float): String {
+    val twoPlaces = String.format(Locale.US, "%.2f", value)
+    return if (twoPlaces.endsWith("0")) twoPlaces.dropLast(1) + "1" else twoPlaces
+}
+
+/** Millimetres without the trailing zeros a plain conversion leaves behind. */
+private fun trimmedMm(value: Float): String =
+    if (value == value.toInt().toFloat()) value.toInt().toString()
+    else String.format(Locale.US, "%.2f", value).trimEnd('0').trimEnd('.')
 
 /** The label a calibration value carries in the settings list. */
 private fun calibrationLabel(tunable: Tunable): Int = when (tunable) {
@@ -218,12 +312,19 @@ fun SettingsScreen(
             Spacer(Modifier.height(4.dp))
             TextButton(onClick = onOpenTestPrint) { Text(stringResource(R.string.settings_testtools)) }
 
-            // Values a tester can still be asked to pin down for a printer nobody here owns.
-            // Development builds only: a released protocol is one verified on a device.
+            // The feed resolution is a value a user corrects for their own device; the rest are
+            // guesses about a printer nobody here owns and only show in a development build.
             val calibrationFamily by vm.calibrationFamily.collectAsState()
-            calibrationFamily?.takeIf { BuildConfig.DEBUG }?.let { family ->
+            calibrationFamily?.let { family ->
                 val calibration by vm.calibration.collectAsState()
                 val declared = remember(family) { PrinterProtocols.baseOf(family) }
+                val offered = declared.tunables.filter {
+                    BuildConfig.DEBUG || it.availability == Tunable.Availability.RELEASE
+                }
+                if (offered.isEmpty()) return@let
+                var measuring by remember { mutableStateOf(false) }
+                var confirmingReset by remember { mutableStateOf(false) }
+
                 Spacer(Modifier.height(16.dp))
                 Text(
                     stringResource(R.string.settings_calibration),
@@ -236,22 +337,79 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.height(8.dp))
-                declared.tunables.forEach { tunable ->
+
+                offered.forEach { tunable ->
                     val label = stringResource(calibrationLabel(tunable))
                     val declaredValue = declared.tunableValue(tunable).orEmpty()
                     val stored = calibration.values[tunable]
-                    when (tunable.kind) {
-                        Tunable.Kind.FLAG -> Row(
+                    when {
+                        // Asking for dots per millimetre would be asking the wrong question. What
+                        // the user has is a ruler and a printed pattern, so that is what is asked.
+                        tunable == Tunable.DOTS_PER_MM -> Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            Text(label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                            val declaredPitch = declared.geometry.dotsPerMm
+                            val pitch = stored?.toFloatOrNull() ?: declaredPitch
+                            val measured by vm.calibrationMeasurement.collectAsState()
+                            Column(Modifier.weight(1f)) {
+                                Text(label, style = MaterialTheme.typography.bodyMedium)
+                                // What the user typed, kept in front of them so the step from it
+                                // to the dots per millimetre is there to follow, with the way back
+                                // right beside it.
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        measured?.toFloatOrNull()?.let {
+                                            stringResource(R.string.calib_length_measured, trimmedMm(it))
+                                        } ?: stringResource(R.string.calib_length_none),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    if (stored != null) {
+                                        Text(
+                                            stringResource(R.string.calib_reset_length),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier
+                                                .padding(start = 8.dp)
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .clickable { confirmingReset = true }
+                                                .padding(horizontal = 6.dp, vertical = 4.dp),
+                                        )
+                                    }
+                                }
+                                // Only worth a line once the two differ.
+                                if (stored != null) {
+                                    Text(
+                                        stringResource(
+                                            R.string.calib_length_current,
+                                            trimmedMm(pitch),
+                                            trimmedMm(declaredPitch),
+                                        ),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+                            OutlinedButton(onClick = { measuring = true }) {
+                                Text(stringResource(R.string.calib_length_action))
+                            }
+                        }
+                        tunable.kind == Tunable.Kind.FLAG -> Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(
+                                label,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f),
+                            )
                             Switch(
                                 checked = (stored ?: declaredValue).toBooleanStrictOrNull() ?: false,
                                 onCheckedChange = { vm.setCalibration(tunable, it.toString()) },
                             )
                         }
-                        Tunable.Kind.NUMBER -> OutlinedTextField(
+                        else -> OutlinedTextField(
                             value = stored.orEmpty(),
                             onValueChange = { vm.setCalibration(tunable, it) },
                             label = { Text(label) },
@@ -263,8 +421,39 @@ fun SettingsScreen(
                     }
                     Spacer(Modifier.height(8.dp))
                 }
-                TextButton(onClick = { vm.resetCalibration() }) {
-                    Text(stringResource(R.string.calib_reset))
+                // Only worth its own button where a family offers more than the one value the
+                // row above already resets.
+                if (offered.size > 1 && calibration.values.isNotEmpty()) {
+                    TextButton(onClick = { vm.resetCalibration() }) {
+                        Text(stringResource(R.string.calib_reset))
+                    }
+                }
+
+                if (confirmingReset) {
+                    AlertDialog(
+                        onDismissRequest = { confirmingReset = false },
+                        title = { Text(stringResource(R.string.calib_reset_confirm_title)) },
+                        text = { Text(stringResource(R.string.calib_reset_confirm_text)) },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                confirmingReset = false
+                                vm.resetLengthCalibration()
+                            }) { Text(stringResource(R.string.calib_reset_length)) }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { confirmingReset = false }) {
+                                Text(stringResource(R.string.action_cancel))
+                            }
+                        },
+                    )
+                }
+
+                if (measuring) {
+                    LengthCalibrationDialog(
+                        declaredPitch = declared.geometry.dotsPerMm,
+                        onDismiss = { measuring = false },
+                        onMeasured = { vm.calibrateFromMeasurement(it); measuring = false },
+                    )
                 }
             }
 

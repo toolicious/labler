@@ -11,6 +11,7 @@ import io.github.toolicious.labler.printer.PhomemoProtocol
 import io.github.toolicious.labler.printer.PrinterFamily
 import io.github.toolicious.labler.printer.PrinterProtocols
 import io.github.toolicious.labler.printer.ProtocolTuning
+import io.github.toolicious.labler.printer.TestPattern
 import io.github.toolicious.labler.printer.Tunable
 
 import kotlinx.coroutines.CancellationException
@@ -73,9 +74,41 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { container.settings.saveTuning(family, tunable, value) }
     }
 
+    /**
+     * Works the feed resolution out of a measured distance. The app knows how many dots the
+     * test pattern puts between its first and last tick, the user supplies what the ruler
+     * showed. The measurement is kept alongside so the settings screen can show what was
+     * entered rather than only what was made of it.
+     */
+    fun calibrateFromMeasurement(measuredMm: Float) {
+        if (measuredMm <= 0f) return
+        val family = calibrationFamily.value ?: return
+        val span = TestPattern.calibrationSpanDots()
+        setCalibration(Tunable.DOTS_PER_MM, (span / measuredMm).toString())
+        viewModelScope.launch {
+            container.settings.saveCalibrationMeasurement(family, measuredMm.toString())
+        }
+    }
+
+    /** What the user last typed into the calibration dialog, for showing it back to them. */
+    val calibrationMeasurement =
+        combine(container.settings.calibrationMeasurements, calibrationFamily) { measured, family ->
+            family?.let { measured[it] }
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    /** Drops only the length calibration, leaving anything else a family offers alone. */
+    fun resetLengthCalibration() {
+        val family = calibrationFamily.value ?: return
+        setCalibration(Tunable.DOTS_PER_MM, null)
+        viewModelScope.launch { container.settings.saveCalibrationMeasurement(family, null) }
+    }
+
     fun resetCalibration() {
         val family = calibrationFamily.value ?: return
-        viewModelScope.launch { container.settings.clearTuning(family) }
+        viewModelScope.launch {
+            container.settings.clearTuning(family)
+            container.settings.saveCalibrationMeasurement(family, null)
+        }
     }
 
     private var scanJob: Job? = null

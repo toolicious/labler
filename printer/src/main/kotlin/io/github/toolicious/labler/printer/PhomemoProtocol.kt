@@ -54,6 +54,22 @@ object PhomemoProtocol : PrinterProtocol {
 
     override val supportedMedia = setOf(MediaType.DIE_CUT, MediaType.CONTINUOUS)
 
+    /**
+     * The feed is worth correcting per device: measured on one P15 it came out around 2 % long,
+     * which ruins a printed scale. Everything else about this family has been verified on the
+     * device and is not up for guessing.
+     */
+    override val tunables = setOf(Tunable.DOTS_PER_MM)
+
+    override fun tunableValue(tunable: Tunable): String? =
+        if (tunable == Tunable.DOTS_PER_MM) geometry.dotsPerMm.toString() else null
+
+    override fun withTuning(tuning: ProtocolTuning): PrinterProtocol =
+        tuning.float(Tunable.DOTS_PER_MM)
+            ?.takeIf { it > 0f }
+            ?.let { RegaugedFeed(this, geometry.copy(dotsPerMm = it)) }
+            ?: this
+
     // Status queries: written to the write characteristic, answered as a notification on FF01.
     override val statusQueries = StatusQueries(
         battery = byteArrayOf(0x10, 0xFF.toByte(), 0x50, 0xF1.toByte()),

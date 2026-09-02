@@ -38,7 +38,7 @@ import io.github.toolicious.labler.printer.MediaType
 import io.github.toolicious.labler.printer.PrinterFamily
 import io.github.toolicious.labler.printer.PrinterProtocols
 import io.github.toolicious.labler.printer.MonoImage
-import io.github.toolicious.labler.printer.TestPattern
+import io.github.toolicious.labler.render.TestPatternRenderer
 import io.github.toolicious.labler.render.TextTestRenderer
 import io.github.toolicious.labler.ui.components.ClearButton
 import io.github.toolicious.labler.ui.components.PrinterStatusChip
@@ -104,7 +104,7 @@ fun TestPrintScreen(onOpenSettings: () -> Unit, vm: TestPrintViewModel = viewMod
 
             Text(stringResource(R.string.testprint_geometry), style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(8.dp))
-            Button(onClick = { withBlePermissions { sheetImage = TestPattern.create(protocol.geometry) } }) {
+            Button(onClick = { withBlePermissions { sheetImage = TestPatternRenderer.render(protocol) } }) {
                 Text(stringResource(R.string.testprint_show))
             }
 
