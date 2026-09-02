@@ -10,6 +10,8 @@ import io.github.toolicious.labler.ble.PrinterState
 import io.github.toolicious.labler.printer.PhomemoProtocol
 import io.github.toolicious.labler.printer.PrinterFamily
 import io.github.toolicious.labler.printer.PrinterProtocols
+import io.github.toolicious.labler.printer.ProtocolTuning
+import io.github.toolicious.labler.printer.Tunable
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -50,6 +52,31 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         if (all) list
         else list.filter { f -> PrinterProtocols.matchName(f.name) != null }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    /**
+     * The family whose calibration is on offer: the connected printer, or failing that the
+     * remembered one. Null where that family has nothing left to pin down, which hides the
+     * whole section.
+     */
+    val calibrationFamily = combine(printerState, savedPrinter) { state, saved ->
+        val family = (state as? PrinterState.Ready)?.family ?: saved?.family
+        family?.takeIf { PrinterProtocols.baseOf(it).tunables.isNotEmpty() }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    /** Values stored for that family, empty where the protocol's own are in use. */
+    val calibration = combine(container.settings.protocolTuning, calibrationFamily) { tuning, family ->
+        family?.let { tuning[it] } ?: ProtocolTuning.NONE
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, ProtocolTuning.NONE)
+
+    fun setCalibration(tunable: Tunable, value: String?) {
+        val family = calibrationFamily.value ?: return
+        viewModelScope.launch { container.settings.saveTuning(family, tunable, value) }
+    }
+
+    fun resetCalibration() {
+        val family = calibrationFamily.value ?: return
+        viewModelScope.launch { container.settings.clearTuning(family) }
+    }
 
     private var scanJob: Job? = null
 

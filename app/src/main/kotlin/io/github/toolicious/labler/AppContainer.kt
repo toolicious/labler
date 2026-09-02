@@ -16,9 +16,12 @@ import io.github.toolicious.labler.data.MIGRATION_5_6
 import io.github.toolicious.labler.data.SettingsRepository
 import io.github.toolicious.labler.data.TemplateJson
 import io.github.toolicious.labler.data.TemplateRepository
+import io.github.toolicious.labler.printer.PrinterProtocols
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 /** Manual dependency root (deliberately without a DI framework). */
@@ -75,4 +78,15 @@ class AppContainer(context: Context) {
     val templateJson = TemplateJson(json)
     val backup = BackupRepository(templateRepository, settings, json)
     val printerManager = PrinterManager(context, settings, applicationScope)
+
+    init {
+        // Calibration values a tester set for a printer nobody here owns. Applied as they
+        // change, so a value can be tried without restarting the app. Never in a release: a
+        // released protocol is one that has been verified on a device.
+        if (BuildConfig.DEBUG) {
+            applicationScope.launch {
+                settings.protocolTuning.collectLatest { PrinterProtocols.applyTuning(it) }
+            }
+        }
+    }
 }

@@ -9,23 +9,35 @@ import java.io.ByteArrayOutputStream
  *
  * The print head is 30 dots across and the label runs lengthwise under it, the same shape the
  * Phomemo family has, only a third of the height and on a coarser dot grid.
+ *
+ * A class rather than an object because nobody here owns the printer: the four values that could
+ * not be settled from the description are [Tunable]s, and a development build hands a tester an
+ * instance with their guesses in it. [DEFAULT] is what everything else uses.
  */
-object DymoProtocol : PrinterProtocol {
+class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol {
 
     override val family = PrinterFamily.DYMO
 
-    /** Rows the head actually prints. The wire format pads them out to a whole 32-bit column. */
-    const val HEAD_DOTS = 30
+    /** Rows the head prints, of the 32 bits a column occupies on the wire. */
+    val headDots: Int = tuning.int(Tunable.HEAD_DOTS) ?: HEAD_DOTS
 
-    /** Bits one column occupies on the wire, whatever the head prints of them. */
-    const val COLUMN_BITS = 32
+    /**
+     * Where the topmost printable row sits inside the 32-bit column.
+     *
+     * The reference implementation shifts every row by one, which leaves the first and last bit
+     * of the word unused and accounts for the 30 printable rows out of 32. Its own README instead
+     * shows a black top-left pixel as 00 00 00 80, which is this offset at zero. The code is the
+     * half that has demonstrably printed, so it is the default.
+     */
+    val rowBitOffset: Int = tuning.int(Tunable.ROW_BIT_OFFSET) ?: ROW_BIT_OFFSET
 
-    /** Dymo's figure for the LetraTag 200B. Only the mm readout depends on it, never the raster. */
-    const val DPI = 160
+    /** Whether row 0 belongs in the last byte of a column (the default) or the first. */
+    val reverseColumnBytes: Boolean =
+        tuning.bool(Tunable.REVERSE_COLUMN_BYTES) ?: REVERSE_COLUMN_BYTES
 
     override val geometry = HeadGeometry(
-        headDots = HEAD_DOTS,
-        dotsPerMm = DPI / 25.4f,
+        headDots = headDots,
+        dotsPerMm = tuning.float(Tunable.DOTS_PER_MM) ?: (DPI / 25.4f),
         bytesPerColumn = COLUMN_BITS / 8,
         minLengthMm = 10,
         maxLengthMm = 500,
@@ -66,41 +78,31 @@ object DymoProtocol : PrinterProtocol {
     /** The printer answers by itself when a job is through; there is nothing to ask it. */
     override val statusQueries: StatusQueries? = null
 
-    override val awaitsPrintResult = true
+    override val awaitsPrintResult =
+        tuning.bool(Tunable.AWAIT_PRINT_RESULT) ?: AWAIT_PRINT_RESULT
 
-    // Frame
-    private const val HEADER_SIZE = 9
-    private const val MAGIC_SIZE = 2
-    private val MAGIC = byteArrayOf(0x12, 0x34)
+    override val tunables = setOf(
+        Tunable.DOTS_PER_MM,
+        Tunable.HEAD_DOTS,
+        Tunable.ROW_BIT_OFFSET,
+        Tunable.REVERSE_COLUMN_BYTES,
+        Tunable.AWAIT_PRINT_RESULT,
+    )
 
-    /** Payload bytes per chunk, on top of the index byte in front of them. */
-    private const val PAYLOAD_CHUNK = 500
+    override fun withTuning(tuning: ProtocolTuning): PrinterProtocol =
+        if (tuning.isEmpty) DEFAULT else DymoProtocol(tuning)
 
-    // Directives: escape plus one letter.
-    private val START = byteArrayOf(0x1B, 0x73, 0x9A.toByte(), 0x02, 0x00, 0x00)
-    private val PRINT_DATA = byteArrayOf(0x1B, 0x44, 0x01, 0x02)
-    private val FORM_FEED = byteArrayOf(0x1B, 0x45)
-    private val STATUS = byteArrayOf(0x1B, 0x41)
-    private val END = byteArrayOf(0x1B, 0x51)
-
-    /** First two bytes of a result the printer pushes: ESC R. */
-    private const val RESULT_ESC = 0x1B
-    private const val RESULT_R = 0x52
-
-    /**
-     * Where the topmost printable row sits inside the 32-bit column.
-     *
-     * The reference implementation shifts every row by one, which leaves the first and last bit
-     * of the word unused and accounts for the 30 printable rows out of 32. Its own README instead
-     * shows a black top-left pixel as 00 00 00 80, which is this offset at zero. The code is the
-     * half that has demonstrably printed, so it wins; if the beta comes back shifted by one row,
-     * this constant is the whole correction.
-     */
-    const val ROW_BIT_OFFSET = 1
+    override fun tunableValue(tunable: Tunable): String? = when (tunable) {
+        Tunable.DOTS_PER_MM -> geometry.dotsPerMm.toString()
+        Tunable.HEAD_DOTS -> headDots.toString()
+        Tunable.ROW_BIT_OFFSET -> rowBitOffset.toString()
+        Tunable.REVERSE_COLUMN_BYTES -> reverseColumnBytes.toString()
+        Tunable.AWAIT_PRINT_RESULT -> awaitsPrintResult.toString()
+    }
 
     /**
-     * One column of 4 bytes per label column, most significant byte last: row 0 lands in the last
-     * byte, the bottom of the head in the first, and within a byte the topmost row is the high bit.
+     * Four bytes per label column. Row 0 lands in the last byte and the bottom of the head in the
+     * first, and within a byte the topmost row is the high bit.
      */
     override fun packColumns(image: MonoImage): ByteArray {
         val bytesPerColumn = geometry.bytesPerColumn
@@ -109,8 +111,9 @@ object DymoProtocol : PrinterProtocol {
             val base = x * bytesPerColumn
             for (y in 0 until image.height) {
                 if (!image.isBlack(x, y)) continue
-                val bit = y + ROW_BIT_OFFSET
-                val index = base + bytesPerColumn - 1 - bit / 8
+                val bit = y + rowBitOffset
+                val byte = bit / 8
+                val index = base + if (reverseColumnBytes) bytesPerColumn - 1 - byte else byte
                 out[index] = (out[index].toInt() or (0x80 ushr (bit % 8))).toByte()
             }
         }
@@ -119,8 +122,8 @@ object DymoProtocol : PrinterProtocol {
 
     override fun buildJob(image: MonoImage, media: MediaType, density: Int?): ByteArray {
         require(media in supportedMedia) { "$media is not supported by $family" }
-        require(image.height == HEAD_DOTS) {
-            "Image must be $HEAD_DOTS dots high, was ${image.height}"
+        require(image.height == headDots) {
+            "Image must be $headDots dots high, was ${image.height}"
         }
         val body = ByteArrayOutputStream(image.width * geometry.bytesPerColumn + 32)
         body.write(START)
@@ -197,4 +200,41 @@ object DymoProtocol : PrinterProtocol {
         ((value shr 16) and 0xFF).toByte(),
         ((value shr 24) and 0xFF).toByte(),
     )
+
+    companion object {
+        /** The protocol as documented, which is what everything but a calibration run uses. */
+        val DEFAULT = DymoProtocol(ProtocolTuning.NONE)
+
+        /** Rows the head actually prints. The wire format pads them out to a whole 32-bit column. */
+        const val HEAD_DOTS = 30
+
+        /** Bits one column occupies on the wire, whatever the head prints of them. */
+        const val COLUMN_BITS = 32
+
+        /** Dymo's figure for the LetraTag 200B. Only the mm readout depends on it, never the raster. */
+        const val DPI = 160
+
+        const val ROW_BIT_OFFSET = 1
+        const val REVERSE_COLUMN_BYTES = true
+        const val AWAIT_PRINT_RESULT = true
+
+        // Frame
+        private const val HEADER_SIZE = 9
+        private const val MAGIC_SIZE = 2
+        private val MAGIC = byteArrayOf(0x12, 0x34)
+
+        /** Payload bytes per chunk, on top of the index byte in front of them. */
+        private const val PAYLOAD_CHUNK = 500
+
+        // Directives: escape plus one letter.
+        private val START = byteArrayOf(0x1B, 0x73, 0x9A.toByte(), 0x02, 0x00, 0x00)
+        private val PRINT_DATA = byteArrayOf(0x1B, 0x44, 0x01, 0x02)
+        private val FORM_FEED = byteArrayOf(0x1B, 0x45)
+        private val STATUS = byteArrayOf(0x1B, 0x41)
+        private val END = byteArrayOf(0x1B, 0x51)
+
+        /** First two bytes of a result the printer pushes: ESC R. */
+        private const val RESULT_ESC = 0x1B
+        private const val RESULT_R = 0x52
+    }
 }

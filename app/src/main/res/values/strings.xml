@@ -209,6 +209,15 @@
     <string name="settings_testtools">Test print tools (geometry pattern)</string>
     <string name="settings_experimental">Experimental</string>
     <string name="settings_experimental_hint">Experimental printer commands, not verified on the P15. Only with a connected printer; ignore if unsure.</string>
+    <string name="settings_calibration">Calibration</string>
+    <string name="settings_calibration_hint">Values that could not be settled without having the printer. A change applies to the next print. Leave a field empty for the value the app ships with.</string>
+    <string name="calib_reset">Back to defaults</string>
+    <string name="calib_default">Default: %1$s</string>
+    <string name="calib_dots_per_mm">Dots per mm</string>
+    <string name="calib_head_dots">Printable dots across the head</string>
+    <string name="calib_row_bit_offset">Row offset inside the column</string>
+    <string name="calib_reverse_column_bytes">Reverse the byte order of a column</string>
+    <string name="calib_await_print_result">Wait for the printer to report the result</string>
     <string name="exp_learn_gap">Calibrate label gap</string>
     <string name="exp_density_value">Print density: %1$s</string>
     <string name="exp_density_off">off</string>

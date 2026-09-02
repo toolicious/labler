@@ -23,6 +23,24 @@ interface PrinterProtocol {
     /** Whether the printer reports how a job went once it is through. */
     val awaitsPrintResult: Boolean get() = false
 
+    /**
+     * Values of this family that a tester can still be asked to pin down. Empty where everything
+     * about the printer has been verified on one, which is the normal case.
+     */
+    val tunables: Set<Tunable> get() = emptySet()
+
+    /**
+     * This protocol with [tuning] applied, or itself where there is nothing to tune. Only a
+     * development build ever passes anything but [ProtocolTuning.NONE].
+     */
+    fun withTuning(tuning: ProtocolTuning): PrinterProtocol = this
+
+    /**
+     * What this protocol currently uses for [tunable], as the text a settings field shows.
+     * Null for a value this family does not have.
+     */
+    fun tunableValue(tunable: Tunable): String? = null
+
     /** Packs a label into the family's raster format. */
     fun packColumns(image: MonoImage): ByteArray
 

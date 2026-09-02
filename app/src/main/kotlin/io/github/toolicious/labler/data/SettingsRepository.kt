@@ -8,6 +8,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import io.github.toolicious.labler.printer.DeviceNames
 import io.github.toolicious.labler.printer.PrinterFamily
+import io.github.toolicious.labler.printer.ProtocolTuning
+import io.github.toolicious.labler.printer.Tunable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -39,6 +41,13 @@ class SettingsRepository(private val context: Context) {
         val PRINT_DENSITY = intPreferencesKey("print_density")
         val CUSTOM_FONTS = stringPreferencesKey("custom_fonts")
         val RECENT_ICONS = stringPreferencesKey("recent_icons")
+
+        /**
+         * One key per family and tunable, so a value a future printer needs fits without
+         * touching the storage. Everything is kept as text and parsed where it is used.
+         */
+        fun tuning(family: PrinterFamily, tunable: Tunable) =
+            stringPreferencesKey("tuning_${family.name}_${tunable.name}")
     }
 
     val savedPrinter: Flow<SavedPrinter?> = context.dataStore.data.map { prefs ->
@@ -49,6 +58,37 @@ class SettingsRepository(private val context: Context) {
             name = prefs[Keys.PRINTER_NAME]?.let(DeviceNames::clean) ?: address,
             family = PrinterFamily.ofName(prefs[Keys.PRINTER_FAMILY]),
         )
+    }
+
+    /**
+     * Calibration overrides per printer family. Only a development build ever writes any, and
+     * a family with nothing stored is left at what its protocol declares.
+     */
+    val protocolTuning: Flow<Map<PrinterFamily, ProtocolTuning>> = context.dataStore.data.map { prefs ->
+        PrinterFamily.entries.associateWith { family ->
+            ProtocolTuning(
+                Tunable.entries.mapNotNull { tunable ->
+                    prefs[Keys.tuning(family, tunable)]
+                        ?.takeIf { it.isNotBlank() }
+                        ?.let { tunable to it }
+                }.toMap()
+            )
+        }.filterValues { !it.isEmpty }
+    }
+
+    /** Stores one calibration value, or clears it when [value] is null or blank. */
+    suspend fun saveTuning(family: PrinterFamily, tunable: Tunable, value: String?) {
+        val key = Keys.tuning(family, tunable)
+        context.dataStore.edit {
+            if (value.isNullOrBlank()) it.remove(key) else it[key] = value
+        }
+    }
+
+    /** Puts every family back on the values its protocol declares. */
+    suspend fun clearTuning(family: PrinterFamily) {
+        context.dataStore.edit { prefs ->
+            Tunable.entries.forEach { prefs.remove(Keys.tuning(family, it)) }
+        }
     }
 
     val defaultTapeWidthMm: Flow<Int> = context.dataStore.data.map { it[Keys.DEFAULT_TAPE_WIDTH] ?: 12 }

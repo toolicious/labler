@@ -144,7 +144,9 @@ class PrinterManager(
         for (attempt in 1..retries) {
             if (!autoConnect) _state.value = PrinterState.Connecting(attempt)
             try {
-                val conn = PrinterConnection.open(context, device, protocol, autoConnect, connectTimeoutMs)
+                val conn = PrinterConnection.open(
+                    context, device, protocol, autoConnect, connectTimeoutMs, log = ::bleLog,
+                )
                 _state.value = PrinterState.Connecting(attempt)
                 connection = conn
                 // Built for anything the printer might say, whether that is an answer to a
@@ -219,6 +221,10 @@ class PrinterManager(
                 // Experimental 0x1F darkness: 0 (off) keeps the default print path byte-for-byte.
                 val density = settings.printDensity.first().takeIf { it in 1..15 }
                 val payloads = images.map { protocol.buildJob(it, media, density) }
+                bleLog(
+                    "printing ${payloads.size} job(s) of ${payloads.first().size} bytes " +
+                        "as ${protocol.framePayload(payloads.first(), conn.chunkSize).size} writes"
+                )
                 _state.value = PrinterState.Printing(0f, 1, payloads.size)
                 gattExclusive.withLock {
                     val send: suspend () -> Unit = {
@@ -229,6 +235,7 @@ class PrinterManager(
                     val listener = statusClient.takeIf { protocol.awaitsPrintResult }
                     if (listener != null) {
                         val result = listener.awaitPrintResult(PRINT_RESULT_TIMEOUT_MS, send)
+                        bleLog("print result: " + (result?.name ?: "none within $PRINT_RESULT_TIMEOUT_MS ms"))
                         if (result != null && !result.printed) error(printResultMessage(result))
                     } else {
                         send()

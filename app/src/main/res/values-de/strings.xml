@@ -206,6 +206,15 @@
     <string name="settings_testtools">Testdruck-Werkzeuge (Geometrie-Muster)</string>
     <string name="settings_experimental">Experimentell</string>
     <string name="settings_experimental_hint">Experimentelle Druckerbefehle, am P15 nicht verifiziert. Nur bei verbundenem Drucker; im Zweifel einfach ignorieren.</string>
+    <string name="settings_calibration">Kalibrierung</string>
+    <string name="settings_calibration_hint">Werte, die sich ohne den Drucker nicht klären ließen. Eine Änderung wirkt ab dem nächsten Druck. Leeres Feld bedeutet den Wert, den die App mitbringt.</string>
+    <string name="calib_reset">Auf Vorgaben zurücksetzen</string>
+    <string name="calib_default">Vorgabe: %1$s</string>
+    <string name="calib_dots_per_mm">Punkte pro mm</string>
+    <string name="calib_head_dots">Druckbare Punkte über den Kopf</string>
+    <string name="calib_row_bit_offset">Zeilenversatz in der Spalte</string>
+    <string name="calib_reverse_column_bytes">Byte-Reihenfolge einer Spalte umdrehen</string>
+    <string name="calib_await_print_result">Auf die Rückmeldung des Druckers warten</string>
     <string name="exp_learn_gap">Banderkennung anlernen</string>
     <string name="exp_density_value">Druckdichte: %1$s</string>
     <string name="exp_density_off">aus</string>

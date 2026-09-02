@@ -4,7 +4,10 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
 class DymoProtocolTest {
 
@@ -13,13 +16,13 @@ class DymoProtocolTest {
     private fun blank(width: Int) = MonoImage.blank(width, DymoProtocol.HEAD_DOTS)
 
     private fun column(image: MonoImage, x: Int): ByteArray =
-        DymoProtocol.packColumns(image).copyOfRange(x * 4, x * 4 + 4)
+        DymoProtocol.DEFAULT.packColumns(image).copyOfRange(x * 4, x * 4 + 4)
 
     // ----- Raster -----
 
     @Test
     fun `a white label packs to four zero bytes per column`() {
-        val packed = DymoProtocol.packColumns(blank(3))
+        val packed = DymoProtocol.DEFAULT.packColumns(blank(3))
         assertEquals(12, packed.size)
         assertContentEquals(ByteArray(12), packed)
     }
@@ -62,7 +65,7 @@ class DymoProtocolTest {
 
     @Test
     fun `a white 8-dot label has exactly the golden bytes`() {
-        val job = DymoProtocol.buildJob(blank(8), MediaType.CONTINUOUS)
+        val job = DymoProtocol.DEFAULT.buildJob(blank(8), MediaType.CONTINUOUS)
 
         val payload = hex(0x1B, 0x73, 0x9A, 0x02, 0x00, 0x00) +   // start
             hex(0x1B, 0x44, 0x01, 0x02) +                          // print data, 1 bpp, alignment 2
@@ -83,21 +86,21 @@ class DymoProtocolTest {
 
     @Test
     fun `the label length rides in the print data directive, little-endian`() {
-        val job = DymoProtocol.buildJob(blank(320), MediaType.CONTINUOUS)
+        val job = DymoProtocol.DEFAULT.buildJob(blank(320), MediaType.CONTINUOUS)
         assertContentEquals(hex(0x40, 0x01, 0x00, 0x00), job.copyOfRange(19, 23))
     }
 
     @Test
     fun `die-cut is refused, the tape is cut by hand`() {
         assertFailsWith<IllegalArgumentException> {
-            DymoProtocol.buildJob(blank(8), MediaType.DIE_CUT)
+            DymoProtocol.DEFAULT.buildJob(blank(8), MediaType.DIE_CUT)
         }
     }
 
     @Test
     fun `an image of the wrong head height is refused`() {
         assertFailsWith<IllegalArgumentException> {
-            DymoProtocol.buildJob(MonoImage.blank(8, 96), MediaType.CONTINUOUS)
+            DymoProtocol.DEFAULT.buildJob(MonoImage.blank(8, 96), MediaType.CONTINUOUS)
         }
     }
 
@@ -105,8 +108,8 @@ class DymoProtocolTest {
 
     @Test
     fun `the header goes out on its own and the rest carries chunk indices`() {
-        val job = DymoProtocol.buildJob(blank(8), MediaType.CONTINUOUS)
-        val chunks = DymoProtocol.framePayload(job, DymoProtocol.transport.chunkSize)
+        val job = DymoProtocol.DEFAULT.buildJob(blank(8), MediaType.CONTINUOUS)
+        val chunks = DymoProtocol.DEFAULT.framePayload(job, DymoProtocol.DEFAULT.transport.chunkSize)
 
         assertEquals(2, chunks.size)
         assertContentEquals(job.copyOfRange(0, 9), chunks[0])
@@ -118,18 +121,18 @@ class DymoProtocolTest {
     @Test
     fun `a payload of exactly 500 bytes still fits one chunk`() {
         // 24 bytes of directives around the raster, so 119 columns make 476 + 24 = 500.
-        val job = DymoProtocol.buildJob(blank(119), MediaType.CONTINUOUS)
+        val job = DymoProtocol.DEFAULT.buildJob(blank(119), MediaType.CONTINUOUS)
         assertEquals(9 + 500, job.size)
-        val chunks = DymoProtocol.framePayload(job, DymoProtocol.transport.chunkSize)
+        val chunks = DymoProtocol.DEFAULT.framePayload(job, DymoProtocol.DEFAULT.transport.chunkSize)
         assertEquals(listOf(9, 503), chunks.map { it.size })
     }
 
     @Test
     fun `one byte more starts a second chunk with the next index`() {
         // A column is four bytes, so the next size up from 500 is 504.
-        val job = DymoProtocol.buildJob(blank(120), MediaType.CONTINUOUS)
+        val job = DymoProtocol.DEFAULT.buildJob(blank(120), MediaType.CONTINUOUS)
         assertEquals(9 + 504, job.size)
-        val chunks = DymoProtocol.framePayload(job, DymoProtocol.transport.chunkSize)
+        val chunks = DymoProtocol.DEFAULT.framePayload(job, DymoProtocol.DEFAULT.transport.chunkSize)
         assertEquals(listOf(9, 501, 7), chunks.map { it.size })
         assertEquals(0x00.toByte(), chunks[1][0])
         assertEquals(0x01.toByte(), chunks[2][0])
@@ -143,36 +146,36 @@ class DymoProtocolTest {
 
     @Test
     fun `a chunk size the frame does not fit into is refused`() {
-        val job = DymoProtocol.buildJob(blank(8), MediaType.CONTINUOUS)
-        assertFailsWith<IllegalArgumentException> { DymoProtocol.framePayload(job, 20) }
+        val job = DymoProtocol.DEFAULT.buildJob(blank(8), MediaType.CONTINUOUS)
+        assertFailsWith<IllegalArgumentException> { DymoProtocol.DEFAULT.framePayload(job, 20) }
     }
 
     // ----- Result -----
 
     @Test
     fun `the printer's own verdict is read off the notify channel`() {
-        assertEquals(PrintResult.OK, DymoProtocol.parsePrintResult(hex(0x1B, 0x52, 0x01)))
-        assertEquals(PrintResult.OK_LOW_BATTERY, DymoProtocol.parsePrintResult(hex(0x1B, 0x52, 0x03)))
-        assertEquals(PrintResult.CANCELLED, DymoProtocol.parsePrintResult(hex(0x1B, 0x52, 0x04)))
-        assertEquals(PrintResult.LOW_BATTERY, DymoProtocol.parsePrintResult(hex(0x1B, 0x52, 0x06)))
-        assertEquals(PrintResult.NO_CASSETTE, DymoProtocol.parsePrintResult(hex(0x1B, 0x52, 0x07)))
-        assertEquals(PrintResult.FAILED, DymoProtocol.parsePrintResult(hex(0x1B, 0x52, 0x02)))
-        assertEquals(PrintResult.FAILED, DymoProtocol.parsePrintResult(hex(0x1B, 0x52, 0x05)))
+        assertEquals(PrintResult.OK, DymoProtocol.DEFAULT.parsePrintResult(hex(0x1B, 0x52, 0x01)))
+        assertEquals(PrintResult.OK_LOW_BATTERY, DymoProtocol.DEFAULT.parsePrintResult(hex(0x1B, 0x52, 0x03)))
+        assertEquals(PrintResult.CANCELLED, DymoProtocol.DEFAULT.parsePrintResult(hex(0x1B, 0x52, 0x04)))
+        assertEquals(PrintResult.LOW_BATTERY, DymoProtocol.DEFAULT.parsePrintResult(hex(0x1B, 0x52, 0x06)))
+        assertEquals(PrintResult.NO_CASSETTE, DymoProtocol.DEFAULT.parsePrintResult(hex(0x1B, 0x52, 0x07)))
+        assertEquals(PrintResult.FAILED, DymoProtocol.DEFAULT.parsePrintResult(hex(0x1B, 0x52, 0x02)))
+        assertEquals(PrintResult.FAILED, DymoProtocol.DEFAULT.parsePrintResult(hex(0x1B, 0x52, 0x05)))
     }
 
     @Test
     fun `anything that is not a result is ignored rather than guessed at`() {
-        assertNull(DymoProtocol.parsePrintResult(hex(0x1B, 0x52)))
-        assertNull(DymoProtocol.parsePrintResult(hex(0x00, 0x52, 0x01)))
-        assertNull(DymoProtocol.parsePrintResult(ByteArray(0)))
+        assertNull(DymoProtocol.DEFAULT.parsePrintResult(hex(0x1B, 0x52)))
+        assertNull(DymoProtocol.DEFAULT.parsePrintResult(hex(0x00, 0x52, 0x01)))
+        assertNull(DymoProtocol.DEFAULT.parsePrintResult(ByteArray(0)))
     }
 
     // ----- Discovery and geometry -----
 
     @Test
     fun `the advertised name finds the family whatever its capitals`() {
-        assertEquals(DymoProtocol, PrinterProtocols.matchName("Letratag58CF79ABCDEF"))
-        assertEquals(DymoProtocol, PrinterProtocols.matchName("LETRATAG58CF79ABCDEF"))
+        assertEquals(DymoProtocol.DEFAULT, PrinterProtocols.matchName("Letratag58CF79ABCDEF"))
+        assertEquals(DymoProtocol.DEFAULT, PrinterProtocols.matchName("LETRATAG58CF79ABCDEF"))
         // The other family keeps its exact-case match.
         assertEquals(PhomemoProtocol, PrinterProtocols.matchName("P15_1234_BLE"))
         assertNull(PrinterProtocols.matchName("p15_1234_BLE"))
@@ -180,7 +183,7 @@ class DymoProtocolTest {
 
     @Test
     fun `geometry is 30 dots on 12 mm tape`() {
-        val g = DymoProtocol.geometry
+        val g = DymoProtocol.DEFAULT.geometry
         assertEquals(30, g.headDots)
         assertEquals(4, g.bytesPerColumn)
         assertEquals(listOf(12), g.tapeWidthsMm)
@@ -188,5 +191,78 @@ class DymoProtocolTest {
         // 160 dpi, so a 40 mm label is 252 dots long.
         assertEquals(252, g.mmToDots(40))
         assertEquals(40, g.dotsToMm(252))
+    }
+
+    // ----- Calibration -----
+
+    private fun tuned(vararg pairs: Pair<Tunable, String>) =
+        DymoProtocol.DEFAULT.withTuning(ProtocolTuning(mapOf(*pairs)))
+
+    @Test
+    fun `no overrides hands back the documented protocol itself`() {
+        assertSame(DymoProtocol.DEFAULT, DymoProtocol.DEFAULT.withTuning(ProtocolTuning.NONE))
+    }
+
+    @Test
+    fun `dropping the row offset moves the top row to the high bit`() {
+        val img = blank(1).also { it.setBlack(0, 0) }
+        val packed = tuned(Tunable.ROW_BIT_OFFSET to "0").packColumns(img)
+        assertContentEquals(hex(0x00, 0x00, 0x00, 0x80), packed)
+    }
+
+    @Test
+    fun `un-reversing the byte order puts the top row in the first byte`() {
+        val img = blank(1).also { it.setBlack(0, 0) }
+        val packed = tuned(Tunable.REVERSE_COLUMN_BYTES to "false").packColumns(img)
+        assertContentEquals(hex(0x40, 0x00, 0x00, 0x00), packed)
+    }
+
+    @Test
+    fun `a measured dot pitch replaces the advertised one`() {
+        val g = tuned(Tunable.DOTS_PER_MM to "5.0").geometry
+        assertEquals(200, g.mmToDots(40))
+        // Everything else about the head is untouched.
+        assertEquals(30, g.headDots)
+    }
+
+    @Test
+    fun `a taller head is accepted and raises the required image height`() {
+        val protocol = tuned(Tunable.HEAD_DOTS to "32")
+        assertEquals(32, protocol.geometry.headDots)
+        protocol.buildJob(MonoImage.blank(4, 32), MediaType.CONTINUOUS)
+        assertFailsWith<IllegalArgumentException> {
+            protocol.buildJob(blank(4), MediaType.CONTINUOUS)
+        }
+    }
+
+    @Test
+    fun `waiting for the printer's verdict can be switched off`() {
+        assertFalse(tuned(Tunable.AWAIT_PRINT_RESULT to "false").awaitsPrintResult)
+        assertTrue(DymoProtocol.DEFAULT.awaitsPrintResult)
+    }
+
+    @Test
+    fun `an unreadable override is ignored rather than crashing the printer path`() {
+        val protocol = tuned(Tunable.ROW_BIT_OFFSET to "nonsense", Tunable.DOTS_PER_MM to "")
+        assertContentEquals(
+            DymoProtocol.DEFAULT.packColumns(blank(1).also { it.setBlack(0, 0) }),
+            protocol.packColumns(blank(1).also { it.setBlack(0, 0) }),
+        )
+        assertEquals(DymoProtocol.DEFAULT.geometry.dotsPerMm, protocol.geometry.dotsPerMm)
+    }
+
+    @Test
+    fun `the registry hands out the tuned protocol and takes it back again`() {
+        try {
+            PrinterProtocols.applyTuning(
+                mapOf(PrinterFamily.DYMO to ProtocolTuning(mapOf(Tunable.HEAD_DOTS to "32")))
+            )
+            assertEquals(32, PrinterProtocols.of(PrinterFamily.DYMO).geometry.headDots)
+            // The other family has nothing to tune and is handed back untouched.
+            assertSame(PhomemoProtocol, PrinterProtocols.of(PrinterFamily.PHOMEMO))
+        } finally {
+            PrinterProtocols.applyTuning(emptyMap())
+        }
+        assertEquals(30, PrinterProtocols.of(PrinterFamily.DYMO).geometry.headDots)
     }
 }

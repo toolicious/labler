@@ -30,6 +30,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -56,8 +57,21 @@ import io.github.toolicious.labler.BuildConfig
 import io.github.toolicious.labler.R
 import io.github.toolicious.labler.ble.BlePermissions
 import io.github.toolicious.labler.ble.PrinterState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import io.github.toolicious.labler.printer.PrinterFamily
+import io.github.toolicious.labler.printer.PrinterProtocols
+import io.github.toolicious.labler.printer.Tunable
 import kotlin.math.roundToInt
+
+/** The label a calibration value carries in the settings list. */
+private fun calibrationLabel(tunable: Tunable): Int = when (tunable) {
+    Tunable.DOTS_PER_MM -> R.string.calib_dots_per_mm
+    Tunable.HEAD_DOTS -> R.string.calib_head_dots
+    Tunable.ROW_BIT_OFFSET -> R.string.calib_row_bit_offset
+    Tunable.REVERSE_COLUMN_BYTES -> R.string.calib_reverse_column_bytes
+    Tunable.AWAIT_PRINT_RESULT -> R.string.calib_await_print_result
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -203,6 +217,56 @@ fun SettingsScreen(
             Text(stringResource(R.string.settings_diagnostics), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(4.dp))
             TextButton(onClick = onOpenTestPrint) { Text(stringResource(R.string.settings_testtools)) }
+
+            // Values a tester can still be asked to pin down for a printer nobody here owns.
+            // Development builds only: a released protocol is one verified on a device.
+            val calibrationFamily by vm.calibrationFamily.collectAsState()
+            calibrationFamily?.takeIf { BuildConfig.DEBUG }?.let { family ->
+                val calibration by vm.calibration.collectAsState()
+                val declared = remember(family) { PrinterProtocols.baseOf(family) }
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    stringResource(R.string.settings_calibration),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    stringResource(R.string.settings_calibration_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(8.dp))
+                declared.tunables.forEach { tunable ->
+                    val label = stringResource(calibrationLabel(tunable))
+                    val declaredValue = declared.tunableValue(tunable).orEmpty()
+                    val stored = calibration.values[tunable]
+                    when (tunable.kind) {
+                        Tunable.Kind.FLAG -> Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                            Switch(
+                                checked = (stored ?: declaredValue).toBooleanStrictOrNull() ?: false,
+                                onCheckedChange = { vm.setCalibration(tunable, it.toString()) },
+                            )
+                        }
+                        Tunable.Kind.NUMBER -> OutlinedTextField(
+                            value = stored.orEmpty(),
+                            onValueChange = { vm.setCalibration(tunable, it) },
+                            label = { Text(label) },
+                            placeholder = { Text(stringResource(R.string.calib_default, declaredValue)) },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+                TextButton(onClick = { vm.resetCalibration() }) {
+                    Text(stringResource(R.string.calib_reset))
+                }
+            }
 
             // Everything in here is a Phomemo command, so it is only offered to one.
             val printerFamily = (state as? PrinterState.Ready)?.family
