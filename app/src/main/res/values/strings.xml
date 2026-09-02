@@ -214,7 +214,7 @@
     <string name="calib_reset">Back to defaults</string>
     <string name="calib_reset_length">Reset</string>
     <string name="calib_reset_confirm_title">Reset calibration?</string>
-    <string name="calib_reset_confirm_text">The printed length then follows the resolution the printer states again.</string>
+    <string name="calib_reset_confirm_text">The printed length then follows the default again.</string>
     <string name="calib_default">Default: %1$s</string>
     <string name="calib_dots_per_mm">Dots per mm</string>
     <string name="calib_length_title">Calibrate printed length</string>
@@ -225,7 +225,7 @@
     <string name="calib_length_current">%1$s instead of %2$s dots per mm</string>
     <string name="calib_length_dpi">(%1$s instead of %2$s dpi)</string>
     <string name="calib_length_measured">Last measured: %1$s mm</string>
-    <string name="calib_length_none">Not calibrated, using the stated resolution</string>
+    <string name="calib_length_none">Not calibrated, using the default</string>
     <string name="calib_head_dots">Printable dots across the head</string>
     <string name="calib_row_bit_offset">Row offset inside the column</string>
     <string name="calib_reverse_column_bytes">Reverse the byte order of a column</string>

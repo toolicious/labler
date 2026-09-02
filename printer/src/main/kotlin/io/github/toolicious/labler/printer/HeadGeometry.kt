@@ -42,8 +42,12 @@ data class HeadGeometry(
     /** Whole millimeters to dots. */
     fun mmToDots(mm: Int): Int = (mm * dotsPerMm).roundToInt()
 
-    /** Dots back to whole millimeters, cutting off what does not fill one. */
-    fun dotsToMm(dots: Int): Int = (dots / dotsPerMm).toInt()
+    /**
+     * Dots back to whole millimeters, for putting a length in front of someone. Rounds rather
+     * than truncates, because the grid is not a whole number of dots per millimeter: cutting
+     * off turned a 20 mm label, whose 157 dots come to 19.94 mm, into "19 mm".
+     */
+    fun dotsToMm(dots: Int): Int = (dots / dotsPerMm).roundToInt()
 
     companion object {
         const val MM_PER_INCH = 25.4f

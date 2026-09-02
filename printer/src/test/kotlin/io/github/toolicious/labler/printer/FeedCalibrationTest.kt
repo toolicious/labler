@@ -13,11 +13,11 @@ class FeedCalibrationTest {
 
     private val declared = PhomemoProtocol.geometry
 
-    /** 240 dots came out 30.61 mm long on the device, where 30.00 was intended. */
+    /** The 240 dots between the calibration marks came out 30.61 mm long on the device. */
     private val measuredMm = 30.61f
 
     private fun calibrated(measured: Float): PrinterProtocol {
-        val span = TestPattern.tickSpanDots(declared)!!
+        val span = TestPattern.calibrationSpanDots()
         return PhomemoProtocol.withTuning(
             ProtocolTuning(mapOf(Tunable.DOTS_PER_MM to (span / measured).toString()))
         )
@@ -25,17 +25,18 @@ class FeedCalibrationTest {
 
     @Test
     fun `the pattern offers a span the user can measure`() {
-        assertEquals(240, TestPattern.tickSpanDots(declared))
+        assertEquals(240, TestPattern.calibrationSpanDots())
         // Which is what the app tells them to expect, at the resolution it currently assumes.
-        assertEquals(30.0f, 240 / declared.dotsPerMm, 0.001f)
+        assertEquals(30.48f, 240 / declared.dotsPerMm, 0.001f)
     }
 
     @Test
     fun `a label asks for the dots that really cover its length once calibrated`() {
         val truth = 240 / measuredMm
         assertEquals(40.0f, calibrated(measuredMm).geometry.mmToDots(40) / truth, 0.1f)
-        // Without the correction the same label runs almost a millimeter long.
-        assertEquals(40.8f, declared.mmToDots(40) / truth, 0.1f)
+        // Without the correction it runs two tenths long, where the 203 dpi the head is sold
+        // with used to miss by almost a millimeter.
+        assertEquals(40.2f, declared.mmToDots(40) / truth, 0.1f)
     }
 
     @Test
@@ -43,8 +44,8 @@ class FeedCalibrationTest {
         val corrected = calibrated(measuredMm).geometry
         val truth = 240 / measuredMm
         val ticks = TestPattern.tickColumns(corrected)
-        // A coarser grid fits one more tick into the same 320 dots, which is the point: the
-        // pattern follows the millimeters, not a fixed dot spacing.
+        // The ticks follow the millimeters rather than a fixed dot spacing, so a correction
+        // moves every one of them. Eight of them fit either way at this size.
         assertEquals(8, ticks.size)
         ticks.forEach { (mm, x) ->
             // Where the tick really ends up on the tape, not where the assumed grid puts it.

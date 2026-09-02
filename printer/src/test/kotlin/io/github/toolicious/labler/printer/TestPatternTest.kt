@@ -20,9 +20,11 @@ class TestPatternTest {
             .filterNot { it == row || it == row + 1 }
 
     @Test
-    fun `short ticks sit every 40 dots, which is every 5 mm at 8 dots per mm`() {
+    fun `short ticks land on the dot each 5 mm step falls on`() {
+        // 7.874 dots per mm, so 5 mm is 39.4 dots and the ticks cannot be evenly spaced.
+        // Each is two dots wide. The last one is 40 mm, which now just fits on the label.
         assertEquals(
-            listOf(40, 41, 80, 81, 120, 121, 160, 161, 200, 201, 240, 241, 280, 281),
+            listOf(39, 40, 79, 80, 118, 119, 157, 158, 197, 198, 236, 237, 276, 277, 315, 316),
             tickColumns(5),
         )
     }
@@ -31,7 +33,7 @@ class TestPatternTest {
     fun `only every second tick reaches down to row 12, at 10 mm spacing`() {
         // The filled square covers 8..19 in these rows and is not a tick either.
         assertEquals(
-            listOf(80, 81, 160, 161, 240, 241),
+            listOf(79, 80, 157, 158, 236, 237, 315, 316),
             tickColumns(12).filterNot { it in 8..19 },
         )
     }

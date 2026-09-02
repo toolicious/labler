@@ -1,0 +1,2 @@
+- The printers feed 200 dpi, not the 203 they state, so a printed length now matches the label (#11)
+- Existing labels lose a few dots at the far end, so check anything placed right against it (#11)

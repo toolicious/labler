@@ -93,15 +93,6 @@ object TestPattern {
     }
 
     /**
-     * Dots between the first and the last tick, which is the distance someone measures with a
-     * ruler to work out what the printer really feeds. Null where fewer than two ticks fit.
-     */
-    fun tickSpanDots(geometry: HeadGeometry, lengthDots: Int = DEFAULT_LENGTH_DOTS): Int? {
-        val ticks = tickColumns(geometry, lengthDots)
-        return if (ticks.size < 2) null else ticks.last().second - ticks.first().second
-    }
-
-    /**
      * Columns of the two calibration marks. Fixed in dots and independent of any
      * resolution, so the distance someone measures is the same before and after a
      * correction and entering the same reading twice changes nothing.
@@ -118,8 +109,8 @@ object TestPattern {
 
     /**
      * Where the calibration marks sit from either end. Chosen so the distance between them
-     * is the 240 dots the first and last tick used to span at 8 dots per millimeter, which
-     * keeps a measurement taken before these marks existed valid.
+     * is the 240 dots the first and last tick spanned back when the app still assumed 8 dots
+     * per millimeter, which keeps a measurement taken before these marks existed valid.
      */
     private const val CALIBRATION_INSET = 40
 

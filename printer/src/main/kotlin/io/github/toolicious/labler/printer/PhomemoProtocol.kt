@@ -13,11 +13,20 @@ object PhomemoProtocol : PrinterProtocol {
 
     // Print head geometry
     const val HEAD_DOTS = 96
-    const val DOTS_PER_MM = 8
+
+    /**
+     * How far the tape really advances, which is not the 203 dpi the print head is sold with.
+     * Three measurements on two printers, a P15 and a P12, came out at 199.2, 199.6 and 200.1
+     * dpi, close enough together that a single unit's tolerance cannot explain it: the feed is
+     * geared to a round 200 while the head prints at 203. Assuming 203 makes anything printed
+     * to scale 1.6 % long, which is 5 mm over a 300 mm ruler. A device that still misses can be
+     * corrected in the settings.
+     */
+    const val FEED_DPI = 200
 
     override val geometry = HeadGeometry(
         headDots = HEAD_DOTS,
-        dotsPerMm = DOTS_PER_MM.toFloat(),
+        dotsPerMm = FEED_DPI / HeadGeometry.MM_PER_INCH,
         bytesPerColumn = HEAD_DOTS / 8,
         minLengthMm = 10,
         maxLengthMm = 500,
@@ -55,9 +64,9 @@ object PhomemoProtocol : PrinterProtocol {
     override val supportedMedia = setOf(MediaType.DIE_CUT, MediaType.CONTINUOUS)
 
     /**
-     * The feed is worth correcting per device: measured on one P15 it came out around 2 % long,
-     * which ruins a printed scale. Everything else about this family has been verified on the
-     * device and is not up for guessing.
+     * [FEED_DPI] is the average of what two printers measured, so an individual one can still
+     * be half a percent off, and on a printed scale that shows. Everything else about this
+     * family has been verified on the device and is not up for guessing.
      */
     override val tunables = setOf(Tunable.DOTS_PER_MM)
 

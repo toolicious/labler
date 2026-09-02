@@ -211,7 +211,7 @@
     <string name="calib_reset">Auf Vorgaben zurücksetzen</string>
     <string name="calib_reset_length">Zurücksetzen</string>
     <string name="calib_reset_confirm_title">Kalibrierung zurücksetzen?</string>
-    <string name="calib_reset_confirm_text">Die Drucklänge richtet sich danach wieder nach der Auflösung, die der Drucker angibt.</string>
+    <string name="calib_reset_confirm_text">Die Drucklänge richtet sich danach wieder nach dem Standardwert.</string>
     <string name="calib_default">Vorgabe: %1$s</string>
     <string name="calib_dots_per_mm">Punkte pro mm</string>
     <string name="calib_length_title">Drucklänge kalibrieren</string>
@@ -222,7 +222,7 @@
     <string name="calib_length_current">%1$s statt %2$s Punkte pro mm</string>
     <string name="calib_length_dpi">(%1$s statt %2$s dpi)</string>
     <string name="calib_length_measured">Zuletzt gemessen: %1$s mm</string>
-    <string name="calib_length_none">Nicht kalibriert, es gilt die angegebene Auflösung</string>
+    <string name="calib_length_none">Nicht kalibriert, es gilt der Standardwert</string>
     <string name="calib_head_dots">Druckbare Punkte über den Kopf</string>
     <string name="calib_row_bit_offset">Zeilenversatz in der Spalte</string>
     <string name="calib_reverse_column_bytes">Byte-Reihenfolge einer Spalte umdrehen</string>
