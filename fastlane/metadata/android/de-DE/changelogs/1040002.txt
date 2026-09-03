@@ -2,3 +2,4 @@
 - Bestehende Etiketten werden dadurch am Ende ein paar Punkte kürzer, prüfe also, was ganz am Rand liegt (#11)
 - Das Geometrie-Testmuster ist so lang, wie es angibt, nämlich 40 mm (#11)
 - Der Knopf für die Lückenerkennung ist raus, der Drucker ignoriert den Befehl dahinter
+- Der Dymo druckt auch, wenn das Handy ein kleineres Bluetooth-Paket aushandelt (#19)

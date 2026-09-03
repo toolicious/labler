@@ -150,6 +150,48 @@ class DymoProtocolTest {
         assertFailsWith<IllegalArgumentException> { DymoProtocol.DEFAULT.framePayload(job, 20) }
     }
 
+    @Test
+    fun `a packet smaller than a full chunk only means more chunks`() {
+        // What a Motorola Edge 2021 negotiated: 500 bytes of MTU, 497 of them usable. 500 is
+        // the most a chunk may carry, not the least, so the job goes out in smaller pieces.
+        val job = DymoProtocol.DEFAULT.buildJob(blank(300), MediaType.CONTINUOUS)
+        assertEquals(9 + 1224, job.size)
+        val chunks = DymoProtocol.DEFAULT.framePayload(job, 497)
+        assertEquals(listOf(9, 495, 495, 239), chunks.map { it.size })
+        assertTrue(chunks.all { it.size <= 497 })
+        assertContentEquals(intArrayOf(0, 1, 2), chunks.drop(1).map { it[0].toInt() }.toIntArray())
+
+        // Reassembling the chunks without index and magic gives the job back.
+        val body = chunks.drop(1).mapIndexed { i, c ->
+            val end = if (i == chunks.size - 2) c.size - 2 else c.size
+            c.copyOfRange(1, end)
+        }.reduce { a, b -> a + b }
+        assertContentEquals(job.copyOfRange(9, job.size), body)
+    }
+
+    @Test
+    fun `the chunk index skips 27, the way the vendor app does`() {
+        // 100 bytes a chunk is the smallest this family accepts, and 29 of them get past the gap.
+        val job = DymoProtocol.DEFAULT.buildJob(blank(719), MediaType.CONTINUOUS)
+        assertEquals(9 + 2900, job.size)
+        val indices = DymoProtocol.DEFAULT.framePayload(job, DymoProtocol.DEFAULT.transport.minChunkSize)
+            .drop(1)
+            .map { it[0].toInt() }
+        assertEquals(29, indices.size)
+        assertEquals(listOf(25, 26, 28, 29), indices.takeLast(4))
+        assertEquals(emptyList(), indices.filter { it == 27 })
+    }
+
+    @Test
+    fun `even the longest label keeps its indices inside one byte`() {
+        val columns = DymoProtocol.DEFAULT.geometry.maxLengthDots
+        val job = DymoProtocol.DEFAULT.buildJob(blank(columns), MediaType.CONTINUOUS)
+        val indices = DymoProtocol.DEFAULT.framePayload(job, DymoProtocol.DEFAULT.transport.minChunkSize)
+            .drop(1)
+            .map { it[0].toInt() }
+        assertTrue(indices.max() <= 0xFF, "highest index ${indices.max()} for $columns columns")
+    }
+
     // ----- Result -----
 
     @Test

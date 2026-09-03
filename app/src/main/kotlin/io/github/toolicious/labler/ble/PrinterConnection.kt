@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import io.github.toolicious.labler.R
 import io.github.toolicious.labler.printer.PrinterProtocol
+import io.github.toolicious.labler.printer.TransportProfile
 
 /** Established connection to a printer including its protocol and the negotiated chunk size. */
 class PrinterConnection private constructor(
@@ -38,15 +39,19 @@ class PrinterConnection private constructor(
                             "Is this a ${protocol.ble.namePrefixes.joinToString("/")}?"
                     )
                 val transport = protocol.transport
+                // A phone answers the request with whatever it and the printer agree on, so
+                // the chunk follows the packet that came back rather than the one asked for.
                 val mtu = client.requestMtu(transport.requestedMtu)
-                val chunkSize = when {
-                    mtu >= transport.minMtuForFullChunks -> transport.chunkSize
-                    // A framed chunk cannot be cut short, so there is nothing to fall back to.
-                    transport.requiresFullChunks -> error(
-                        context.getString(R.string.err_mtu_too_small, transport.minMtuForFullChunks)
+                val usable = mtu - TransportProfile.ATT_OVERHEAD
+                if (usable < transport.minChunkSize) {
+                    error(
+                        context.getString(
+                            R.string.err_mtu_too_small,
+                            transport.minChunkSize + TransportProfile.ATT_OVERHEAD,
+                        )
                     )
-                    else -> transport.fallbackChunkSize
                 }
+                val chunkSize = minOf(transport.chunkSize, usable)
                 log("MTU $mtu, chunk size $chunkSize bytes")
                 return PrinterConnection(client, protocol, uuids, writeChar, chunkSize, mtu)
             } catch (t: Throwable) {

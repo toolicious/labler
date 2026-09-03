@@ -54,8 +54,8 @@ object PhomemoProtocol : PrinterProtocol {
     override val transport = TransportProfile(
         requestedMtu = 185,
         chunkSize = 96,
-        fallbackChunkSize = 20,
-        minMtuForFullChunks = 99,
+        // The job is a plain byte stream, so any packet the phone grants will do.
+        minChunkSize = 20,
         chunkDelayMs = 30L,
         copyDelayMs = 500L,
         queryGapMs = 20L,

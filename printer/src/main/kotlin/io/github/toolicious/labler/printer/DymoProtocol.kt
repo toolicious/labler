@@ -63,14 +63,13 @@ class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol
         requestedMtu = 517,
         // Index byte + payload + the trailing magic of the final chunk.
         chunkSize = 1 + PAYLOAD_CHUNK + MAGIC_SIZE,
-        fallbackChunkSize = 1 + PAYLOAD_CHUNK + MAGIC_SIZE,
-        // ATT keeps three bytes of every packet for itself.
-        minMtuForFullChunks = 1 + PAYLOAD_CHUNK + MAGIC_SIZE + 3,
+        // 500 is what a chunk may hold at most, not what it has to hold, so a smaller packet
+        // only means more chunks. The floor is the index: it is one byte, and the longest
+        // label this family prints has to stay inside it.
+        minChunkSize = 1 + MIN_PAYLOAD_CHUNK + MAGIC_SIZE,
         chunkDelayMs = 20L,
         copyDelayMs = 1_500L,
         queryGapMs = 20L,
-        // The chunk index is part of the format, so a short write is a broken job, not a slow one.
-        requiresFullChunks = true,
     )
 
     override val supportedMedia = setOf(MediaType.CONTINUOUS)
@@ -146,27 +145,42 @@ class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol
      */
     override fun framePayload(job: ByteArray, chunkSize: Int): List<ByteArray> {
         require(job.size > HEADER_SIZE) { "Job is shorter than its own header" }
-        require(chunkSize >= transport.chunkSize) {
-            "A chunk of $chunkSize bytes cannot hold a framed chunk of ${transport.chunkSize}"
+        require(chunkSize >= transport.minChunkSize) {
+            "A chunk of $chunkSize bytes is below the ${transport.minChunkSize} this family needs"
         }
-        val out = ArrayList<ByteArray>(2 + (job.size - HEADER_SIZE) / PAYLOAD_CHUNK)
+        // Whatever the phone negotiated, minus the frame around the payload. The magic only
+        // rides along on the last chunk, but leaving room for it everywhere keeps this to one
+        // number and costs two bytes a chunk.
+        val payloadChunk = minOf(PAYLOAD_CHUNK, chunkSize - 1 - MAGIC_SIZE)
+        val out = ArrayList<ByteArray>(2 + (job.size - HEADER_SIZE) / payloadChunk)
         out.add(job.copyOfRange(0, HEADER_SIZE))
 
         var pos = HEADER_SIZE
-        var index = 0
+        var sequence = 0
         while (pos < job.size) {
-            val end = minOf(pos + PAYLOAD_CHUNK, job.size)
+            val end = minOf(pos + payloadChunk, job.size)
             val last = end == job.size
             val chunk = ByteArray(1 + (end - pos) + if (last) MAGIC_SIZE else 0)
-            chunk[0] = index.toByte()
+            chunk[0] = chunkIndex(sequence).toByte()
             job.copyInto(chunk, 1, pos, end)
             if (last) MAGIC.copyInto(chunk, chunk.size - MAGIC_SIZE)
             out.add(chunk)
             pos = end
-            index++
+            sequence++
         }
         return out
     }
+
+    /**
+     * The number a chunk carries in front of its data.
+     *
+     * The vendor app never sends [SKIPPED_INDEX]; why is not documented anywhere, and the
+     * reference implementation copies the gap without knowing either. At the full chunk size no
+     * label this family can print reaches that far, but a phone that grants a smaller packet
+     * makes more chunks out of the same job and does.
+     */
+    private fun chunkIndex(sequence: Int): Int =
+        if (sequence >= SKIPPED_INDEX) sequence + 1 else sequence
 
     override fun parsePrintResult(bytes: ByteArray): PrintResult? {
         if (bytes.size < 3) return null
@@ -225,6 +239,16 @@ class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol
 
         /** Payload bytes per chunk, on top of the index byte in front of them. */
         private const val PAYLOAD_CHUNK = 500
+
+        /**
+         * Smallest payload a chunk may carry. The index is one byte, so the longest job this
+         * family builds, around 12.6 kB at 500 mm, has to fit in 255 chunks; 100 leaves room
+         * to spare and asks no more of a phone than a 106 byte packet.
+         */
+        private const val MIN_PAYLOAD_CHUNK = 100
+
+        /** The index the vendor app leaves out. */
+        private const val SKIPPED_INDEX = 27
 
         // Directives: escape plus one letter.
         private val START = byteArrayOf(0x1B, 0x73, 0x9A.toByte(), 0x02, 0x00, 0x00)

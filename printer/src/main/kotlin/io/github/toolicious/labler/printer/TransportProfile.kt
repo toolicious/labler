@@ -3,19 +3,24 @@ package io.github.toolicious.labler.printer
 /** How much goes into one BLE write and how fast writes may follow each other. */
 data class TransportProfile(
     val requestedMtu: Int,
+    /** Bytes in one write when the negotiated packet has room for that many. */
     val chunkSize: Int,
-    /** Chunk size used when the negotiated MTU is below [minMtuForFullChunks]. */
-    val fallbackChunkSize: Int,
-    val minMtuForFullChunks: Int,
+    /**
+     * Bytes in one write below which the family will not work at all.
+     *
+     * What a phone negotiates is not what was asked for, so the size actually used lands
+     * somewhere between the two: as much of the packet as fits, capped at [chunkSize]. Under
+     * this floor the connection fails instead, with the number a user can act on.
+     */
+    val minChunkSize: Int,
     val chunkDelayMs: Long,
     /** Pause between two copies of the same label. */
     val copyDelayMs: Long,
     /** Pause between two status queries. */
     val queryGapMs: Long,
-    /**
-     * Whether [chunkSize] is a protocol requirement rather than a transfer optimisation.
-     * A family that frames its chunks cannot simply send smaller ones, so a connection whose
-     * MTU stays below [minMtuForFullChunks] has to fail instead of writing a broken job.
-     */
-    val requiresFullChunks: Boolean = false,
-)
+) {
+    companion object {
+        /** Bytes of every BLE packet that ATT keeps for itself. */
+        const val ATT_OVERHEAD = 3
+    }
+}

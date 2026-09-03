@@ -2,3 +2,4 @@
 - Existing labels lose a few dots at the far end, so check anything placed right against it (#11)
 - The geometry test pattern is the 40 mm it claims, not a dot count that stopped matching (#11)
 - Dropped the label gap button, the printer ignores the command behind it
+- The Dymo prints on a phone that negotiates a smaller Bluetooth packet than the full chunk (#19)
