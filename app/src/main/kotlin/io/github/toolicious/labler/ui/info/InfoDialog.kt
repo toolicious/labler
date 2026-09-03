@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -56,6 +55,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+/** List bullet with a non-breaking space after it, so it never ends up alone on a line. */
+private const val BULLET = "\u2022\u00A0"
 
 /**
  * Info/About dialog. Laid out after the model of "Collaged" (centered, wide
@@ -198,11 +200,23 @@ fun InfoDialog(onDismiss: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    stringResource(R.string.about_version, version),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = muted
-                )
+                // Version and license belong to the app itself, so they sit together right
+                // under its name rather than at the far end of the dialog.
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        stringResource(R.string.about_version, version),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = muted
+                    )
+                    Text(
+                        stringResource(R.string.about_license),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = muted
+                    )
+                }
                 Text(
                     stringResource(R.string.about_description),
                     style = MaterialTheme.typography.bodyMedium,
@@ -242,17 +256,19 @@ fun InfoDialog(onDismiss: () -> Unit) {
                     }
                 }
 
-                // One thanks line per project that made a protocol accessible, its name as an
-                // inline link, plus the license. No origin information.
+                // One line per project that made a protocol accessible, its name as an inline
+                // link. Kept short enough to stay on one line, because a wrapped bullet reads
+                // like two entries. No origin information.
                 val linkStyles = TextLinkStyles(
                     style = SpanStyle(
                         color = MaterialTheme.colorScheme.primary,
                         textDecoration = TextDecoration.Underline
                     )
                 )
-                // Whole sentence as one string with placeholder %1$s; the link covers only the name.
+                // Whole line as one string with placeholder %1$s; the link covers only the name.
                 fun credit(template: String, name: String, url: String) = buildAnnotatedString {
                     val parts = template.split("%1\$s", limit = 2)
+                    append(BULLET)
                     append(parts[0])
                     withLink(LinkAnnotation.Url(url = url, styles = linkStyles)) { append(name) }
                     if (parts.size > 1) append(parts[1])
@@ -265,20 +281,22 @@ fun InfoDialog(onDismiss: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    credits.forEach { line ->
-                        Text(
-                            line,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = muted,
-                            textAlign = TextAlign.Center
-                        )
-                    }
                     Text(
-                        stringResource(R.string.about_license),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = muted,
-                        textAlign = TextAlign.Center
+                        stringResource(R.string.about_thanks_title),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = muted
                     )
+                    // The bullets line up with each other rather than with the dialog, so the
+                    // list is centered as a block while its lines are not.
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        credits.forEach { line ->
+                            Text(
+                                line,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = muted
+                            )
+                        }
+                    }
                 }
             }
         },

@@ -3,3 +3,4 @@
 - Das Geometrie-Testmuster ist so lang, wie es angibt, nämlich 40 mm (#11)
 - Der Knopf für die Lückenerkennung ist raus, der Drucker ignoriert den Befehl dahinter
 - Der Dymo druckt auch, wenn das Handy ein kleineres Bluetooth-Paket aushandelt (#19)
+- Der Info-Dialog stellt die Lizenz zur Version und die beiden Danksagungen unter eine Überschrift

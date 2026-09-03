@@ -265,8 +265,9 @@
     <string name="about_version">Version %1$s</string>
     <string name="about_description">LaBLEr is a label printer app for Bluetooth Low Energy label printers: the Marklife family (P15, P12, L13) and the Dymo LetraTag 200B. Design your own labels right on your phone with text, symbols and frames, save them as templates and print them again anytime.</string>
     <string name="about_source">Source code &amp; help</string>
-    <string name="about_thanks">Thanks to the open-source Chrome web app %1$s, which made the P15 protocol accessible.</string>
-    <string name="about_thanks_dymo">Thanks to %1$s for documenting the LetraTag 200B protocol.</string>
+    <string name="about_thanks_title">Thanks</string>
+    <string name="about_thanks">%1$s for the P15 protocol</string>
+    <string name="about_thanks_dymo">%1$s for the LetraTag 200B protocol</string>
     <string name="about_link_dymo" translatable="false">https://github.com/ysfchn/dymo-bluetooth</string>
     <string name="about_license">License: GPL-3.0-or-later</string>
     <string name="app_language">Language</string>
