@@ -5,7 +5,9 @@ import kotlin.math.roundToInt
 /**
  * Procedural geometry test pattern for the print test. It makes orientation,
  * mirroring, cropping and dimensional accuracy clearly recognizable on the printout:
- * - 2-px border on all four edges (cropping test)
+ * - border on all four edges (cropping test)
+ * - hairline frame along the outer edges of that square, which lands on the label even
+ *   on a print where the border does not
  * - filled 12x12 square at top left at (8,8) (corner anchor)
  * - diagonal from the top left corner down across the full head height (mirroring test)
  * - arrow in +X direction at half height (print direction test)
@@ -26,14 +28,34 @@ object TestPattern {
         val w = lengthDots
         val h = geometry.headDots
 
-        // Border, 2 px thick
+        // Border. The two edges running along the tape keep the same two elements of the head
+        // firing for every column of the print, so they run hot and come out fatter than the two
+        // that are a single short pulse across the whole head. The upright pair gets a dot more
+        // to even that out on the tape; the extra dot goes inwards, so the outer size of the
+        // frame is the same either way.
         for (x in 0 until w) {
-            img.setBlack(x, 0); img.setBlack(x, 1)
-            img.setBlack(x, h - 2); img.setBlack(x, h - 1)
+            for (d in 0 until BORDER_DOTS) {
+                img.setBlack(x, d); img.setBlack(x, h - 1 - d)
+            }
         }
         for (y in 0 until h) {
-            img.setBlack(0, y); img.setBlack(1, y)
-            img.setBlack(w - 2, y); img.setBlack(w - 1, y)
+            for (d in 0 until UPRIGHT_BORDER_DOTS) {
+                img.setBlack(d, y); img.setBlack(w - 1 - d, y)
+            }
+        }
+
+        // A hairline frame, one dot thick, running along the outer edges of the corner square
+        // so the two line up instead of crossing. The border only fits when the tape sits
+        // exactly right, so on a print where it runs off the label there is nothing left to
+        // measure against. This one lands whatever happens, which turns the gap between it and
+        // the label edge into a number rather than a guess.
+        if (h > 2 * FRAME_INSET_Y + 2 && w > 2 * FRAME_INSET_X + 2) {
+            for (x in FRAME_INSET_X until w - FRAME_INSET_X) {
+                img.setBlack(x, FRAME_INSET_Y); img.setBlack(x, h - 1 - FRAME_INSET_Y)
+            }
+            for (y in FRAME_INSET_Y until h - FRAME_INSET_Y) {
+                img.setBlack(FRAME_INSET_X, y); img.setBlack(w - 1 - FRAME_INSET_X, y)
+            }
         }
 
         // Diagonal (2 px thick) from top left to bottom right within the head square
@@ -42,9 +64,9 @@ object TestPattern {
             img.setBlack(d + 1, d)
         }
 
-        // Filled 12x12 square at top left
-        for (x in 8 until 20) {
-            for (y in 8 until 20) img.setBlack(x, y)
+        // Filled square in the top left corner, its outer edges on the hairline frame
+        for (x in FRAME_INSET_X until FRAME_INSET_X + SQUARE_DOTS) {
+            for (y in FRAME_INSET_Y until FRAME_INSET_Y + SQUARE_DOTS) img.setBlack(x, y)
         }
 
         // Arrow in +X direction at half height
@@ -119,10 +141,42 @@ object TestPattern {
         return left to left + calibrationSpan
     }
 
+    /** Thickness of the two border edges that run along the tape. */
+    const val BORDER_DOTS = 2
+
+    /**
+     * Thickness of the two border edges that run across it, one dot more so that both pairs
+     * come off the printer looking the same. On screen they look too thick for it, which is the
+     * price of a preview that knows nothing about a print head warming up.
+     */
+    const val UPRIGHT_BORDER_DOTS = 3
+
+    /**
+     * Clear dots between the border and the hairline frame, which is what the eye compares.
+     * Held equal on all four sides rather than the distance to the edge of the print, because
+     * the upright border is a dot thicker and would otherwise eat into its own side of the gap.
+     */
+    const val FRAME_GAP_DOTS = 6
+
+    /**
+     * Where the hairline frame runs, and with it the outer edges of the corner square. One pair
+     * of numbers for both, so the square can only ever sit exactly in the corner of the frame.
+     */
+    const val FRAME_INSET_X = UPRIGHT_BORDER_DOTS + FRAME_GAP_DOTS
+    const val FRAME_INSET_Y = BORDER_DOTS + FRAME_GAP_DOTS
+
+    /** Side of the corner square. */
+    const val SQUARE_DOTS = 12
+
     /** How far a correction may stray from the declared resolution before it is a typo. */
     const val PLAUSIBLE_FACTOR = 2f
 
-    /** Length of the pattern, matching the die-cut label it is meant to be printed on. */
+    /**
+     * Length of the pattern, which is exactly the die-cut label it goes on. That leaves no room
+     * for a placement error, and that is the point rather than an oversight: the border can only
+     * fit if the tape sits right, so whichever end of it falls off the label says which way the
+     * tape is out. Shortening the pattern would hide the one thing it is there to show.
+     */
     const val LENGTH_MM = 40
 
     /** What the two marks are apart, and so the distance the user is asked to measure. */

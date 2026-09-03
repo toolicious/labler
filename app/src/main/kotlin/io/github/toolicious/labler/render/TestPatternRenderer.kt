@@ -58,8 +58,10 @@ object TestPatternRenderer {
         pattern.recycle()
 
         // Inline it goes into the clear band below the arrow, past the diagonal that crosses the
-        // left of the pattern. Beside it, it simply follows the pattern.
-        val baseline = if (inline) head - head / 16f - 2f else head / 2f - (paint.ascent() + paint.descent()) / 2f
+        // left of the pattern, and clear of the hairline frame so the line does not run through
+        // the bottom of the glyphs. Beside it, it simply follows the pattern.
+        val baseline = if (inline) (head - TestPattern.FRAME_INSET_Y - 2).toFloat()
+        else head / 2f - (paint.ascent() + paint.descent()) / 2f
         val x = if (inline) head + 8f else (lengthDots + CAPTION_GAP).toFloat()
         canvas.drawText(caption, x, baseline, paint)
 
