@@ -1,0 +1,1 @@
+- A name too long for its space now ends in an ellipsis instead of breaking off mid-letter (#24)

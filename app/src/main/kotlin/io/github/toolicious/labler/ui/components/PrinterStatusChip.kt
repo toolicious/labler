@@ -109,6 +109,7 @@ fun PrinterStatusChip(state: PrinterState, permissionMissing: Boolean = false, o
                     color = Color.White,
                     style = MaterialTheme.typography.labelLarge,
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     softWrap = false,
                 )
             }

@@ -195,6 +195,7 @@ fun EditorScreen(
                     Text(
                         t?.name ?: stringResource(R.string.app_name),
                         maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = if (t != null) Modifier.clickable { showMetaDialog = true } else Modifier,
                     )
                 },
@@ -451,7 +452,11 @@ private fun ElementChipLabel(element: LabelElement) {
             if (element.symbology == Symbology.QR_CODE) "QR" else "▊▎▊",
             maxLines = 1
         )
-        is ImageElement -> Text(stringResource(R.string.add_image), maxLines = 1)
+        is ImageElement -> Text(
+            stringResource(R.string.add_image),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -760,6 +765,7 @@ private fun SectionActionButton(text: String, onClick: () -> Unit, modifier: Mod
         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
         color = MaterialTheme.colorScheme.primary,
         maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
         modifier = modifier
             .clip(shape)
             .border(1.dp, MaterialTheme.colorScheme.primary, shape)

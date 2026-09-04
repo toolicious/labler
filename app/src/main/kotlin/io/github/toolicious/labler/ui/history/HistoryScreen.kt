@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.toolicious.labler.R
@@ -140,7 +141,12 @@ private fun HistoryCard(
             Spacer(Modifier.height(6.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(entry.templateName, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
+                    Text(
+                        entry.templateName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                     val context = LocalContext.current
                     val dateText = remember(entry.id, context) {
                         appDateTimeFormat(context).format(Date(entry.printedAt))

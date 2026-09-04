@@ -68,7 +68,9 @@ fun PrinterConnectSection(
                 is PrinterState.Disconnected ->
                     Icon(Icons.Default.Close, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Text(statusText, style = MaterialTheme.typography.bodyMedium)
+            // Wraps rather than ellipsizes: an error message has to stay readable in full, and
+            // the weight is what keeps a long printer name inside the row instead of past its edge.
+            Text(statusText, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
         }
 
         if (state !is PrinterState.Ready && state !is PrinterState.Printing) {

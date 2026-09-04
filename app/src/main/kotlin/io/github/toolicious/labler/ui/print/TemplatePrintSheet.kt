@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.toolicious.labler.R
@@ -116,14 +117,20 @@ fun TemplatePrintSheet(
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Text(stringResource(R.string.print_title, template.name), style = MaterialTheme.typography.titleMedium)
+            Text(
+                stringResource(R.string.print_title, template.name),
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
             Spacer(Modifier.height(12.dp))
 
             questions.forEach { question ->
                 OutlinedTextField(
                     value = answers[question].orEmpty(),
                     onValueChange = { answers = answers + (question to it) },
-                    label = { Text(question) },
+                    // The question is written into the label as {var:...}, so it can be any length.
+                    label = { Text(question, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     trailingIcon = {

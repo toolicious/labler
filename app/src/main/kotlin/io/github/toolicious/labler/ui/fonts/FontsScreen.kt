@@ -244,7 +244,8 @@ private fun RenameDialog(font: CustomFont, onDismiss: () -> Unit, onConfirm: (St
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text(font.family) },
+                    // The family name comes out of the font file and can be long.
+                    label = { Text(font.family, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                     singleLine = true,
                 )
                 Text(

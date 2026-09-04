@@ -1,0 +1,1 @@
+- Ein zu langer Name endet jetzt mit Auslassungspunkten, statt mitten im Buchstaben abzubrechen (#24)

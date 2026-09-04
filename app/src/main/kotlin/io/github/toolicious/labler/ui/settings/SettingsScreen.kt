@@ -2,6 +2,7 @@ package io.github.toolicious.labler.ui.settings
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +63,7 @@ import io.github.toolicious.labler.ble.BlePermissions
 import io.github.toolicious.labler.ble.PrinterState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import io.github.toolicious.labler.printer.HeadGeometry
 import io.github.toolicious.labler.printer.PrinterFamily
 import io.github.toolicious.labler.printer.PrinterProtocols
@@ -244,6 +246,8 @@ fun SettingsScreen(
                             Text(
                                 stringResource(R.string.settings_saved, it.name, it.address),
                                 style = MaterialTheme.typography.bodySmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.weight(1f)
                             )
                             // Accent-colored X: forgets the saved printer (after confirmation).
@@ -265,10 +269,12 @@ fun SettingsScreen(
                         Spacer(Modifier.height(8.dp))
                         HorizontalDivider()
                         Spacer(Modifier.height(8.dp))
-                        info?.model?.let { Text(stringResource(R.string.info_model, it), style = MaterialTheme.typography.bodySmall) }
-                        info?.firmware?.let { Text(stringResource(R.string.info_firmware, it), style = MaterialTheme.typography.bodySmall) }
-                        info?.hardware?.let { Text(stringResource(R.string.info_hardware, it), style = MaterialTheme.typography.bodySmall) }
-                        info?.serial?.let { Text(stringResource(R.string.info_serial, it), style = MaterialTheme.typography.bodySmall) }
+                        // The printer fills these in itself, so a long or odd value is ellipsized
+                        // rather than allowed to wrap the card open.
+                        info?.model?.let { DeviceInfoLine(R.string.info_model, it) }
+                        info?.firmware?.let { DeviceInfoLine(R.string.info_firmware, it) }
+                        info?.hardware?.let { DeviceInfoLine(R.string.info_hardware, it) }
+                        info?.serial?.let { DeviceInfoLine(R.string.info_serial, it) }
                     }
 
                     Spacer(Modifier.height(12.dp))
@@ -580,8 +586,18 @@ private fun ScanSheet(vm: SettingsViewModel, onDismiss: () -> Unit) {
             LazyColumn {
                 items(results, key = { it.device.address }) { found ->
                     ListItem(
-                        headlineContent = { Text(found.name) },
-                        supportingContent = { Text(stringResource(R.string.scan_device_line, found.device.address, found.rssi)) },
+                        // A device advertises whatever name it likes, so both lines are capped
+                        // instead of growing the row.
+                        headlineContent = {
+                            Text(found.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        },
+                        supportingContent = {
+                            Text(
+                                stringResource(R.string.scan_device_line, found.device.address, found.rssi),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         trailingContent = {
                             TextButton(onClick = {
@@ -595,4 +611,15 @@ private fun ScanSheet(vm: SettingsViewModel, onDismiss: () -> Unit) {
             Spacer(Modifier.height(24.dp))
         }
     }
+}
+
+/** One line of the printer's self-reported information. */
+@Composable
+private fun DeviceInfoLine(@StringRes label: Int, value: String) {
+    Text(
+        stringResource(label, value),
+        style = MaterialTheme.typography.bodySmall,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
 }
