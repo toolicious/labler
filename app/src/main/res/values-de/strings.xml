@@ -217,7 +217,7 @@
     <string name="calib_length_title">Drucklänge kalibrieren</string>
     <string name="calib_length_action">Kalibrieren</string>
     <string name="calib_length_body">Miss zwischen den beiden Marken am unteren Rand, jeweils von Mitte zu Mitte. Es sollten ungefähr %1$s mm sein, aber trage die exakt gemessene Länge ein (z.B. %2$s mm), damit der Druck genauer wird.</string>
-    <string name="calib_length_field">Gemessen in mm</string>
+    <string name="calib_length_field">Gemessene Länge</string>
     <string name="calib_length_implausible">Das liegt weit von den erwarteten %1$s mm entfernt. Hast du vielleicht die Millimeterstriche am oberen Rand gemessen statt der beiden Marken unten?</string>
     <string name="calib_length_current">%1$s statt %2$s Punkte pro mm</string>
     <string name="calib_length_dpi">(%1$s statt %2$s dpi)</string>

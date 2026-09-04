@@ -1,0 +1,1 @@
+- Das Feld für die Längenkalibrierung sieht nicht mehr aus, als wollte es Zoll (#19)

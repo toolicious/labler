@@ -220,7 +220,7 @@
     <string name="calib_length_title">Calibrate printed length</string>
     <string name="calib_length_action">Calibrate</string>
     <string name="calib_length_body">Measure between the two marks at the bottom edge, middle to middle. It should be roughly %1$s mm, but enter the exact length you measured (e.g. %2$s mm) so the print comes out more accurate.</string>
-    <string name="calib_length_field">Measured in mm</string>
+    <string name="calib_length_field">Measured length</string>
     <string name="calib_length_implausible">That is far from the expected %1$s mm. Did you measure the millimeter ticks along the top instead of the two marks at the bottom?</string>
     <string name="calib_length_current">%1$s instead of %2$s dots per mm</string>
     <string name="calib_length_dpi">(%1$s instead of %2$s dpi)</string>

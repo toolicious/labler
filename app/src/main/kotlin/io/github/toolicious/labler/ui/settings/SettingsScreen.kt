@@ -110,7 +110,10 @@ private fun LengthCalibrationDialog(
                 OutlinedTextField(
                     value = text,
                     onValueChange = { text = it },
-                    label = { Text(stringResource(R.string.calib_length_field)) },
+                    // Unit appended here rather than baked into the string, so the label can
+                    // be reused where the unit is a different one. It also keeps "in" out of
+                    // the English, where it sat right before mm and read as inches.
+                    label = { Text("${stringResource(R.string.calib_length_field)} (mm)") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth(),
