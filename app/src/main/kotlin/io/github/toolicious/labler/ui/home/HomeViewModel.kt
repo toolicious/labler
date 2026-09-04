@@ -6,6 +6,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.toolicious.labler.App
 import io.github.toolicious.labler.R
+import io.github.toolicious.labler.data.OverviewPrefs
+import io.github.toolicious.labler.data.TemplateSort
+import io.github.toolicious.labler.data.TemplateViewMode
 import io.github.toolicious.labler.model.LabelSpec
 import io.github.toolicious.labler.render.LabelRenderer
 import io.github.toolicious.labler.model.LabelTemplate
@@ -14,9 +17,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+/**
+ * Last known layout and order, held for the length of the process and preloaded by
+ * [io.github.toolicious.labler.App], so the overview does not come up as a grid in the wrong order
+ * for one frame before the stored settings arrive.
+ */
+internal var lastOverviewPrefs = OverviewPrefs()
 
 class HomeViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -30,13 +42,76 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
-    val templates = combine(repo.observeAll(), _query) { list, q ->
-        if (q.isBlank()) list
-        else list.filter { it.name.contains(q.trim(), ignoreCase = true) }
+    private val _filter = MutableStateFlow(TemplateFilter())
+    val filter = _filter.asStateFlow()
+
+    val prefs = container.settings.overviewPrefs
+        .stateIn(viewModelScope, SharingStarted.Eagerly, lastOverviewPrefs)
+
+    /**
+     * Every stored label with the length it actually reaches. Measured once per change of the
+     * list and off the main thread, because a variable label has to be laid out to be measured,
+     * and shared so that the facets and the list itself do not each measure their own.
+     */
+    private val measured = repo.observeAll()
+        .map { list ->
+            list.map { MeasuredTemplate(it, LabelRenderer.effectiveLengthMm(it.spec, it.elements)) }
+        }
+        .flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /**
+     * Which chips to offer and how many labels are behind each. Built from the searched list and
+     * not from the filtered one, so neither the chips nor their numbers move around while filters
+     * are being set.
+     */
+    val facets = combine(measured, _query) { items, q -> facetsOf(items.searched(q)) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TemplateFacets())
+
+    val templates = combine(measured, _query, prefs, _filter) { items, q, p, f ->
+        items.searched(q)
+            .filter { f.matches(it) }
+            .map { it.template }
+            .sortedWith(templateComparator(p.sort, p.ascending))
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun setQuery(value: String) {
         _query.value = value
+    }
+
+    fun setViewMode(mode: TemplateViewMode) = savePrefs(prefs.value.copy(viewMode = mode))
+
+    /**
+     * Picking the criterion that is already active turns it around; picking another switches to it
+     * the way round it reads best. One entry per criterion, never two.
+     */
+    fun selectSort(sort: TemplateSort) {
+        val current = prefs.value
+        savePrefs(
+            if (current.sort == sort) current.copy(ascending = !current.ascending)
+            else current.copy(sort = sort, ascending = sort.ascendingByDefault)
+        )
+    }
+
+    /** Back to the order the overview starts out with, for the long press on the sort button. */
+    fun resetSort() = savePrefs(
+        prefs.value.copy(
+            sort = TemplateSort.DEFAULT,
+            ascending = TemplateSort.DEFAULT.ascendingByDefault,
+        )
+    )
+
+    private fun savePrefs(next: OverviewPrefs) {
+        lastOverviewPrefs = next
+        viewModelScope.launch { container.settings.saveOverviewPrefs(next) }
+    }
+
+    fun setFilter(value: TemplateFilter) {
+        _filter.value = value
+    }
+
+    fun clearFilter() {
+        _filter.value = TemplateFilter()
     }
 
     fun create(name: String, spec: LabelSpec, defaultName: String, onCreated: (String) -> Unit) {

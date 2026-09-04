@@ -22,6 +22,56 @@ data class SavedPrinter(
     val family: PrinterFamily = PrinterFamily.DEFAULT,
 )
 
+/** How the saved labels are laid out on the overview. */
+enum class TemplateViewMode {
+    /** Adaptive grid of cards, each with a large preview. */
+    GRID,
+
+    /** One row per label, which fits more of them on the screen. */
+    LIST,
+    ;
+
+    companion object {
+        val DEFAULT = GRID
+
+        /** [valueOf] that falls back instead of throwing, for values read from storage. */
+        fun ofName(name: String?): TemplateViewMode = entries.firstOrNull { it.name == name } ?: DEFAULT
+    }
+}
+
+/** What the overview orders the saved labels by. */
+enum class TemplateSort(
+    /** Where a fresh pick starts, which is the reading most people want first. */
+    val ascendingByDefault: Boolean,
+) {
+    /** Alphabetical, so A to Z is the way up. */
+    NAME(ascendingByDefault = true),
+
+    /** Last edited, where the newest first is the way most lists read. */
+    UPDATED(ascendingByDefault = false),
+
+    /** Labels printed from it, most used first. */
+    PRINTS(ascendingByDefault = false),
+    ;
+
+    companion object {
+        val DEFAULT = UPDATED
+
+        /** [valueOf] that falls back instead of throwing, for values read from storage. */
+        fun ofName(name: String?): TemplateSort = entries.firstOrNull { it.name == name } ?: DEFAULT
+    }
+}
+
+/**
+ * How the overview presents its labels. One bundle rather than three settings read one by one,
+ * because they are all needed before the first frame can be drawn.
+ */
+data class OverviewPrefs(
+    val viewMode: TemplateViewMode = TemplateViewMode.DEFAULT,
+    val sort: TemplateSort = TemplateSort.DEFAULT,
+    val ascending: Boolean = TemplateSort.DEFAULT.ascendingByDefault,
+)
+
 /**
  * More than fit on a row, a tablet in landscape included, so that removing one always has
  * something left to slide up into its place.
@@ -41,6 +91,9 @@ class SettingsRepository(private val context: Context) {
         val PRINT_DENSITY = intPreferencesKey("print_density")
         val CUSTOM_FONTS = stringPreferencesKey("custom_fonts")
         val RECENT_ICONS = stringPreferencesKey("recent_icons")
+        val TEMPLATE_VIEW_MODE = stringPreferencesKey("template_view_mode")
+        val TEMPLATE_SORT = stringPreferencesKey("template_sort")
+        val TEMPLATE_SORT_ASC = booleanPreferencesKey("template_sort_asc")
 
         /**
          * One key per family and tunable, so a value a future printer needs fits without
@@ -148,6 +201,28 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun saveLastSymbolTab(tab: Int) {
         context.dataStore.edit { it[Keys.LAST_SYMBOL_TAB] = tab }
+    }
+
+    /**
+     * Layout and order of the overview. The enums are stored by name, so the constants keep their
+     * spelling; filters are deliberately not here, they are meant to last only as long as the
+     * screen does.
+     */
+    val overviewPrefs: Flow<OverviewPrefs> = context.dataStore.data.map { prefs ->
+        val sort = TemplateSort.ofName(prefs[Keys.TEMPLATE_SORT])
+        OverviewPrefs(
+            viewMode = TemplateViewMode.ofName(prefs[Keys.TEMPLATE_VIEW_MODE]),
+            sort = sort,
+            ascending = prefs[Keys.TEMPLATE_SORT_ASC] ?: sort.ascendingByDefault,
+        )
+    }
+
+    suspend fun saveOverviewPrefs(prefs: OverviewPrefs) {
+        context.dataStore.edit {
+            it[Keys.TEMPLATE_VIEW_MODE] = prefs.viewMode.name
+            it[Keys.TEMPLATE_SORT] = prefs.sort.name
+            it[Keys.TEMPLATE_SORT_ASC] = prefs.ascending
+        }
     }
 
     /**

@@ -1,1 +1,8 @@
 - A name too long for its space now ends in an ellipsis instead of breaking off mid-letter (#24)
+- The overview switches between tiles and a list, from the new button beside the search field (#22)
+- The last label no longer sits under the + button when the overview is scrolled to the end (#22)
+- Starring a label scrolls the overview along, so it does not vanish when the order changes (#22)
+- The overview sorts by name, edit date or number of prints, and a second tap turns the direction around (#22)
+- A filter narrows the overview down by paper, tape width, length, printer, favorites and labels carrying a code (#22)
+- The print history moved from the title bar into the sorting menu, below the entries for the order (#22)
+- A long press on the sorting or the filter button puts it back to where it started (#22)

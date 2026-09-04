@@ -1,1 +1,8 @@
 - Ein zu langer Name endet jetzt mit Auslassungspunkten, statt mitten im Buchstaben abzubrechen (#24)
+- Die Übersicht lässt sich zwischen Kacheln und Liste umschalten, über den neuen Knopf neben dem Suchfeld (#22)
+- Das letzte Etikett klemmt nicht mehr unter dem +-Knopf, wenn die Übersicht ganz nach unten gescrollt ist (#22)
+- Beim Favorisieren scrollt die Übersicht mit, damit das Etikett beim Umsortieren nicht verschwindet (#22)
+- Die Übersicht sortiert nach Name, Bearbeitungsdatum oder Anzahl der Drucke, ein zweiter Tipp dreht die Richtung um (#22)
+- Ein Filter engt die Übersicht nach Papier, Bandbreite, Länge, Drucker, Favoriten und Etiketten mit Code ein (#22)
+- Der Druckverlauf ist aus der Titelleiste in das Sortiermenü gewandert, unter die Einträge für die Reihenfolge (#22)
+- Ein langer Druck auf den Sortier- oder den Filterknopf setzt ihn wieder zurück (#22)

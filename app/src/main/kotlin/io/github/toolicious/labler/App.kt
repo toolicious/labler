@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import io.github.toolicious.labler.render.FontRegistry
 import io.github.toolicious.labler.ui.editor.lastSymbolTab
+import io.github.toolicious.labler.ui.home.lastOverviewPrefs
 import io.github.toolicious.labler.ui.info.wrapWithAppLanguage
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -23,9 +24,13 @@ class App : Application() {
         super.onCreate()
         container = AppContainer(this)
         FontRegistry.init(this)
-        // Load the most recently used symbol/emoji tab from the settings into the cache.
+        // Load the most recently used symbol/emoji tab and the overview's layout and order into
+        // their caches. The splash holds long enough on a cold start for both to arrive in time.
         container.applicationScope.launch {
             lastSymbolTab = container.settings.lastSymbolTab.first()
+        }
+        container.applicationScope.launch {
+            lastOverviewPrefs = container.settings.overviewPrefs.first()
         }
     }
 }
