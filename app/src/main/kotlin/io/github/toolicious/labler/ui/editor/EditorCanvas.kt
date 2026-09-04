@@ -174,9 +174,9 @@ private fun measureInk(el: LabelElement): Rect? {
  * border next to the tape: dragging one moves that edge, double tapping it pulls the edge up to
  * the content.
  *
- * The label is shown print accurate: everything but the selected element is rendered
- * through the real print pipeline and magnified without interpolation, so the editor
- * shows the printed dots instead of a smooth screen resolution image.
+ * The label is shown print accurate: it goes through the real print pipeline and is magnified
+ * without interpolation, so the editor shows the printed dots instead of a smooth screen
+ * resolution image. Only a selected text is left out of that and drawn smoothly on top.
  */
 @Composable
 fun EditorCanvas(
@@ -252,10 +252,13 @@ fun EditorCanvas(
     )
 
     // The label as the printer sees it: 1 px per dot, 1 bit, same pipeline as the print preview.
-    // The selected element is left out and drawn on top as vector graphics, so it stays readable
-    // while it is being edited. That also keeps this bitmap valid while dragging or typing, because
-    // only the selected element changes then.
-    val others = elements.filter { it.id != selectedId }
+    // Only a selected text is kept out of the raster and drawn smoothly on top, because a
+    // one-bit rendering of it is hard to read while typing. Everything else stays in, selected or
+    // not: a dither is tuned by eye, and it would be worth little if selecting the element showed
+    // a different set of dots than the print. The selected one is sorted to the end instead, which
+    // puts it in front the same way drawing it on top used to.
+    val vectorId = selectedId?.takeIf { id -> elements.any { it.id == id && it is TextElement } }
+    val others = elements.filter { it.id != vectorId }.sortedBy { it.id == selectedId }
     // The revision is a key as well: custom fonts finish loading after startup, and this raster
     // would otherwise keep showing the fallback until the element set happens to change.
     // The length is pinned to the canvas: `others` omits the selected element, so letting the
@@ -448,9 +451,8 @@ fun EditorCanvas(
                     android.graphics.RectF(0f, 0f, labelW, labelH),
                     basePaint,
                 )
-                // Drawn last, so a selected element moves to the front while it is selected and
-                // drops back into its place in the stack when it is deselected.
-                elements.find { it.id == selectedId }?.let {
+                // Drawn last, so the text being edited sits in front of everything else.
+                elements.find { it.id == vectorId }?.let {
                     val inner = nc.save()
                     nc.translate(offsetPx, 0f)
                     LabelRenderer.drawElementInto(nc, it)
