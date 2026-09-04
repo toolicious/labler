@@ -323,6 +323,14 @@
     <string name="add_barcode">Code</string>
     <string name="prop_barcode_data">Content</string>
     <string name="prop_barcode_type">Type</string>
+    <string name="code_hint_qr">Square, holds the most</string>
+    <string name="code_hint_rmqr">Keeps dots large on narrow tape</string>
+    <string name="code_hint_datamatrix">Compact, common in industry</string>
+    <string name="code_hint_code128">Any text, the usual choice</string>
+    <string name="code_hint_ean13">Retail, exactly 13 digits</string>
+    <string name="code_hint_upca">Retail, exactly 12 digits</string>
+    <string name="code_hint_code39">Capitals and digits, widely read</string>
+    <string name="code_hint_itf">Digits only, always in pairs</string>
     <string name="prop_barcode_caption">Show text</string>
 
     <!-- QR content -->

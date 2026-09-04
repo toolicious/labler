@@ -15,6 +15,7 @@ import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -38,7 +39,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -449,7 +452,7 @@ private fun ElementChipLabel(element: LabelElement) {
                 .border(1.5.dp, LocalContentColor.current, RoundedCornerShape(2.dp))
         )
         is BarcodeElement -> Text(
-            if (element.symbology == Symbology.QR_CODE) "QR" else "▊▎▊",
+            if (element.symbology.isMatrix) symbologyLabel(element.symbology) else "▊▎▊",
             maxLines = 1
         )
         is ImageElement -> Text(
@@ -845,27 +848,19 @@ private fun ChoiceChip(
 @Composable
 private fun BarcodeProperties(element: BarcodeElement, onUpdate: (LabelElement) -> Unit) {
     GroupLabel(stringResource(R.string.prop_barcode_type))
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Symbology.entries.forEach { s ->
-            ChoiceChip(
-                selected = element.symbology == s,
-                onClick = {
-                    // Leaving QR for a 1D barcode: reset the wizard to raw text, and if we were on a
-                    // structured payload (WiFi, contact, ...) keep only its primary value so the barcode
-                    // does not carry a full WIFI:/MECARD: string.
-                    val leavingStructured = element.symbology == Symbology.QR_CODE &&
-                        element.payloadType != QrPayloadType.TEXT && element.payloadType != QrPayloadType.LINK
-                    val type = if (s == Symbology.QR_CODE) element.payloadType else QrPayloadType.TEXT
-                    val data = if (s != Symbology.QR_CODE && leavingStructured)
-                        element.payload[QrPayload.primaryKey(element.payloadType)].orEmpty()
-                    else element.data
-                    onUpdate(element.copy(symbology = s, payloadType = type, data = data))
-                },
-                label = { Text(symbologyLabel(s)) },
-            )
-        }
+    SymbologyPicker(element.symbology) { s ->
+        // Leaving a matrix code for a 1D barcode: reset the wizard to raw text, and if we were on a
+        // structured payload (WiFi, contact, ...) keep only its primary value so the barcode does
+        // not carry a full WIFI:/MECARD: string.
+        val leavingStructured = element.symbology.isMatrix &&
+            element.payloadType != QrPayloadType.TEXT && element.payloadType != QrPayloadType.LINK
+        val type = if (s.isMatrix) element.payloadType else QrPayloadType.TEXT
+        val data = if (!s.isMatrix && leavingStructured)
+            element.payload[QrPayload.primaryKey(element.payloadType)].orEmpty()
+        else element.data
+        onUpdate(element.copy(symbology = s, payloadType = type, data = data))
     }
-    if (element.symbology == Symbology.QR_CODE) {
+    if (element.symbology.isMatrix) {
         Spacer(Modifier.height(6.dp))
         GroupLabel(stringResource(R.string.qr_content))
         val types = listOf(
@@ -1030,8 +1025,100 @@ private fun QrPayloadFields(element: BarcodeElement, onUpdate: (LabelElement) ->
     }
 }
 
+/**
+ * Picks the code type. A menu rather than a row of chips, because seven types no longer fit on one
+ * line. In here each one has room for its name, a word on what it is good for, and a glyph of the
+ * shape it comes out as, which is exactly what the choice between QR and rMQR is about.
+ */
+@Composable
+private fun SymbologyPicker(current: Symbology, onSelect: (Symbology) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    val fieldPadding = 10.dp
+    val arrowSize = 24.dp
+    BoxWithConstraints {
+        // The menu stops where the arrow begins, so it sits under the name rather than under the
+        // whole field. Setting the width also lifts Material's 280 dp cap on a menu item, which is
+        // narrow enough to break the longer descriptions onto a second line.
+        val itemWidth = maxWidth - fieldPadding - arrowSize
+        Surface(
+            onClick = { open = true },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            color = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = fieldPadding, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(painterResource(symbologyIcon(current)), contentDescription = null)
+                Spacer(Modifier.width(10.dp))
+                Text(symbologyName(current), style = MaterialTheme.typography.labelLarge)
+                Spacer(Modifier.weight(1f))
+                Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, modifier = Modifier.size(arrowSize))
+            }
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            Symbology.entries.forEach { s ->
+                // A rule sets the two matrix codes off from the bar codes.
+                if (s == Symbology.CODE_128) HorizontalDivider()
+                DropdownMenuItem(
+                    modifier = Modifier.width(itemWidth),
+                    text = {
+                        Column {
+                            Text(symbologyName(s))
+                            Text(
+                                stringResource(symbologyHint(s)),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    },
+                    leadingIcon = {
+                        Icon(painterResource(symbologyIcon(s)), contentDescription = null)
+                    },
+                    trailingIcon = {
+                        if (s == current) Icon(Icons.Default.Check, contentDescription = null)
+                    },
+                    onClick = { open = false; onSelect(s) },
+                )
+            }
+        }
+    }
+}
+
+/** The glyph shows the family: the two matrix codes get their own, the bar codes share one. */
+private fun symbologyIcon(s: Symbology): Int = when (s) {
+    Symbology.QR_CODE -> R.drawable.ic_code_qr
+    Symbology.RMQR -> R.drawable.ic_code_rmqr
+    Symbology.DATA_MATRIX -> R.drawable.ic_code_datamatrix
+    else -> R.drawable.ic_code_bars
+}
+
+private fun symbologyHint(s: Symbology): Int = when (s) {
+    Symbology.QR_CODE -> R.string.code_hint_qr
+    Symbology.RMQR -> R.string.code_hint_rmqr
+    Symbology.DATA_MATRIX -> R.string.code_hint_datamatrix
+    Symbology.CODE_128 -> R.string.code_hint_code128
+    Symbology.EAN_13 -> R.string.code_hint_ean13
+    Symbology.UPC_A -> R.string.code_hint_upca
+    Symbology.CODE_39 -> R.string.code_hint_code39
+    Symbology.ITF -> R.string.code_hint_itf
+}
+
+/** The full name, for the picker. [symbologyLabel] stays short for the crowded element chip. */
+private fun symbologyName(s: Symbology): String = when (s) {
+    Symbology.QR_CODE -> "QR Code"
+    Symbology.RMQR -> "rMQR Code"
+    Symbology.DATA_MATRIX -> "Data Matrix"
+    else -> symbologyLabel(s)
+}
+
 private fun symbologyLabel(s: Symbology): String = when (s) {
     Symbology.QR_CODE -> "QR"
+    Symbology.RMQR -> "rMQR"
+    Symbology.DATA_MATRIX -> "DM"
     Symbology.CODE_128 -> "Code 128"
     Symbology.EAN_13 -> "EAN-13"
     Symbology.UPC_A -> "UPC-A"

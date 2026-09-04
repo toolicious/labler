@@ -250,7 +250,7 @@ object LabelRenderer {
         is BarcodeElement -> {
             // The reserved box: the code renders as large as cleanly fits and centers inside it.
             // A 1D barcode cannot shrink below 1 px per module, so let the frame grow to contain it.
-            if (element.symbology == Symbology.QR_CODE) {
+            if (element.symbology.isMatrix) {
                 ElementSize(element.widthPx, element.heightPx)
             } else {
                 val m = barcodeMatrix(element)
@@ -486,32 +486,41 @@ object LabelRenderer {
     // ----- Barcode / QR (ZXing, integer module scaling -> no staircase effect) -----
 
     private fun barcodeCaptionHeight(e: BarcodeElement): Float =
-        if (e.symbology != Symbology.QR_CODE && e.showText) (e.heightPx * 0.26f).coerceIn(10f, 20f) else 0f
+        if (!e.symbology.isMatrix && e.showText) (e.heightPx * 0.26f).coerceIn(10f, 20f) else 0f
 
     private fun barcodeMatrix(e: BarcodeElement): BitMatrix? {
         if (e.data.isBlank()) return null
         // showText changes the encoded height (it reserves a caption band), so it must be in the key.
         val key = "${e.symbology}:${e.widthPx.toInt()}:${e.heightPx.toInt()}:${e.showText}:${e.data}"
         matrixCache.get(key)?.let { return it }
+        if (e.symbology == Symbology.RMQR) {
+            val matrix = rmqrMatrix(e)
+            if (matrix != null) matrixCache.put(key, matrix)
+            return matrix
+        }
         val isQr = e.symbology == Symbology.QR_CODE
         val format = when (e.symbology) {
-            Symbology.QR_CODE -> BarcodeFormat.QR_CODE
+            Symbology.QR_CODE, Symbology.RMQR -> BarcodeFormat.QR_CODE
+            Symbology.DATA_MATRIX -> BarcodeFormat.DATA_MATRIX
             Symbology.CODE_128 -> BarcodeFormat.CODE_128
             Symbology.EAN_13 -> BarcodeFormat.EAN_13
             Symbology.UPC_A -> BarcodeFormat.UPC_A
             Symbology.CODE_39 -> BarcodeFormat.CODE_39
             Symbology.ITF -> BarcodeFormat.ITF
         }
+        // A square code gets the smaller of the two sides; a bar code keeps the box it was given,
+        // minus the band its caption sits in.
+        val square = e.symbology.isSquare
         val side = minOf(e.widthPx, e.heightPx)
-        val codeW = (if (isQr) side else e.widthPx).toInt().coerceAtLeast(8)
-        val codeH = (if (isQr) side else e.heightPx - barcodeCaptionHeight(e)).toInt().coerceAtLeast(8)
+        val codeW = (if (square) side else e.widthPx).toInt().coerceAtLeast(8)
+        val codeH = (if (square) side else e.heightPx - barcodeCaptionHeight(e)).toInt().coerceAtLeast(8)
         val hints = buildMap<EncodeHintType, Any> {
-            put(EncodeHintType.MARGIN, if (isQr) 1 else 2)
+            put(EncodeHintType.MARGIN, if (square) 1 else 2)
             // Without this hint ZXing encodes in ISO-8859-1 and silently turns every character it
             // cannot map into a literal '?', which is what the scanner then reads back. UTF-8 is
             // requested only when the content needs it: ZXing adds an ECI marker for it, and pure
             // ASCII codes keep the exact module pattern they had before.
-            if (isQr && e.data.any { it.code > 127 }) put(EncodeHintType.CHARACTER_SET, "UTF-8")
+            if (square && e.data.any { it.code > 127 }) put(EncodeHintType.CHARACTER_SET, "UTF-8")
         }
         val matrix = try {
             if (isQr) QRCodeWriter().encode(e.data, format, codeW, codeH, hints)
@@ -521,6 +530,31 @@ object LabelRenderer {
         }
         if (matrix != null) matrixCache.put(key, matrix)
         return matrix
+    }
+
+    /**
+     * rMQR has no writer in ZXing, so the scaling ZXing does for a QR code happens here: the symbol
+     * is blown up by whole modules, gets its quiet zone, and the result is a plain BitMatrix again
+     * so that everything downstream stays the same.
+     */
+    private fun rmqrMatrix(e: BarcodeElement): BitMatrix? {
+        val boxW = e.widthPx.toInt()
+        val boxH = e.heightPx.toInt()
+        val symbol = RmqrEncoder.fit(e.data, boxW, boxH) ?: return null
+        val quiet = RmqrEncoder.QUIET_ZONE
+        val scale = minOf(
+            boxW / (symbol.width + 2 * quiet),
+            boxH / (symbol.height + 2 * quiet),
+        )
+        val out = BitMatrix((symbol.width + 2 * quiet) * scale, (symbol.height + 2 * quiet) * scale)
+        for (y in 0 until symbol.height) {
+            for (x in 0 until symbol.width) {
+                if (symbol.modules[y][x]) {
+                    out.setRegion((x + quiet) * scale, (y + quiet) * scale, scale, scale)
+                }
+            }
+        }
+        return out
     }
 
     private fun drawBarcode(canvas: Canvas, e: BarcodeElement) {

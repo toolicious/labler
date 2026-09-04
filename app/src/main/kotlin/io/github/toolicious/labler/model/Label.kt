@@ -142,7 +142,30 @@ enum class LengthMode { VARIABLE, MANUAL, FIXED }
 
 enum class FrameStyle { RECT, ROUND_RECT, LINE_H, LINE_V }
 
-enum class Symbology { QR_CODE, CODE_128, EAN_13, UPC_A, CODE_39, ITF }
+enum class Symbology {
+    QR_CODE,
+
+    /** Rectangular Micro QR: the same idea as QR, laid out flat along the tape. See RmqrEncoder. */
+    RMQR,
+
+    DATA_MATRIX,
+
+    CODE_128,
+    EAN_13,
+    UPC_A,
+    CODE_39,
+    ITF,
+    ;
+
+    /**
+     * Two-dimensional codes. They carry no caption underneath and their box is theirs to fill,
+     * while a bar code has to keep at least one pixel per bar and grows its frame instead.
+     */
+    val isMatrix: Boolean get() = this == QR_CODE || this == RMQR || this == DATA_MATRIX
+
+    /** Matrix codes that come out square whatever box they are given. rMQR is the flat one. */
+    val isSquare: Boolean get() = isMatrix && this != RMQR
+}
 
 enum class QrPayloadType { TEXT, LINK, WIFI, EMAIL, PHONE, CONTACT }
 

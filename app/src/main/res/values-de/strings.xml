@@ -301,6 +301,14 @@
     <string name="add_barcode">Code</string>
     <string name="prop_barcode_data">Inhalt</string>
     <string name="prop_barcode_type">Typ</string>
+    <string name="code_hint_qr">Quadratisch, fasst am meisten</string>
+    <string name="code_hint_rmqr">Große Punkte auf schmalem Band</string>
+    <string name="code_hint_datamatrix">Kompakt, in der Industrie üblich</string>
+    <string name="code_hint_code128">Beliebiger Text, der übliche Fall</string>
+    <string name="code_hint_ean13">Handel, genau 13 Ziffern</string>
+    <string name="code_hint_upca">Handel, genau 12 Ziffern</string>
+    <string name="code_hint_code39">Großbuchstaben und Ziffern</string>
+    <string name="code_hint_itf">Nur Ziffern, immer paarweise</string>
     <string name="prop_barcode_caption">Text anzeigen</string>
 
     <!-- QR-Inhalt -->

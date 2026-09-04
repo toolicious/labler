@@ -544,8 +544,8 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
                 widthPx = (el.widthPx + delta.x).coerceAtLeast(8f),
                 heightPx = (el.heightPx + delta.y).coerceIn(8f, headPx)
             )
-            is BarcodeElement -> if (el.symbology == Symbology.QR_CODE) {
-                // QR stays square.
+            is BarcodeElement -> if (el.symbology.isSquare) {
+                // QR and Data Matrix stay square. rMQR does not, being flat is the point of it.
                 val s = (minOf(el.widthPx, el.heightPx) + max(delta.x, delta.y))
                     .coerceIn(24f, headPx)
                 el.copy(widthPx = s, heightPx = s)

@@ -6,3 +6,5 @@
 - Ein Filter engt die Übersicht nach Papier, Bandbreite, Länge, Drucker, Favoriten und Etiketten mit Code ein (#22)
 - Der Druckverlauf ist aus der Titelleiste in das Sortiermenü gewandert, unter die Einträge für die Reihenfolge (#22)
 - Ein langer Druck auf den Sortier- oder den Filterknopf setzt ihn wieder zurück (#22)
+- Etiketten können einen rechteckigen Micro-QR-Code tragen, der seine Module groß hält, indem er das Band entlang wächst statt nach oben (#26)
+- Data Matrix kommt als Codetyp dazu, und die Typen wählt man jetzt in einem Menü, das zu jedem sagt wofür er taugt (#26)

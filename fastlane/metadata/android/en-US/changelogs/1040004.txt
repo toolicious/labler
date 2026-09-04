@@ -6,3 +6,5 @@
 - A filter narrows the overview down by paper, tape width, length, printer, favorites and labels carrying a code (#22)
 - The print history moved from the title bar into the sorting menu, below the entries for the order (#22)
 - A long press on the sorting or the filter button puts it back to where it started (#22)
+- Labels can carry a rectangular Micro QR code, which keeps its modules large by growing along the tape instead of upwards (#26)
+- Data Matrix joins the code types, and they are now picked from a menu that says what each one is for (#26)
