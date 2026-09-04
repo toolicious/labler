@@ -107,7 +107,10 @@ fun TemplatePrintSheet(
         }
     }
 
-    ModalBottomSheet(onDismissRequest = { if (!working) onDismiss() }) {
+    // Closable while a job runs: the print lives in the application scope and carries on,
+    // and the status chip keeps showing it. Holding the sheet shut left the whole app
+    // looking frozen for as long as the printer stayed quiet.
+    ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
             Modifier
                 .padding(horizontal = 16.dp)

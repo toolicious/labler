@@ -4,11 +4,11 @@ import io.github.toolicious.labler.printer.PrintResult
 import io.github.toolicious.labler.printer.PrinterProtocol
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.withTimeout
 
@@ -105,12 +105,27 @@ class StatusClient(
         }
         return try {
             withTimeout(timeoutMs) {
+                var acknowledgementSkipped = false
                 client.events
                     .onSubscription { send() }
                     .filterIsInstance<GattEvent.Notification>()
                     .filter { it.uuid == notifyUuid }
+                    // Logged raw: a printer that says nothing and one that says something we fail
+                    // to read look the same from the outside, and only the log tells them apart.
+                    .onEach { bleLog("notify " + it.value.joinToString(" ") { b -> "%02X".format(b) }) }
                     .mapNotNull { protocol.parsePrintResult(it.value) }
-                    .drop(1)
+                    .filter { result ->
+                        // The printer answers twice, first that it has started and then how it
+                        // went. Only that acknowledgement is worth skipping, and only when the
+                        // first message is one: anything else arriving first is already the
+                        // verdict, and dropping it left a missing cassette looking like a hang.
+                        if (!acknowledgementSkipped && result == PrintResult.OK) {
+                            acknowledgementSkipped = true
+                            false
+                        } else {
+                            true
+                        }
+                    }
                     .first()
             }
         } catch (timeout: TimeoutCancellationException) {

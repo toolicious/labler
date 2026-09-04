@@ -1,1 +1,5 @@
 - Das Feld für die Längenkalibrierung sieht nicht mehr aus, als wollte es Zoll (#19)
+- Der Dymo schiebt das Band doppelt so fein vor wie sein Kopf druckt, dadurch stimmt die Etikettenlänge (#19)
+- Bleibt die Rückmeldung des Druckers aus, wartet die App nur noch so lange, wie das Etikett braucht (#19)
+- Das Druck-Blatt lässt sich während des Drucks schließen und blockiert die App nicht mehr (#19)
+- Der eingebaute Textdruck passt sich an einen niedrigen Druckkopf an und wird nicht mehr abgeschnitten (#19)

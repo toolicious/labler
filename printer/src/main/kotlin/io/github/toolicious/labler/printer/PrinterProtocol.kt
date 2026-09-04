@@ -24,6 +24,13 @@ interface PrinterProtocol {
     val awaitsPrintResult: Boolean get() = false
 
     /**
+     * How long to give the printer to report on a raster of [columns] columns before giving up
+     * on it. Only consulted where [awaitsPrintResult] is on. A flat number cannot serve both
+     * ends of the range: what is a long wait for a short label is too short for a long one.
+     */
+    fun printResultTimeoutMs(columns: Int): Long = 60_000L
+
+    /**
      * Values of this family that a tester can still be asked to pin down. Empty where everything
      * about the printer has been verified on one, which is the normal case.
      */

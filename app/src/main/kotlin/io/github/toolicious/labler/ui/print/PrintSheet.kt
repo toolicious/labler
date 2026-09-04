@@ -86,7 +86,10 @@ fun PrintSheet(
         }
     }
 
-    ModalBottomSheet(onDismissRequest = { if (!working) onDismiss() }) {
+    // Closable while a job runs: the print lives in the application scope and carries on,
+    // and the status chip keeps showing it. Holding the sheet shut left the whole app
+    // looking frozen for as long as the printer stayed quiet.
+    ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.padding(horizontal = 16.dp)) {
             Text(stringResource(R.string.action_print), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(12.dp))
@@ -184,7 +187,7 @@ fun PrintSheet(
                     onClick = { vm.print(image, media, copies) },
                     enabled = !working && printerState is PrinterState.Ready
                 ) { Text(stringResource(R.string.action_print)) }
-                OutlinedButton(onClick = onDismiss, enabled = !working) { Text(stringResource(R.string.action_cancel)) }
+                OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
             }
             Spacer(Modifier.height(24.dp))
         }

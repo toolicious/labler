@@ -9,12 +9,16 @@ import io.github.toolicious.labler.printer.MonoImage
 object TextTestRenderer {
 
     fun render(text: String, spec: LabelSpec = LabelSpec()): MonoImage {
+        // Written for a 96 dot head, so on a shorter one it comes down with it. Without this
+        // the sample overflowed a 30 dot head and printed with its bottoms cut off.
+        val fitted = 40f * (spec.printHeightPx.toFloat() / LabelSpec.DEFAULT_ELEMENT_HEAD_DOTS)
+            .coerceAtMost(1f)
         var element = TextElement(
             id = "quicktext",
             x = 8f,
             y = 0f,
             text = text.ifBlank { "LaBLEr" },
-            fontSizePx = 40f,
+            fontSizePx = fitted,
             bold = true,
             align = LabelTextAlign.CENTER,
             boxWidthPx = (spec.lengthPx - 16).toFloat(),

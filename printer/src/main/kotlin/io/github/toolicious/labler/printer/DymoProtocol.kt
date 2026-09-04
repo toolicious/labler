@@ -37,7 +37,7 @@ class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol
 
     override val geometry = HeadGeometry(
         headDots = headDots,
-        dotsPerMm = tuning.float(Tunable.DOTS_PER_MM) ?: (DPI / 25.4f),
+        dotsPerMm = tuning.float(Tunable.DOTS_PER_MM) ?: (FEED_DPI / HeadGeometry.MM_PER_INCH),
         bytesPerColumn = COLUMN_BITS / 8,
         minLengthMm = 10,
         maxLengthMm = 500,
@@ -76,6 +76,11 @@ class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol
 
     /** The printer answers by itself when a job is through; there is nothing to ask it. */
     override val statusQueries: StatusQueries? = null
+
+    override fun printResultTimeoutMs(columns: Int): Long {
+        val seconds = columns / geometry.dotsPerMm / PRINT_SPEED_MM_PER_SEC
+        return RESULT_GRACE_MS + (seconds * 1000f).toLong()
+    }
 
     override val awaitsPrintResult =
         tuning.bool(Tunable.AWAIT_PRINT_RESULT) ?: AWAIT_PRINT_RESULT
@@ -225,8 +230,28 @@ class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol
         /** Bits one column occupies on the wire, whatever the head prints of them. */
         const val COLUMN_BITS = 32
 
-        /** Dymo's figure for the LetraTag 200B. Only the mm readout depends on it, never the raster. */
-        const val DPI = 160
+        /**
+         * Dots per inch across the tape. Dymo's own figure for the LetraTag 200B, and the one
+         * the tester confirmed: 30 dots came out 4.75 mm tall.
+         */
+        const val HEAD_DPI = 160
+
+        /**
+         * Dots per inch along the tape, which is a different number and documented nowhere. The
+         * reference implementation never needed it, because it works in pixels and leaves
+         * millimeters to the caller, so nobody had asked. On the device 189 dots between the
+         * calibration marks measured 15.34 mm, which is 313 dpi, and twice the head is the round
+         * value beside it. That rests on one reading, so the settings can still correct it.
+         *
+         * Only the mm readout depends on this, never the raster.
+         */
+        const val FEED_DPI = 2 * HEAD_DPI
+
+        /** Tape the printer puts out per second, from the data sheet. */
+        const val PRINT_SPEED_MM_PER_SEC = 7f
+
+        /** Room on top of the time a job needs, for the printer to get going and to answer. */
+        const val RESULT_GRACE_MS = 5_000L
 
         const val ROW_BIT_OFFSET = 1
         const val REVERSE_COLUMN_BYTES = true

@@ -234,8 +234,10 @@ class PrinterManager(
                     }
                     val listener = statusClient.takeIf { protocol.awaitsPrintResult }
                     if (listener != null) {
-                        val result = listener.awaitPrintResult(PRINT_RESULT_TIMEOUT_MS, send)
-                        bleLog("print result: " + (result?.name ?: "none within $PRINT_RESULT_TIMEOUT_MS ms"))
+                        val timeout = protocol.printResultTimeoutMs(images.first().width) *
+                            payloads.size
+                        val result = listener.awaitPrintResult(timeout, send)
+                        bleLog("print result: " + (result?.name ?: "none within $timeout ms"))
                         if (result != null && !result.printed) error(printResultMessage(result))
                     } else {
                         send()
@@ -355,6 +357,5 @@ class PrinterManager(
          * through, and a long label takes its time, so this is generous; running out is treated
          * as a print that went fine rather than as a failure.
          */
-        const val PRINT_RESULT_TIMEOUT_MS = 60_000L
     }
 }

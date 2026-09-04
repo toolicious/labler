@@ -113,10 +113,10 @@ class TestPatternTest {
     @Test
     fun `a coarser dot grid moves the ticks but keeps them 5 mm apart`() {
         val dymo = TestPattern.create(DymoProtocol.DEFAULT.geometry, lengthDots = 200)
-        // 160 dpi is 6.2992 dots per mm, so 5 mm lands on 31 dots and 10 mm on 63.
-        assertTrue(dymo.isBlack(31, 5))
+        // The feed is 12.5984 dots per mm, so 5 mm lands on 63 dots and 10 mm on 126.
         assertTrue(dymo.isBlack(63, 5))
-        assertFalse(dymo.isBlack(40, 5))
+        assertTrue(dymo.isBlack(126, 5))
+        assertFalse(dymo.isBlack(80, 5))
     }
 
     @Test

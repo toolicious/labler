@@ -230,9 +230,11 @@ class DymoProtocolTest {
         assertEquals(4, g.bytesPerColumn)
         assertEquals(listOf(12), g.tapeWidthsMm)
         assertEquals(emptyList(), g.diecutPresets)
-        // 160 dpi, so a 40 mm label is 252 dots long.
-        assertEquals(252, g.mmToDots(40))
-        assertEquals(40, g.dotsToMm(252))
+        // The head is 160 dpi but the tape advances at twice that, so a 40 mm label is 504
+        // columns and not the 252 the head figure alone would suggest.
+        assertEquals(504, g.mmToDots(40))
+        assertEquals(40, g.dotsToMm(504))
+        assertEquals(320f, g.dpi, 0.01f)
     }
 
     // ----- Calibration -----

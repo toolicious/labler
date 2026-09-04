@@ -1,1 +1,5 @@
 - The length calibration field no longer reads as if it wanted inches (#19)
+- The Dymo advances the tape at twice the resolution of its head, so a label is the length it says (#19)
+- A print that the printer never reports on gives up after a wait that fits the label, not a flat minute (#19)
+- The print sheet closes while a job runs instead of holding the app until the printer answers (#19)
+- The built-in text sample fits a short print head instead of printing with its bottoms cut off (#19)
