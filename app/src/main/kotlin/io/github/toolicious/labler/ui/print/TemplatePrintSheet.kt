@@ -149,7 +149,12 @@ fun TemplatePrintSheet(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(previewImage.width.toFloat() / previewImage.height)
+                    // In millimeters, not in dots: the raster's columns are not as far apart
+                    // as its rows, so its own proportions are not the tape's.
+                    .aspectRatio(
+                        (previewImage.width / template.spec.geometry.feedDotsPerMm) /
+                            (previewImage.height / template.spec.geometry.headDotsPerMm)
+                    )
                     .border(1.dp, MaterialTheme.colorScheme.outline),
                 contentScale = ContentScale.FillBounds,
                 filterQuality = FilterQuality.None

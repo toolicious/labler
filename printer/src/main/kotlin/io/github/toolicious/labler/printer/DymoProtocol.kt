@@ -37,7 +37,8 @@ class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol
 
     override val geometry = HeadGeometry(
         headDots = headDots,
-        dotsPerMm = tuning.float(Tunable.DOTS_PER_MM) ?: (FEED_DPI / HeadGeometry.MM_PER_INCH),
+        headDotsPerMm = HEAD_DPI / HeadGeometry.MM_PER_INCH,
+        feedDotsPerMm = tuning.float(Tunable.DOTS_PER_MM) ?: (FEED_DPI / HeadGeometry.MM_PER_INCH),
         bytesPerColumn = COLUMN_BITS / 8,
         minLengthMm = 10,
         maxLengthMm = 500,
@@ -78,7 +79,7 @@ class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol
     override val statusQueries: StatusQueries? = null
 
     override fun printResultTimeoutMs(columns: Int): Long {
-        val seconds = columns / geometry.dotsPerMm / PRINT_SPEED_MM_PER_SEC
+        val seconds = columns / geometry.feedDotsPerMm / PRINT_SPEED_MM_PER_SEC
         return RESULT_GRACE_MS + (seconds * 1000f).toLong()
     }
 
@@ -97,7 +98,7 @@ class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol
         if (tuning.isEmpty) DEFAULT else DymoProtocol(tuning)
 
     override fun tunableValue(tunable: Tunable): String? = when (tunable) {
-        Tunable.DOTS_PER_MM -> geometry.dotsPerMm.toString()
+        Tunable.DOTS_PER_MM -> geometry.feedDotsPerMm.toString()
         Tunable.HEAD_DOTS -> headDots.toString()
         Tunable.ROW_BIT_OFFSET -> rowBitOffset.toString()
         Tunable.REVERSE_COLUMN_BYTES -> reverseColumnBytes.toString()
@@ -267,10 +268,11 @@ class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol
 
         /**
          * Smallest payload a chunk may carry. The index is one byte, so the longest job this
-         * family builds, around 12.6 kB at 500 mm, has to fit in 255 chunks; 100 leaves room
-         * to spare and asks no more of a phone than a 106 byte packet.
+         * family builds has to fit in 255 chunks. At 500 mm and a feed of twice the head that
+         * is around 25 kB, which 128 covers with room over while asking no more of a phone
+         * than a 134 byte packet.
          */
-        private const val MIN_PAYLOAD_CHUNK = 100
+        private const val MIN_PAYLOAD_CHUNK = 128
 
         /** The index the vendor app leaves out. */
         private const val SKIPPED_INDEX = 27

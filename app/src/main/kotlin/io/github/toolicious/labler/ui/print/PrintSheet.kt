@@ -95,7 +95,7 @@ fun PrintSheet(
             Spacer(Modifier.height(12.dp))
 
             Text(
-                stringResource(R.string.print_preview, protocol.geometry.dotsToMm(image.width)),
+                stringResource(R.string.print_preview, protocol.geometry.columnsToMm(image.width)),
                 style = MaterialTheme.typography.bodySmall
             )
             Spacer(Modifier.height(4.dp))
@@ -104,7 +104,12 @@ fun PrintSheet(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(image.width.toFloat() / image.height)
+                    // In millimeters, not in dots: the raster's columns are not as far apart
+                    // as its rows, so its own proportions are not the tape's.
+                    .aspectRatio(
+                        (image.width / protocol.geometry.feedDotsPerMm) /
+                            (image.height / protocol.geometry.headDotsPerMm)
+                    )
                     .border(1.dp, MaterialTheme.colorScheme.outline),
                 contentScale = ContentScale.FillBounds,
                 filterQuality = FilterQuality.None

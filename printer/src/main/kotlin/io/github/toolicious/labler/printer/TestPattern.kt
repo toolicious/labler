@@ -3,7 +3,9 @@ package io.github.toolicious.labler.printer
 import kotlin.math.roundToInt
 
 /**
- * Procedural geometry test pattern for the print test. It makes orientation,
+ * Procedural geometry test pattern for the print test. Unlike a label, it is built straight
+ * on the printer's own column grid rather than laid out on the square one, because what it
+ * checks is that grid itself. It makes orientation,
  * mirroring, cropping and dimensional accuracy clearly recognizable on the printout:
  * - border on all four edges (cropping test)
  * - hairline frame along the outer edges of that square, which lands on the label even
@@ -109,7 +111,7 @@ object TestPattern {
         val out = mutableListOf<Pair<Int, Int>>()
         var mm = TICK_STEP_MM
         while (true) {
-            val x = (mm * geometry.dotsPerMm).roundToInt()
+            val x = (mm * geometry.feedDotsPerMm).roundToInt()
             if (x >= lengthDots - 2) break
             out += mm to x
             mm += TICK_STEP_MM
@@ -123,7 +125,7 @@ object TestPattern {
      * the moment the feed resolution was corrected, and nobody noticed because the app was
      * quoting the same wrong number back to itself.
      */
-    fun defaultLengthDots(geometry: HeadGeometry): Int = geometry.mmToDots(LENGTH_MM)
+    fun defaultLengthDots(geometry: HeadGeometry): Int = geometry.mmToColumns(LENGTH_MM)
 
     /**
      * Dots between the two calibration marks, which is [CALIBRATION_MM] on the grid the family
@@ -133,7 +135,7 @@ object TestPattern {
      * across corrections, otherwise entering the same reading a second time walks the result a
      * little further instead of leaving it alone.
      */
-    fun calibrationSpanDots(declared: HeadGeometry): Int = declared.mmToDots(CALIBRATION_MM)
+    fun calibrationSpanDots(declared: HeadGeometry): Int = declared.mmToColumns(CALIBRATION_MM)
 
     /** Columns of the two calibration marks, centered on the pattern. */
     fun calibrationMarks(lengthDots: Int, calibrationSpan: Int): Pair<Int, Int> {

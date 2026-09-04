@@ -13,22 +13,32 @@ class HeadGeometryTest {
     private val phomemo = PhomemoProtocol.geometry
 
     @Test
-    fun `the grid is the feed two printers measured, not the pitch the head is sold with`() {
+    fun `the two axes are different grids`() {
+        // The head is the 203 dpi it is sold with, the feed the 200 two printers measured.
+        assertEquals(8f, phomemo.headDotsPerMm, 0.001f)
+        assertEquals(7.874f, phomemo.feedDotsPerMm, 0.001f)
         assertEquals(200f, phomemo.dpi, 0.001f)
-        assertEquals(7.874f, phomemo.dotsPerMm, 0.001f)
+        assertEquals(0.984f, phomemo.feedAspect, 0.001f)
     }
 
     @Test
-    fun `millimeters to dots, spelled out`() {
+    fun `a label is laid out on the square grid of the head`() {
         assertEquals(0, phomemo.mmToDots(0))
-        assertEquals(79, phomemo.mmToDots(10))
-        // The die-cut label the test pattern is meant for.
-        assertEquals(315, phomemo.mmToDots(40))
-        assertEquals(1181, phomemo.mmToDots(150))
-        // The ruler case: 38 dots less than the old grid asked for, which is the 4.8 mm a
-        // 300 mm scale used to come out too long.
-        assertEquals(2362, phomemo.mmToDots(300))
-        assertEquals(3937, phomemo.mmToDots(500))
+        assertEquals(80, phomemo.mmToDots(10))
+        assertEquals(320, phomemo.mmToDots(40))
+        assertEquals(1200, phomemo.mmToDots(150))
+        assertEquals(2400, phomemo.mmToDots(300))
+        assertEquals(4000, phomemo.mmToDots(500))
+    }
+
+    @Test
+    fun `and rastered onto the columns the feed really covers`() {
+        // The die-cut label the test pattern is meant for: 320 square dots, 315 columns.
+        assertEquals(315, phomemo.layoutToColumns(320))
+        assertEquals(315, phomemo.mmToColumns(40))
+        assertEquals(40, phomemo.columnsToMm(315))
+        // The ruler case, where the old grid asked for 38 columns too many.
+        assertEquals(2362, phomemo.mmToColumns(300))
     }
 
     @Test
@@ -49,7 +59,7 @@ class HeadGeometryTest {
     fun `derived bounds follow the family`() {
         assertEquals(96, phomemo.headDots)
         assertEquals(12, phomemo.bytesPerColumn)
-        assertEquals(3937, phomemo.maxLengthDots)
+        assertEquals(4000, phomemo.maxLengthDots)
         assertEquals(listOf(12, 14, 15), phomemo.tapeWidthsMm)
     }
 }

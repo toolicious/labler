@@ -119,9 +119,9 @@ class SnappingTest {
 
     @Test
     fun `a fixed label offers its center and both borders`() {
-        val spec = LabelSpec(lengthMm = 40) // 315 px
+        val spec = LabelSpec(lengthMm = 40) // 320 px
         val t = labelXTargets(spec)
-        assertEquals(listOf(157.5f, 0f, 315f), t.map { it.line })
+        assertEquals(listOf(160f, 0f, 320f), t.map { it.line })
         assertEquals(
             listOf(SnapAnchor.CENTER, SnapAnchor.LEADING, SnapAnchor.TRAILING),
             t.map { it.anchor },
@@ -153,20 +153,19 @@ class SnappingTest {
     fun `a manual label offers its lines where its leading edge puts them`() {
         // Its edges are dragged rather than derived, so they hold still and can be snapped to. The
         // element coordinates start 2 mm inside the tape, so the tape starts 16 px before them.
-        // 40 mm is 315 px, which puts the center on a half dot.
         val manual = LabelSpec(
             lengthMm = 40,
             media = MediaType.CONTINUOUS,
             manualEdges = true,
             leadingMm = 2,
         )
-        assertEquals(listOf(141.5f, -16f, 299f), labelXTargets(manual).map { it.line })
+        assertEquals(listOf(144f, -16f, 304f), labelXTargets(manual).map { it.line })
     }
 
     @Test
     fun `a continuous tape on a fixed length keeps its own lines`() {
         val spec = LabelSpec(lengthMm = 40, media = MediaType.CONTINUOUS)
-        assertEquals(listOf(157.5f, 0f, 315f), labelXTargets(spec).map { it.line })
+        assertEquals(listOf(160f, 0f, 320f), labelXTargets(spec).map { it.line })
     }
 
     @Test

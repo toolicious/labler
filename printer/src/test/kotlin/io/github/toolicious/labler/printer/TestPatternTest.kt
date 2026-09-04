@@ -102,12 +102,12 @@ class TestPatternTest {
     fun `the pattern is the label it is meant for, not a dot count that used to match`() {
         val declared = PhomemoProtocol.geometry
         assertEquals(315, TestPattern.defaultLengthDots(declared))
-        assertEquals(TestPattern.LENGTH_MM, declared.dotsToMm(TestPattern.defaultLengthDots(declared)))
-        // A corrected feed wants a different number of dots for the same 40 mm, which is the
+        assertEquals(TestPattern.LENGTH_MM, declared.columnsToMm(TestPattern.defaultLengthDots(declared)))
+        // A corrected feed wants a different number of columns for the same 40 mm, which is the
         // whole reason this is not a constant.
-        val corrected = declared.copy(dotsPerMm = 7.8406f)
+        val corrected = declared.copy(feedDotsPerMm = 7.8406f)
         assertEquals(314, TestPattern.defaultLengthDots(corrected))
-        assertEquals(TestPattern.LENGTH_MM, corrected.dotsToMm(TestPattern.defaultLengthDots(corrected)))
+        assertEquals(TestPattern.LENGTH_MM, corrected.columnsToMm(TestPattern.defaultLengthDots(corrected)))
     }
 
     @Test
@@ -128,17 +128,17 @@ class TestPatternTest {
 
         // A correction moves every millimeter tick and leaves the two marks the same distance
         // apart. That is what makes them something to measure against twice.
-        val corrected = declared.copy(dotsPerMm = 7.5f)
+        val corrected = declared.copy(feedDotsPerMm = 7.5f)
         assertTrue(TestPattern.tickColumns(corrected) != TestPattern.tickColumns(declared))
 
         listOf(declared, corrected).forEach { geometry ->
             val lengthDots = TestPattern.defaultLengthDots(geometry)
             val (left, right) = TestPattern.calibrationMarks(lengthDots, span)
-            assertEquals(span, right - left, "span at ${geometry.dotsPerMm} dots/mm")
+            assertEquals(span, right - left, "span at ${geometry.feedDotsPerMm} dots/mm")
             val drawn = TestPattern.create(geometry, lengthDots, span)
             val row = geometry.headDots - 4
-            assertTrue(drawn.isBlack(left, row), "left mark at ${geometry.dotsPerMm} dots/mm")
-            assertTrue(drawn.isBlack(right, row), "right mark at ${geometry.dotsPerMm} dots/mm")
+            assertTrue(drawn.isBlack(left, row), "left mark at ${geometry.feedDotsPerMm} dots/mm")
+            assertTrue(drawn.isBlack(right, row), "right mark at ${geometry.feedDotsPerMm} dots/mm")
         }
     }
 }

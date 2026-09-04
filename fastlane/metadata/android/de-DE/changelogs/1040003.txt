@@ -3,3 +3,5 @@
 - Bleibt die Rückmeldung des Druckers aus, wartet die App nur noch so lange, wie das Etikett braucht (#19)
 - Das Druck-Blatt lässt sich während des Drucks schließen und blockiert die App nicht mehr (#19)
 - Der eingebaute Textdruck passt sich an einen niedrigen Druckkopf an und wird nicht mehr abgeschnitten (#19)
+- Ein Etikett wird auf quadratischen Punkten entworfen und erst beim Drucken auf die Spalten des Druckers gezogen, dadurch stimmen die Proportionen auf dem Dymo (#19)
+- Eine Vorschubkorrektur verschiebt nichts mehr auf dem Etikett, sie ändert nur die Zahl der Spalten (#11)

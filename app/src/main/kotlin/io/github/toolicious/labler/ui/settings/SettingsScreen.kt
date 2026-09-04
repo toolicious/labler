@@ -352,7 +352,7 @@ fun SettingsScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            val declaredPitch = declared.geometry.dotsPerMm
+                            val declaredPitch = declared.geometry.feedDotsPerMm
                             val pitch = stored?.toFloatOrNull() ?: declaredPitch
                             val measured by vm.calibrationMeasurement.collectAsState()
                             Column(Modifier.weight(1f)) {
@@ -465,7 +465,7 @@ fun SettingsScreen(
                 if (measuring) {
                     LengthCalibrationDialog(
                         spanDots = TestPattern.calibrationSpanDots(declared.geometry),
-                        declaredPitch = declared.geometry.dotsPerMm,
+                        declaredPitch = declared.geometry.feedDotsPerMm,
                         onDismiss = { measuring = false },
                         onMeasured = { vm.calibrateFromMeasurement(it); measuring = false },
                     )

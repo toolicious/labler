@@ -106,7 +106,7 @@ fun TestPrintScreen(onOpenSettings: () -> Unit, vm: TestPrintViewModel = viewMod
             Text(
                 stringResource(
                     R.string.testprint_geometry,
-                    protocol.geometry.dotsToMm(TestPattern.defaultLengthDots(protocol.geometry)),
+                    protocol.geometry.columnsToMm(TestPattern.defaultLengthDots(protocol.geometry)),
                 ),
                 style = MaterialTheme.typography.titleSmall,
             )

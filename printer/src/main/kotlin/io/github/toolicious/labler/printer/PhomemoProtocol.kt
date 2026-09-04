@@ -24,9 +24,14 @@ object PhomemoProtocol : PrinterProtocol {
      */
     const val FEED_DPI = 200
 
+    /** Millimeters of tape the head covers, which is what its dots are spread over. */
+    const val TAPE_HEIGHT_MM = 12f
+
     override val geometry = HeadGeometry(
         headDots = HEAD_DOTS,
-        dotsPerMm = FEED_DPI / HeadGeometry.MM_PER_INCH,
+        // 96 dots over the 12 mm of tape they cover, which is the 203 dpi the head is sold with.
+        headDotsPerMm = HEAD_DOTS / TAPE_HEIGHT_MM,
+        feedDotsPerMm = FEED_DPI / HeadGeometry.MM_PER_INCH,
         bytesPerColumn = HEAD_DOTS / 8,
         minLengthMm = 10,
         maxLengthMm = 500,
@@ -71,12 +76,12 @@ object PhomemoProtocol : PrinterProtocol {
     override val tunables = setOf(Tunable.DOTS_PER_MM)
 
     override fun tunableValue(tunable: Tunable): String? =
-        if (tunable == Tunable.DOTS_PER_MM) geometry.dotsPerMm.toString() else null
+        if (tunable == Tunable.DOTS_PER_MM) geometry.feedDotsPerMm.toString() else null
 
     override fun withTuning(tuning: ProtocolTuning): PrinterProtocol =
         tuning.float(Tunable.DOTS_PER_MM)
             ?.takeIf { it > 0f }
-            ?.let { RegaugedFeed(this, geometry.copy(dotsPerMm = it)) }
+            ?.let { RegaugedFeed(this, geometry.copy(feedDotsPerMm = it)) }
             ?: this
 
     // Status queries: written to the write characteristic, answered as a notification on FF01.

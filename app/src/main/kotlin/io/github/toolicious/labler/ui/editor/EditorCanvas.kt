@@ -439,7 +439,15 @@ fun EditorCanvas(
                 } else {
                     nc.clipRect(0f, 0f, labelW, labelH)
                 }
-                nc.drawBitmap(base, 0f, 0f, basePaint)
+                // Into the label rectangle, not at its own size: the raster comes back in
+                // printer columns, which are not as far apart as the square dots the canvas
+                // works in. Drawn one to one it would sit narrower than the element on top.
+                nc.drawBitmap(
+                    base,
+                    null,
+                    android.graphics.RectF(0f, 0f, labelW, labelH),
+                    basePaint,
+                )
                 // Drawn last, so a selected element moves to the front while it is selected and
                 // drops back into its place in the stack when it is deselected.
                 elements.find { it.id == selectedId }?.let {

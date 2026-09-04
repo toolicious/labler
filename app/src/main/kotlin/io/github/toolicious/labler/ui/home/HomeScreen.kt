@@ -492,7 +492,7 @@ internal fun LabelDialog(
     var widthText by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.tapeWidthMm.toString()) }
     var lengthText by rememberSaveable(initialSpec) { mutableStateOf(initialSpec.lengthMm.toString()) }
     var marginText by rememberSaveable(initialSpec) {
-        mutableStateOf(mmText(initialSpec.marginPx, geometry.dotsPerMm))
+        mutableStateOf(mmText(initialSpec.marginPx, geometry.headDotsPerMm))
     }
     val supportsDieCut = MediaType.DIE_CUT in initialSpec.supportedMedia
     var dieCut by rememberSaveable(initialSpec) {
@@ -721,7 +721,7 @@ internal fun LabelDialog(
                     ?.coerceIn(geometry.minLengthMm, geometry.maxLengthMm) ?: 40
                 val media = if (dieCut) MediaType.DIE_CUT else MediaType.CONTINUOUS
                 val mode = if (dieCut) LengthMode.FIXED else lengthMode
-                val margin = mmPx(marginText, geometry.dotsPerMm)
+                val margin = mmPx(marginText, geometry.headDotsPerMm)
                 // Edited from the spec that came in, so the label keeps the printer family it
                 // was designed for. A die-cut label is always fixed, its length belongs to the stock.
                 onConfirm(
@@ -806,7 +806,7 @@ private fun MmField(
 }
 
 /** Millimeters of [px] dots, without the trailing zeros a plain conversion leaves behind. */
-private fun mmText(px: Int, dotsPerMm: Float): String = trimmed(px / dotsPerMm)
+private fun mmText(px: Int, perMm: Float): String = trimmed(px / perMm)
 
 private fun trimmed(mm: Float): String =
     if (mm == mm.toInt().toFloat()) mm.toInt().toString() else mm.toString().trimEnd('0')
@@ -816,11 +816,11 @@ private fun trimmed(mm: Float): String =
  * Anything unreadable falls back to the default margin rather than to zero, which would silently
  * print flush to the edge.
  */
-private fun mmPx(text: String, dotsPerMm: Float): Int {
-    val mm = text.replace(',', '.').toFloatOrNull() ?: return (dotsPerMm).roundToInt()
-    return (mm * dotsPerMm).roundToInt().coerceIn(
-        (LabelSpec.MIN_MARGIN_MM * dotsPerMm).roundToInt(),
-        (LabelSpec.MAX_MARGIN_MM * dotsPerMm).roundToInt(),
+private fun mmPx(text: String, perMm: Float): Int {
+    val mm = text.replace(',', '.').toFloatOrNull() ?: return (perMm).roundToInt()
+    return (mm * perMm).roundToInt().coerceIn(
+        (LabelSpec.MIN_MARGIN_MM * perMm).roundToInt(),
+        (LabelSpec.MAX_MARGIN_MM * perMm).roundToInt(),
     )
 }
 

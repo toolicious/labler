@@ -171,9 +171,9 @@ class DymoProtocolTest {
 
     @Test
     fun `the chunk index skips 27, the way the vendor app does`() {
-        // 100 bytes a chunk is the smallest this family accepts, and 29 of them get past the gap.
-        val job = DymoProtocol.DEFAULT.buildJob(blank(719), MediaType.CONTINUOUS)
-        assertEquals(9 + 2900, job.size)
+        // 128 bytes a chunk is the smallest this family accepts, and 29 of them get past the gap.
+        val job = DymoProtocol.DEFAULT.buildJob(blank(922), MediaType.CONTINUOUS)
+        assertEquals(9 + 3712, job.size)
         val indices = DymoProtocol.DEFAULT.framePayload(job, DymoProtocol.DEFAULT.transport.minChunkSize)
             .drop(1)
             .map { it[0].toInt() }
@@ -184,7 +184,8 @@ class DymoProtocolTest {
 
     @Test
     fun `even the longest label keeps its indices inside one byte`() {
-        val columns = DymoProtocol.DEFAULT.geometry.maxLengthDots
+        val g = DymoProtocol.DEFAULT.geometry
+        val columns = g.mmToColumns(g.maxLengthMm)
         val job = DymoProtocol.DEFAULT.buildJob(blank(columns), MediaType.CONTINUOUS)
         val indices = DymoProtocol.DEFAULT.framePayload(job, DymoProtocol.DEFAULT.transport.minChunkSize)
             .drop(1)
@@ -230,11 +231,14 @@ class DymoProtocolTest {
         assertEquals(4, g.bytesPerColumn)
         assertEquals(listOf(12), g.tapeWidthsMm)
         assertEquals(emptyList(), g.diecutPresets)
-        // The head is 160 dpi but the tape advances at twice that, so a 40 mm label is 504
-        // columns and not the 252 the head figure alone would suggest.
-        assertEquals(504, g.mmToDots(40))
-        assertEquals(40, g.dotsToMm(504))
+        // The head is 160 dpi, so a 40 mm label is laid out on 252 square dots. The tape
+        // advances at twice that, so those 252 dots go out as 504 columns.
+        assertEquals(252, g.mmToDots(40))
+        assertEquals(40, g.dotsToMm(252))
+        assertEquals(504, g.mmToColumns(40))
+        assertEquals(504, g.layoutToColumns(252))
         assertEquals(320f, g.dpi, 0.01f)
+        assertEquals(2f, g.feedAspect, 0.001f)
     }
 
     // ----- Calibration -----
@@ -264,8 +268,9 @@ class DymoProtocolTest {
     @Test
     fun `a measured dot pitch replaces the advertised one`() {
         val g = tuned(Tunable.DOTS_PER_MM to "5.0").geometry
-        assertEquals(200, g.mmToDots(40))
-        // Everything else about the head is untouched.
+        assertEquals(200, g.mmToColumns(40))
+        // The head keeps its own grid, so a correction moves no element of any label.
+        assertEquals(252, g.mmToDots(40))
         assertEquals(30, g.headDots)
     }
 
@@ -292,7 +297,7 @@ class DymoProtocolTest {
             DymoProtocol.DEFAULT.packColumns(blank(1).also { it.setBlack(0, 0) }),
             protocol.packColumns(blank(1).also { it.setBlack(0, 0) }),
         )
-        assertEquals(DymoProtocol.DEFAULT.geometry.dotsPerMm, protocol.geometry.dotsPerMm)
+        assertEquals(DymoProtocol.DEFAULT.geometry.feedDotsPerMm, protocol.geometry.feedDotsPerMm)
     }
 
     @Test

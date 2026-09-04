@@ -30,16 +30,20 @@ class FeedCalibrationTest {
     fun `the pattern offers a span the user can measure`() {
         assertEquals(236, TestPattern.calibrationSpanDots(declared))
         // And it stands for the round number the dialog quotes, to within the odd dot.
-        assertEquals(TestPattern.CALIBRATION_MM.toFloat(), 236 / declared.dotsPerMm, 0.05f)
+        assertEquals(TestPattern.CALIBRATION_MM.toFloat(), 236 / declared.feedDotsPerMm, 0.05f)
     }
 
     @Test
     fun `a label asks for the dots that really cover its length once calibrated`() {
         val truth = 236 / measuredMm
-        assertEquals(40.0f, calibrated(measuredMm).geometry.mmToDots(40) / truth, 0.1f)
+        assertEquals(40.0f, calibrated(measuredMm).geometry.mmToColumns(40) / truth, 0.1f)
         // Without the correction it runs two tenths long, where the 203 dpi the head is sold
         // with used to miss by almost a millimeter.
-        assertEquals(40.2f, declared.mmToDots(40) / truth, 0.1f)
+        assertEquals(40.2f, declared.mmToColumns(40) / truth, 0.1f)
+        // And the label itself is laid out on the same square dots either way, so correcting
+        // the feed leaves every element where the user put it.
+        assertEquals(320, calibrated(measuredMm).geometry.mmToDots(40))
+        assertEquals(320, declared.mmToDots(40))
     }
 
     @Test

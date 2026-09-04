@@ -43,8 +43,8 @@ import kotlin.math.round
 import kotlin.math.sin
 
 /**
- * Renders a label 1:1 at print resolution (lengthPx x the head height of its family,
- * white background).
+ * Renders a label at print resolution: the columns its length comes to on the family it was
+ * drawn for, by the head height of that family, on white.
  * Used identically for the editor preview, thumbnails and printing (WYSIWYG);
  * the 1-bit quantization is handled by the MonoConverter.
  */
@@ -95,7 +95,7 @@ object LabelRenderer {
 
     /** [effectiveLengthPx] in millimeters, rounded up, for the length shown in the UI. */
     fun effectiveLengthMm(spec: LabelSpec, elements: List<LabelElement>): Int =
-        ceil(effectiveLengthPx(spec, elements) / spec.geometry.dotsPerMm).toInt()
+        ceil(effectiveLengthPx(spec, elements) / spec.geometry.headDotsPerMm).toInt()
 
     /** Leftmost point any element reaches, mirroring [rightEdge]. Zero on an empty label. */
     private fun contentLeft(elements: List<LabelElement>): Float =
@@ -190,8 +190,15 @@ object LabelRenderer {
         lengthPx: Int = effectiveLengthPx(spec, elements),
         offsetPx: Float = contentOffsetPx(spec, elements),
     ): Bitmap {
-        val bmp = Bitmap.createBitmap(lengthPx, spec.printHeightPx, Bitmap.Config.ARGB_8888)
-        drawInto(Canvas(bmp), spec, elements, offsetPx)
+        // A label is laid out on square dots. The printer's columns sit closer together than that
+        // on one family and twice as close on another, and this one stretch is the whole of the
+        // difference: everything above this line stays on the grid the user placed things on, and
+        // correcting the feed changes nothing but how many columns come out of it.
+        val columns = spec.geometry.layoutToColumns(lengthPx).coerceAtLeast(1)
+        val bmp = Bitmap.createBitmap(columns, spec.printHeightPx, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bmp)
+        canvas.scale(spec.geometry.feedAspect, 1f)
+        drawInto(canvas, spec, elements, offsetPx)
         return bmp
     }
 

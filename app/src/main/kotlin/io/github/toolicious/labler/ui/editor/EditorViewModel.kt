@@ -587,7 +587,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         if (elements.isEmpty()) return null
         val left = elements.minOf { elementBounds(it).left } + spec.leadingPx
         val right = elements.maxOf { elementBounds(it).right } + spec.leadingPx
-        val perMm = spec.geometry.dotsPerMm
+        val perMm = spec.geometry.headDotsPerMm
         return floor(left / perMm).toInt() to ceil(right / perMm).toInt()
     }
 
@@ -625,7 +625,7 @@ class EditorViewModel(app: Application, private val templateId: String) : Androi
         val edge = edgeDrag ?: return
         val t = _template.value ?: return
         edgeRawPx += dxPx
-        val mm = (edgeRawPx / t.spec.geometry.dotsPerMm).roundToInt()
+        val mm = (edgeRawPx / t.spec.geometry.headDotsPerMm).roundToInt()
         val spec = when (edge) {
             // Moving the leading edge to the left (negative) grows the label in front of the content.
             LabelEdge.LEFT -> withLeadingMm(t.spec, edgeStartLeadingMm - mm)

@@ -9,8 +9,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
- * How a variable label lays itself out. Everything is in dots, of which there are 7.874 to
- * the millimeter, so a length given in millimeters lands on an odd number of them.
+ * How a variable label lays itself out. Everything is in layout dots, of which there are 8 to
+ * the millimeter on this family; what the printer is sent is a stretch of that.
  *
  * Auto length only exists on continuous tape; a die-cut spec is FIXED whatever the flags say.
  */
@@ -35,14 +35,13 @@ class AutoLengthTest {
     @Test
     fun `a lone element can be arranged in the room the minimum length leaves`() {
         val s = spec(minMm = 20)
-        // 20 mm is 157 px. An 80 px element between two 8 px margins leaves 61 px of room,
-        // so it can sit anywhere from 8 to 69.
-        assertEquals("len=157 front=8 back=69", layout(s, listOf(box("a", 0f, 80f))))
-        assertEquals("len=157 front=8 back=69", layout(s, listOf(box("a", 8f, 80f))))
-        assertEquals("len=157 front=40 back=37", layout(s, listOf(box("a", 40f, 80f))))
-        assertEquals("len=157 front=69 back=8", layout(s, listOf(box("a", 72f, 80f))))
+        // 20 mm label, 10 mm element, 1 mm margins: 8 mm of room, so 8..72 px.
+        assertEquals("len=160 front=8 back=72", layout(s, listOf(box("a", 0f, 80f))))
+        assertEquals("len=160 front=8 back=72", layout(s, listOf(box("a", 8f, 80f))))
+        assertEquals("len=160 front=40 back=40", layout(s, listOf(box("a", 40f, 80f))))
+        assertEquals("len=160 front=72 back=8", layout(s, listOf(box("a", 72f, 80f))))
         // Past the room there is nothing left to give, so the label slides along instead.
-        assertEquals("len=157 front=69 back=8", layout(s, listOf(box("a", 200f, 80f))))
+        assertEquals("len=160 front=72 back=8", layout(s, listOf(box("a", 200f, 80f))))
     }
 
     @Test
@@ -50,27 +49,26 @@ class AutoLengthTest {
         val s = spec(minMm = 20)
         val lengths = listOf(0f, 8f, 40f, 72f, 200f)
             .map { LabelRenderer.effectiveLengthPx(s, listOf(box("a", it, 80f))) }
-        assertEquals(listOf(157, 157, 157, 157, 157), lengths)
+        assertEquals(listOf(160, 160, 160, 160, 160), lengths)
     }
 
     @Test
     fun `a wider element pushes the length past the minimum`() {
         val s = spec(minMm = 20)
-        // 176 px of content plus two 8 px margins, which is past the 157 px minimum.
+        // 22 mm of content plus two margins: 24 mm.
         assertEquals("len=192 front=8 back=8", layout(s, listOf(box("a", 8f, 176f))))
     }
 
     @Test
     fun `dragging one element outwards takes the other one to the edge, then grows the label`() {
-        // 30 mm label, so 236 px. A 64 px symbol at 88 px, and an 80 px text dragged right.
+        // 30 mm label, symbol of 8 mm at 11 mm, text of 10 mm dragged to the right edge.
         val s = spec(minMm = 30)
         fun withText(x: Float) = listOf(box("symbol", 88f, 64f), box("text", x, 80f))
 
-        // The text is already against the trailing margin, so the symbol has begun to follow.
-        assertEquals("len=236 front=84 back=8", layout(s, withText(152f)))
-        // Eight px further right: the text stays at the edge, the symbol comes along.
-        assertEquals("len=236 front=76 back=8", layout(s, withText(160f)))
-        // Far enough in, the symbol has reached the margin and the room is used up.
+        assertEquals("len=240 front=88 back=8", layout(s, withText(152f)))
+        // One millimeter to the right: the text stays at the edge, the symbol comes along.
+        assertEquals("len=240 front=80 back=8", layout(s, withText(160f)))
+        // Ten millimeters in, the symbol has reached the margin and the room is used up.
         assertEquals("len=240 front=8 back=8", layout(s, withText(232f)))
         // From there the label grows by whatever the text is dragged further.
         assertEquals("len=248 front=8 back=8", layout(s, withText(240f)))

@@ -56,7 +56,7 @@ data class LabelSpec(
 
     val lengthPx: Int get() = geometry.mmToDots(lengthMm)
     val leadingPx: Int get() = geometry.mmToDots(leadingMm)
-    val marginMm: Float get() = marginPx / geometry.dotsPerMm
+    val marginMm: Float get() = marginPx / geometry.headDotsPerMm
 
     /** Height of every label of this family, in dots. */
     val printHeightPx: Int get() = geometry.headDots

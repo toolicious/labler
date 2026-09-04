@@ -14,7 +14,7 @@ internal class RegaugedFeed(
 ) : PrinterProtocol by base {
 
     override fun tunableValue(tunable: Tunable): String? =
-        if (tunable == Tunable.DOTS_PER_MM) geometry.dotsPerMm.toString() else base.tunableValue(tunable)
+        if (tunable == Tunable.DOTS_PER_MM) geometry.feedDotsPerMm.toString() else base.tunableValue(tunable)
 
     override fun withTuning(tuning: ProtocolTuning): PrinterProtocol = base.withTuning(tuning)
 }

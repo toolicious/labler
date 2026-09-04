@@ -3,3 +3,5 @@
 - A print that the printer never reports on gives up after a wait that fits the label, not a flat minute (#19)
 - The print sheet closes while a job runs instead of holding the app until the printer answers (#19)
 - The built-in text sample fits a short print head instead of printing with its bottoms cut off (#19)
+- A label is laid out on square dots and stretched onto the printer's columns when it prints, so text on the Dymo comes out the shape it was drawn (#19)
+- Correcting the feed no longer moves anything on a label, it only changes how many columns come out of it (#11)
