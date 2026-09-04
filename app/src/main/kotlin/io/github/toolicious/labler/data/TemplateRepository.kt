@@ -67,6 +67,9 @@ class TemplateRepository(private val dao: TemplateDao, private val json: Json) {
 
     suspend fun setCounter(id: String, value: Int) = dao.setCounter(id, value)
 
+    /** Counts [copies] more labels printed from this template. */
+    suspend fun addPrints(id: String, copies: Int) = dao.addPrints(id, copies)
+
     suspend fun delete(id: String) = dao.delete(id)
 
     /** Snapshot of all templates (for the backup export). */
@@ -96,6 +99,7 @@ class TemplateRepository(private val dao: TemplateDao, private val json: Json) {
         elements = decodeElements(schemaVersion, elementsJson),
         favorite = favorite,
         counterValue = counterValue,
+        printCount = printCount,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
@@ -115,6 +119,7 @@ class TemplateRepository(private val dao: TemplateDao, private val json: Json) {
         schemaVersion = SCHEMA_VERSION,
         favorite = favorite,
         counterValue = counterValue,
+        printCount = printCount,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )

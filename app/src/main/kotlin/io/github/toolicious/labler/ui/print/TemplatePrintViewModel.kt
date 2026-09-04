@@ -67,6 +67,10 @@ class TemplatePrintViewModel(app: Application) : AndroidViewModel(app) {
                 if (hasCounter) {
                     templateRepo.setCounter(template.id, template.counterValue + copies)
                 }
+                // Counted here rather than derived from the history, which only keeps the last
+                // 50 entries. Both the overview and the editor print through this sheet, so this
+                // is the one place a template print passes.
+                templateRepo.addPrints(template.id, copies)
                 val printedSpec = template.spec.copy(media = media)
                 val printed = reanchored.first()
                 // A history entry is a snapshot of what actually came out: reprinting it has to

@@ -42,6 +42,9 @@ data class TemplateEntity(
     val schemaVersion: Int,
     val favorite: Boolean,
     val counterValue: Int,
+    /** Labels printed from this template, copies counted; see MIGRATION_6_7. */
+    @ColumnInfo(defaultValue = "0")
+    val printCount: Int = 0,
     val createdAt: Long,
     val updatedAt: Long,
 )
@@ -60,6 +63,13 @@ interface TemplateDao {
 
     @Query("UPDATE templates SET favorite = :favorite WHERE id = :id")
     suspend fun setFavorite(id: String, favorite: Boolean)
+
+    /**
+     * Raises the print counter. Deliberately its own statement rather than a full save, so that
+     * printing leaves updatedAt alone and does not read as an edit.
+     */
+    @Query("UPDATE templates SET printCount = printCount + :by WHERE id = :id")
+    suspend fun addPrints(id: String, by: Int)
 
     @Query("UPDATE templates SET name = :name, updatedAt = :updatedAt WHERE id = :id")
     suspend fun rename(id: String, name: String, updatedAt: Long)
@@ -165,9 +175,20 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
     }
 }
 
+/**
+ * Per-template print counter (issue #22, sorting by prints). It cannot be reconstructed, because
+ * print_history only keeps the last 50 entries and the user can delete them, so everything that
+ * exists starts at zero.
+ */
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `templates` ADD COLUMN `printCount` INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
 @Database(
     entities = [TemplateEntity::class, PrintHistoryEntity::class],
-    version = 6,
+    version = 7,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {

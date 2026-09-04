@@ -278,6 +278,11 @@ data class LabelTemplate(
     val elements: List<LabelElement> = emptyList(),
     val favorite: Boolean = false,
     val counterValue: Int = 1,
+    /**
+     * Labels printed from this template, copies counted. Defaulted so a backup written before the
+     * counter existed still reads, and so an imported template starts over at zero.
+     */
+    val printCount: Int = 0,
     val createdAt: Long = 0L,
     val updatedAt: Long = 0L,
 )
