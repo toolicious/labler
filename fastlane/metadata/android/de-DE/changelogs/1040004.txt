@@ -8,3 +8,4 @@
 - Ein langer Druck auf den Sortier- oder den Filterknopf setzt ihn wieder zurück (#22)
 - Etiketten können einen rechteckigen Micro-QR-Code tragen, der seine Module groß hält, indem er das Band entlang wächst statt nach oben (#26)
 - Data Matrix kommt als Codetyp dazu, und die Typen wählt man jetzt in einem Menü, das zu jedem sagt wofür er taugt (#26)
+- Das Vergrößern eines Bildes stürzt nicht mehr ab, wenn es genau seine Ausgangsgröße passiert (#27)

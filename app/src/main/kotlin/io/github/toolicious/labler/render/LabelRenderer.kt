@@ -613,7 +613,11 @@ object LabelRenderer {
             null
         } ?: return null
         val scaled = Bitmap.createScaledBitmap(src, w, h, true)
-        src.recycle()
+        // createScaledBitmap hands the source straight back when it is already the wanted size, so
+        // the two are then one and the same bitmap. Recycling the source unconditionally therefore
+        // threw the pixels away a line before they were read, and dragging an image through exactly
+        // its own size crashed the app (issue #27).
+        if (scaled !== src) src.recycle()
         val px = IntArray(w * h)
         scaled.getPixels(px, 0, w, 0, 0, w, h)
         scaled.recycle()
