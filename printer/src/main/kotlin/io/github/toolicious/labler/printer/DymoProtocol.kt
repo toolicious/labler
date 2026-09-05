@@ -188,6 +188,12 @@ class DymoProtocol private constructor(tuning: ProtocolTuning) : PrinterProtocol
     private fun chunkIndex(sequence: Int): Int =
         if (sequence >= SKIPPED_INDEX) sequence + 1 else sequence
 
+    /**
+     * Codes seen on the device so far: 0 after a finished job and 4 after one cancelled at the
+     * printer. 7 never arrives. With the lid open the machine runs the motor and heats the head
+     * as if it were printing, only the platen is not against the tape, so a missing cassette
+     * cannot be told from a good print. The rest of the mapping is from the description.
+     */
     override fun parsePrintResult(bytes: ByteArray): PrintResult? {
         if (bytes.size < 3) return null
         if (bytes[0].toInt() != RESULT_ESC || bytes[1].toInt() != RESULT_R) return null

@@ -93,9 +93,17 @@ class StatusClient(
      * Runs [send] and waits for the printer's verdict on the job it just received.
      *
      * The write happens from inside the collector, so a printer that answers the instant the last
-     * byte lands cannot beat the subscription to it. The first reply only says printing has begun,
-     * the one after it carries the result. Null on a timeout, which is deliberately not an error:
-     * the tape has most likely come out fine and a job is not worth failing over a missing receipt.
+     * byte lands cannot beat the subscription to it. Null on a timeout, which is deliberately not
+     * an error: the tape has most likely come out fine and a job is not worth failing over a
+     * missing receipt.
+     *
+     * The first reply is taken as the verdict. The reference implementation instead discards a
+     * first reply of 0 or 1, expecting the printer to say that it has started and then how it
+     * went, but the LetraTag 200B sends one message and no more: 1B 52 00 for a finished job and
+     * 1B 52 04 for a cancelled one. Skipping it left every successful print waiting out the clock
+     * for a second message that never came. Taking it costs nothing on a printer that does send
+     * two, because the only codes that would ever have been skipped are the two that both mean
+     * the job is through.
      */
     suspend fun awaitPrintResult(timeoutMs: Long, send: suspend () -> Unit): PrintResult? {
         val notifyUuid = uuids.notify
@@ -105,7 +113,6 @@ class StatusClient(
         }
         return try {
             withTimeout(timeoutMs) {
-                var acknowledgementSkipped = false
                 client.events
                     .onSubscription { send() }
                     .filterIsInstance<GattEvent.Notification>()
@@ -114,18 +121,6 @@ class StatusClient(
                     // to read look the same from the outside, and only the log tells them apart.
                     .onEach { bleLog("notify " + it.value.joinToString(" ") { b -> "%02X".format(b) }) }
                     .mapNotNull { protocol.parsePrintResult(it.value) }
-                    .filter { result ->
-                        // The printer answers twice, first that it has started and then how it
-                        // went. Only that acknowledgement is worth skipping, and only when the
-                        // first message is one: anything else arriving first is already the
-                        // verdict, and dropping it left a missing cassette looking like a hang.
-                        if (!acknowledgementSkipped && result == PrintResult.OK) {
-                            acknowledgementSkipped = true
-                            false
-                        } else {
-                            true
-                        }
-                    }
                     .first()
             }
         } catch (timeout: TimeoutCancellationException) {

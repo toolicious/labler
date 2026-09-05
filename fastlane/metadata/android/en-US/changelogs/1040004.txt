@@ -12,3 +12,4 @@
 - Two pixel fonts, Fixed and Terminus, keep small text readable where the normal fonts blur (#21)
 - Text sits on whole print dots now, so the same letter comes out the same width every time (#21)
 - The caption under a bar code has a font and a size of its own, so a pixel font can keep it readable on a low code (#21)
+- A finished Dymo print is recognized as such instead of waiting out the clock (#19)
