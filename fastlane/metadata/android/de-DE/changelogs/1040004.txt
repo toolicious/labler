@@ -11,3 +11,4 @@
 - Das Vergrößern eines Bildes stürzt nicht mehr ab, wenn es genau seine Ausgangsgröße passiert (#27)
 - Zwei Pixelschriften, Fixed und Terminus, halten kleine Schrift lesbar, wo die normalen verschwimmen (#21)
 - Text sitzt jetzt auf ganzen Druckpunkten, dadurch wird derselbe Buchstabe überall gleich breit (#21)
+- Die Zeile unter einem Barcode hat eine eigene Schriftart und Größe, mit einer Pixelschrift bleibt sie auch bei einem niedrigen Code lesbar (#21)

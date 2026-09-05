@@ -264,7 +264,7 @@
     <string name="print_need_printer">Aby drukować, drukarka musi być połączona.</string>
     <string name="perm_bluetooth_missing">Brak uprawnienia Bluetooth. Bez niego nie można połączyć się z drukarką.</string>
     <string name="print_printer_settings">Ustawienia drukarki</string>
-    <string name="prop_barcode_caption">Pokaż tekst</string>
+    <string name="prop_barcode_caption">Podpis</string>
     <string name="prop_barcode_data">Treść</string>
     <string name="prop_barcode_type">Typ</string>
     <string name="prop_image_threshold">Próg</string>
@@ -358,4 +358,5 @@
     <string name="code_hint_upca">Handel, dokładnie 12 cyfr</string>
     <string name="code_hint_code39">Wielkie litery i cyfry, szeroko obsługiwany</string>
     <string name="code_hint_itf">Tylko cyfry, zawsze parami</string>
+    <string name="size_auto">Auto</string>
 </resources>

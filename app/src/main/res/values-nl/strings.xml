@@ -262,7 +262,7 @@
     <string name="print_need_printer">Er moet een printer verbonden zijn om af te drukken.</string>
     <string name="perm_bluetooth_missing">Bluetooth-toestemming ontbreekt. Zonder deze kan er geen printer worden verbonden.</string>
     <string name="print_printer_settings">Printerinstellingen</string>
-    <string name="prop_barcode_caption">Tekst tonen</string>
+    <string name="prop_barcode_caption">Bijschrift</string>
     <string name="prop_barcode_data">Inhoud</string>
     <string name="prop_barcode_type">Type</string>
     <string name="prop_image_threshold">Drempel</string>
@@ -356,4 +356,5 @@
     <string name="code_hint_upca">Handel, precies 12 cijfers</string>
     <string name="code_hint_code39">Hoofdletters en cijfers, breed ondersteund</string>
     <string name="code_hint_itf">Alleen cijfers, altijd in paren</string>
+    <string name="size_auto">Auto</string>
 </resources>

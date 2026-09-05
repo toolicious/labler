@@ -79,6 +79,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -94,6 +95,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -114,6 +116,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.toolicious.labler.App
 import io.github.toolicious.labler.R
+import io.github.toolicious.labler.data.CaptionFont
 import io.github.toolicious.labler.data.CustomFontRepository
 import io.github.toolicious.labler.model.BarcodeElement
 import io.github.toolicious.labler.model.FrameElement
@@ -359,7 +362,13 @@ fun EditorScreen(
                     vm.addElement(frame, place = false)
                 }
                 AddButton(stringResource(R.string.add_barcode)) {
-                    vm.addElement(BarcodeElement(id = UUID.randomUUID().toString()))
+                    vm.addElement(
+                        BarcodeElement(
+                            id = UUID.randomUUID().toString(),
+                            captionFont = lastCaptionFont.font,
+                            captionCustomFont = lastCaptionFont.custom,
+                        )
+                    )
                 }
             }
 
@@ -638,6 +647,12 @@ private fun Stepper(
     onDecrease: () -> Unit,
     onIncrease: () -> Unit,
     edit: NumberEdit? = null,
+    /**
+     * The longest readings this stepper can show, for one that has to keep still beside something
+     * else. Laid out rather than guessed at in dp, so it also covers a translation longer than the
+     * one it was written against.
+     */
+    readings: List<String> = emptyList(),
 ) {
     var typing by remember { mutableStateOf(false) }
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -653,7 +668,18 @@ private fun Stepper(
                 .padding(horizontal = 8.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Text(value, style = MaterialTheme.typography.bodyMedium)
+            // Every reading laid out invisibly underneath, so the box is exactly as wide as the
+            // longest of them will ever need and the row stops shifting as the number gains a
+            // digit. Nothing to read out, hence the cleared semantics.
+            readings.forEach {
+                Text(
+                    it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    modifier = Modifier.alpha(0f).clearAndSetSemantics {},
+                )
+            }
+            Text(value, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
         }
         StepButton("+", onIncrease)
     }
@@ -740,6 +766,13 @@ private fun ToggleRow(label: String, checked: Boolean, onCheckedChange: (Boolean
     }
 }
 
+/**
+ * Font last picked for a bar code caption. Process-wide cache, loaded from the settings at app
+ * start and written back on every pick, the same way the symbol picker keeps its tab, so the next
+ * code element starts out with the font the last one got.
+ */
+internal var lastCaptionFont = CaptionFont()
+
 /** Custom fonts, so a property panel can offer them next to the built-in ones. */
 @Composable
 private fun rememberFontRepository(): CustomFontRepository {
@@ -788,6 +821,51 @@ private fun PixelFontChipLabel(font: LabelFont, text: String) {
                 with(density) { sample.height.toDp() },
             ),
         )
+    }
+}
+
+/** What a built-in font is called. The bundled ones go by their own name. */
+@Composable
+private fun fontName(font: LabelFont): String = when (font) {
+    LabelFont.SANS -> stringResource(R.string.font_sans)
+    LabelFont.SERIF -> stringResource(R.string.font_serif)
+    LabelFont.MONO -> stringResource(R.string.font_mono)
+    LabelFont.OSWALD -> "Oswald"
+    LabelFont.ZILLA_SLAB -> "Slab"
+    LabelFont.COMFORTAA -> "Rund"
+    LabelFont.CAVEAT -> "Caveat"
+    LabelFont.PACIFICO -> "Pacifico"
+    LabelFont.PIXEL_FIXED -> "Fixed"
+    LabelFont.PIXEL_TERMINUS -> "Terminus"
+}
+
+/** A built-in font's name, set in that font. */
+@Composable
+private fun FontLabel(font: LabelFont) {
+    val name = fontName(font)
+    // A bitmap face has no Typeface to hand Compose, and a substitute would hide the one thing
+    // that makes it worth picking.
+    if (PixelFonts.isPixel(font)) PixelFontChipLabel(font, name)
+    else FontChipLabel(name, labelFontFamily(font = font))
+}
+
+/**
+ * The same for a font of the user's own. The icon tells the three kinds apart at a glance: plain
+ * text for the built-in ones, dots for the bitmap ones, and this for the imported ones.
+ */
+@Composable
+private fun CustomFontLabel(label: String, family: String) {
+    Row(
+        modifier = Modifier.height(fontChipLineHeight()),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painterResource(R.drawable.ic_font_custom),
+            contentDescription = null,
+            modifier = Modifier.size(FONT_CHIP_ICON),
+        )
+        Spacer(Modifier.width(4.dp))
+        FontChipLabel(label, labelFontFamily(customFamily = family))
     }
 }
 
@@ -959,9 +1037,139 @@ private fun BarcodeProperties(element: BarcodeElement, onUpdate: (LabelElement) 
             trailingIcon = { if (element.data.isNotEmpty()) ClearButton { onUpdate(element.copy(data = "")) } },
             singleLine = true,
         )
-        Spacer(Modifier.height(4.dp))
-        ToggleRow(stringResource(R.string.prop_barcode_caption), element.showText) {
-            onUpdate(element.copy(showText = it))
+        // Six, like every other heading in this panel. Four was right when a switch stood here,
+        // a heading sits further from what it follows.
+        Spacer(Modifier.height(6.dp))
+        val context = LocalContext.current
+        val container = remember(context) { (context.applicationContext as App).container }
+        GroupLabel(stringResource(R.string.prop_barcode_caption))
+        // Switch, font and size on one row, with the heading above carrying the word that would
+        // otherwise sit next to the switch and cost the font name its space. A Row and not a
+        // FlowRow on purpose: the font picker gives way instead of anything dropping to a line
+        // of its own.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Switch(
+                checked = element.showText,
+                onCheckedChange = { onUpdate(element.copy(showText = it)) },
+            )
+            // Nothing to set a font or a size for while the caption is off.
+            if (element.showText) {
+                Spacer(Modifier.width(8.dp))
+                CaptionFontPicker(
+                    font = element.captionFont,
+                    custom = element.captionCustomFont,
+                    modifier = Modifier.weight(1f),
+                ) { font, custom ->
+                    onUpdate(element.copy(captionFont = font, captionCustomFont = custom))
+                    lastCaptionFont = CaptionFont(font, custom)
+                    container.applicationScope.launch {
+                        container.settings.saveCaptionFont(lastCaptionFont)
+                    }
+                }
+                CaptionSizeSpinner(element) { onUpdate(element.copy(captionSizePx = it)) }
+            }
+        }
+    }
+}
+
+/**
+ * Size of the caption band, in the stepper a text element sizes its font with, with automatic
+ * sitting one step below the smallest height that can be set. So the two ends meet: stepping down
+ * off the smallest height reaches it, and stepping up off it lands back on that height.
+ */
+@Composable
+private fun CaptionSizeSpinner(element: BarcodeElement, onUpdate: (Float?) -> Unit) {
+    val range = LabelRenderer.MIN_CAPTION_PX..LabelRenderer.MAX_CAPTION_PX
+    val size = element.captionSizePx?.roundToInt()
+    Stepper(
+        label = "",
+        value = size?.let { "$it px" } ?: stringResource(R.string.size_auto),
+        readings = listOf("${LabelRenderer.MAX_CAPTION_PX} px", stringResource(R.string.size_auto)),
+        onDecrease = {
+            // Already at the bottom when it is automatic, so nothing below it to go to.
+            val next = (size ?: return@Stepper) - CAPTION_SIZE_STEP
+            onUpdate(if (next < range.first) null else next.toFloat())
+        },
+        onIncrease = { onUpdate((size?.plus(CAPTION_SIZE_STEP) ?: range.first).coerceIn(range).toFloat()) },
+        edit = NumberEdit(
+            title = stringResource(R.string.prop_size),
+            value = size ?: LabelRenderer.autoCaptionHeightPx(element.heightPx).roundToInt(),
+            range = range,
+            onValue = { onUpdate(it.toFloat()) },
+        ),
+    )
+}
+
+/** Dots a tap on the caption spinner is worth. Its whole range is thirty-odd dots wide. */
+private const val CAPTION_SIZE_STEP = 2
+
+/**
+ * Font for the caption under a bar code, in the order a text element lists them: the built-in
+ * fonts, then the imported ones.
+ *
+ * A dropdown and not the chip row a text element gets, because that row runs over four lines and
+ * this one sits next to a switch.
+ */
+@Composable
+private fun CaptionFontPicker(
+    font: LabelFont,
+    custom: String?,
+    modifier: Modifier = Modifier,
+    onSelect: (LabelFont, String?) -> Unit,
+) {
+    var open by remember { mutableStateOf(false) }
+    val customFonts by rememberFontRepository().fonts.collectAsState()
+    val chosen = customFonts.firstOrNull { it.family == custom }
+    Box(modifier) {
+        Surface(
+            onClick = { open = true },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            color = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        ) {
+            Row(
+                modifier = Modifier.padding(start = 10.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                ProvideTextStyle(MaterialTheme.typography.labelLarge) {
+                    // An uninstalled font is shown by its bare family name, which is the only
+                    // thing left of it, rather than silently reading as the fallback.
+                    if (custom != null) CustomFontLabel(chosen?.label ?: custom, custom)
+                    else FontLabel(font)
+                }
+                Spacer(Modifier.weight(1f))
+                Icon(
+                    Icons.Default.KeyboardArrowDown,
+                    contentDescription = stringResource(R.string.group_font),
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            LabelFont.entries.forEach { f ->
+                DropdownMenuItem(
+                    text = { FontLabel(f) },
+                    trailingIcon = {
+                        if (custom == null && font == f) Icon(Icons.Default.Check, contentDescription = null)
+                    },
+                    onClick = { open = false; onSelect(f, null) },
+                )
+            }
+            customFonts.forEach { c ->
+                DropdownMenuItem(
+                    text = { CustomFontLabel(c.label, c.family) },
+                    trailingIcon = {
+                        if (custom == c.family) Icon(Icons.Default.Check, contentDescription = null)
+                    },
+                    // font is left alone on purpose, it stays the fallback for this element.
+                    onClick = { open = false; onSelect(font, c.family) },
+                )
+            }
         }
     }
 }
@@ -1375,24 +1583,7 @@ private fun TextProperties(
             ChoiceChip(
                 selected = element.customFont == null && element.font == f,
                 onClick = { onUpdate(element.copy(font = f, customFont = null)) },
-                label = {
-                    val name = when (f) {
-                        LabelFont.SANS -> stringResource(R.string.font_sans)
-                        LabelFont.SERIF -> stringResource(R.string.font_serif)
-                        LabelFont.MONO -> stringResource(R.string.font_mono)
-                        LabelFont.OSWALD -> "Oswald"
-                        LabelFont.ZILLA_SLAB -> "Slab"
-                        LabelFont.COMFORTAA -> "Rund"
-                        LabelFont.CAVEAT -> "Caveat"
-                        LabelFont.PACIFICO -> "Pacifico"
-                        LabelFont.PIXEL_FIXED -> "Fixed"
-                        LabelFont.PIXEL_TERMINUS -> "Terminus"
-                    }
-                    // A bitmap face has no Typeface to hand Compose, and a substitute would hide
-                    // the one thing that makes it worth picking.
-                    if (PixelFonts.isPixel(f)) PixelFontChipLabel(f, name)
-                    else FontChipLabel(name, labelFontFamily(font = f))
-                }
+                label = { FontLabel(f) },
             )
         }
         customFonts.forEach { custom ->
@@ -1400,23 +1591,7 @@ private fun TextProperties(
                 selected = element.customFont == custom.family,
                 // element.font is left alone on purpose, it stays the fallback for this element.
                 onClick = { onUpdate(element.copy(customFont = custom.family)) },
-                label = {
-                    // Marks the chip as a font of the user's own, so the three kinds in this row
-                    // are told apart at a glance: plain text for the built-in ones, dots for the
-                    // bitmap ones, and this for the imported ones.
-                    Row(
-                        modifier = Modifier.height(fontChipLineHeight()),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            painterResource(R.drawable.ic_font_custom),
-                            contentDescription = null,
-                            modifier = Modifier.size(FONT_CHIP_ICON),
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        FontChipLabel(custom.label, labelFontFamily(customFamily = custom.family))
-                    }
-                }
+                label = { CustomFontLabel(custom.label, custom.family) },
             )
         }
         if (missingFont != null) {

@@ -258,7 +258,7 @@
     <string name="add_barcode">條碼</string>
     <string name="prop_barcode_data">內容</string>
     <string name="prop_barcode_type">類型</string>
-    <string name="prop_barcode_caption">顯示文字</string>
+    <string name="prop_barcode_caption">說明文字</string>
 
     <!-- QR 內容 -->
     <string name="qr_content">QR 內容</string>
@@ -366,4 +366,5 @@
     <string name="code_hint_upca">零售，正好 12 位數字</string>
     <string name="code_hint_code39">大寫字母和數字，廣泛可讀</string>
     <string name="code_hint_itf">僅數字，且必須是偶數個</string>
+    <string name="size_auto">自動</string>
 </resources>

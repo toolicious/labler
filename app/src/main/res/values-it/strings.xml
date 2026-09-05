@@ -264,7 +264,7 @@
     <string name="print_need_printer">Per stampare è necessaria una stampante connessa.</string>
     <string name="perm_bluetooth_missing">Manca l\'autorizzazione Bluetooth. Senza di essa non è possibile collegare alcuna stampante.</string>
     <string name="print_printer_settings">Impostazioni stampante</string>
-    <string name="prop_barcode_caption">Mostra testo</string>
+    <string name="prop_barcode_caption">Didascalia</string>
     <string name="prop_barcode_data">Contenuto</string>
     <string name="prop_barcode_type">Tipo</string>
     <string name="prop_image_threshold">Soglia</string>
@@ -358,4 +358,5 @@
     <string name="code_hint_upca">Commercio, esattamente 12 cifre</string>
     <string name="code_hint_code39">Maiuscole e cifre, molto diffuso</string>
     <string name="code_hint_itf">Solo cifre, sempre a coppie</string>
+    <string name="size_auto">Auto</string>
 </resources>

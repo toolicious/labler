@@ -263,7 +263,7 @@
     <string name="add_barcode">Kode</string>
     <string name="prop_barcode_data">Konten</string>
     <string name="prop_barcode_type">Jenis</string>
-    <string name="prop_barcode_caption">Tampilkan teks</string>
+    <string name="prop_barcode_caption">Keterangan</string>
 
     <!-- Konten QR -->
     <string name="qr_content">Konten QR</string>
@@ -371,4 +371,5 @@
     <string name="code_hint_upca">Ritel, tepat 12 angka</string>
     <string name="code_hint_code39">Huruf besar dan angka, terbaca di mana-mana</string>
     <string name="code_hint_itf">Hanya angka, dan selalu genap</string>
+    <string name="size_auto">Otomatis</string>
 </resources>

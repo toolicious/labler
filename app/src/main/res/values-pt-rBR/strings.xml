@@ -264,7 +264,7 @@
     <string name="print_need_printer">É necessário conectar uma impressora para imprimir.</string>
     <string name="perm_bluetooth_missing">Falta a permissão de Bluetooth. Sem ela nenhuma impressora pode se conectar.</string>
     <string name="print_printer_settings">Configurações da impressora</string>
-    <string name="prop_barcode_caption">Mostrar texto</string>
+    <string name="prop_barcode_caption">Legenda</string>
     <string name="prop_barcode_data">Conteúdo</string>
     <string name="prop_barcode_type">Tipo</string>
     <string name="prop_image_threshold">Limiar</string>
@@ -358,4 +358,5 @@
     <string name="code_hint_upca">Varejo, exatamente 12 dígitos</string>
     <string name="code_hint_code39">Maiúsculas e dígitos, muito difundido</string>
     <string name="code_hint_itf">Somente dígitos, sempre em pares</string>
+    <string name="size_auto">Auto</string>
 </resources>

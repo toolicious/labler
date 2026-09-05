@@ -258,7 +258,7 @@
     <string name="add_barcode">코드</string>
     <string name="prop_barcode_data">내용</string>
     <string name="prop_barcode_type">종류</string>
-    <string name="prop_barcode_caption">텍스트 표시</string>
+    <string name="prop_barcode_caption">캐션</string>
 
     <!-- QR 내용 -->
     <string name="qr_content">QR 내용</string>
@@ -366,4 +366,5 @@
     <string name="code_hint_upca">소매용, 정확히 12자리</string>
     <string name="code_hint_code39">대문자와 숫자, 널리 읽힘</string>
     <string name="code_hint_itf">숫자만, 항상 짝수 개</string>
+    <string name="size_auto">자동</string>
 </resources>

@@ -264,7 +264,7 @@
     <string name="print_need_printer">Для печати необходимо подключить принтер.</string>
     <string name="perm_bluetooth_missing">Нет разрешения на Bluetooth. Без него принтер не подключить.</string>
     <string name="print_printer_settings">Настройки принтера</string>
-    <string name="prop_barcode_caption">Показать текст</string>
+    <string name="prop_barcode_caption">Подпись</string>
     <string name="prop_barcode_data">Содержимое</string>
     <string name="prop_barcode_type">Тип</string>
     <string name="prop_image_threshold">Порог</string>
@@ -358,4 +358,5 @@
     <string name="code_hint_upca">Торговля, ровно 12 цифр</string>
     <string name="code_hint_code39">Заглавные буквы и цифры, широко читается</string>
     <string name="code_hint_itf">Только цифры, всегда парами</string>
+    <string name="size_auto">Авто</string>
 </resources>

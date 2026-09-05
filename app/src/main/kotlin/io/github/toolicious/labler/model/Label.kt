@@ -263,6 +263,18 @@ data class BarcodeElement(
     val widthPx: Float = 64f,
     val heightPx: Float = 64f,
     val showText: Boolean = true,
+    /**
+     * Face of the caption, out of the same set a text element offers. The default is what every
+     * caption was drawn in before it could be picked, so an older label keeps the look it had.
+     */
+    val captionFont: LabelFont = LabelFont.SANS,
+    /** A font of the user's own, which wins over [captionFont] the way it does on a text element. */
+    val captionCustomFont: String? = null,
+    /**
+     * Height of the caption band in dots, or null for the share of the code the caption always
+     * took. Null is the default, so an older label keeps the size it had.
+     */
+    val captionSizePx: Float? = null,
     // For QR codes only: a typed payload (WiFi, contact, ...). The encoded string in `data` is
     // rebuilt from these fields, which are kept so the wizard can be reopened for editing.
     val payloadType: QrPayloadType = QrPayloadType.TEXT,

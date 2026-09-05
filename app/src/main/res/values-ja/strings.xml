@@ -264,7 +264,7 @@
     <string name="print_need_printer">印刷するにはプリンターを接続する必要があります。</string>
     <string name="perm_bluetooth_missing">Bluetooth の権限がありません。許可しないとプリンターに接続できません。</string>
     <string name="print_printer_settings">プリンター設定</string>
-    <string name="prop_barcode_caption">テキストを表示</string>
+    <string name="prop_barcode_caption">キャプション</string>
     <string name="prop_barcode_data">内容</string>
     <string name="prop_barcode_type">種類</string>
     <string name="prop_image_threshold">しきい値</string>
@@ -358,4 +358,5 @@
     <string name="code_hint_upca">小売向け、12桁ちょうど</string>
     <string name="code_hint_code39">大文字と数字、広く読める</string>
     <string name="code_hint_itf">数字のみ、必ず偶数桁</string>
+    <string name="size_auto">自動</string>
 </resources>

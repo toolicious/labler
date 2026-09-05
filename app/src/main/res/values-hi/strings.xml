@@ -258,7 +258,7 @@
     <string name="add_barcode">कोड</string>
     <string name="prop_barcode_data">सामग्री</string>
     <string name="prop_barcode_type">प्रकार</string>
-    <string name="prop_barcode_caption">टेक्स्ट दिखाएँ</string>
+    <string name="prop_barcode_caption">कैप्शन</string>
 
     <!-- QR सामग्री -->
     <string name="qr_content">QR सामग्री</string>
@@ -366,4 +366,5 @@
     <string name="code_hint_upca">रिटेल, ठीक 12 अंक</string>
     <string name="code_hint_code39">बड़े अक्षर और अंक, हर जगह पढ़े जाते हैं</string>
     <string name="code_hint_itf">सिर्फ़ अंक, और हमेशा सम संख्या में</string>
+    <string name="size_auto">ऑटो</string>
 </resources>

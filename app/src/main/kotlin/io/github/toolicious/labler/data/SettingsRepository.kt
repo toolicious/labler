@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import io.github.toolicious.labler.model.LabelFont
 import io.github.toolicious.labler.printer.DeviceNames
 import io.github.toolicious.labler.printer.PrinterFamily
 import io.github.toolicious.labler.printer.ProtocolTuning
@@ -72,6 +73,13 @@ data class OverviewPrefs(
     val ascending: Boolean = TemplateSort.DEFAULT.ascendingByDefault,
 )
 
+/** Face last picked for a bar code caption, so the next code element can start with it. */
+data class CaptionFont(
+    val font: LabelFont = LabelFont.SANS,
+    /** A font of the user's own, which wins over [font]. */
+    val custom: String? = null,
+)
+
 /**
  * More than fit on a row, a tablet in landscape included, so that removing one always has
  * something left to slide up into its place.
@@ -94,6 +102,8 @@ class SettingsRepository(private val context: Context) {
         val TEMPLATE_VIEW_MODE = stringPreferencesKey("template_view_mode")
         val TEMPLATE_SORT = stringPreferencesKey("template_sort")
         val TEMPLATE_SORT_ASC = booleanPreferencesKey("template_sort_asc")
+        val CAPTION_FONT = stringPreferencesKey("caption_font")
+        val CAPTION_CUSTOM_FONT = stringPreferencesKey("caption_custom_font")
 
         /**
          * One key per family and tunable, so a value a future printer needs fits without
@@ -201,6 +211,26 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun saveLastSymbolTab(tab: Int) {
         context.dataStore.edit { it[Keys.LAST_SYMBOL_TAB] = tab }
+    }
+
+    /**
+     * Font last picked for a bar code caption. A font that is no longer installed reads back as
+     * it was stored; the renderer falls back on its own, and the picker shows the name.
+     */
+    val captionFont: Flow<CaptionFont> = context.dataStore.data.map { prefs ->
+        CaptionFont(
+            font = LabelFont.entries.firstOrNull { it.name == prefs[Keys.CAPTION_FONT] }
+                ?: LabelFont.SANS,
+            custom = prefs[Keys.CAPTION_CUSTOM_FONT]?.takeIf { it.isNotBlank() },
+        )
+    }
+
+    suspend fun saveCaptionFont(caption: CaptionFont) {
+        context.dataStore.edit {
+            it[Keys.CAPTION_FONT] = caption.font.name
+            if (caption.custom.isNullOrBlank()) it.remove(Keys.CAPTION_CUSTOM_FONT)
+            else it[Keys.CAPTION_CUSTOM_FONT] = caption.custom
+        }
     }
 
     /**

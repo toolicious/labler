@@ -191,13 +191,31 @@ object PixelFonts {
      * A size below the smallest designed face still gets that face rather than nothing, because a
      * label with no text at all would be worse than one whose text is a little too tall.
      */
-    fun fit(family: LabelFont, heightPx: Float, bold: Boolean): FittedPixelFont? {
+    fun fit(family: LabelFont, heightPx: Float, bold: Boolean): FittedPixelFont? =
+        fitLine(family, columns = 0, heightPx = heightPx, widthPx = 0f, bold = bold)
+
+    /**
+     * The same choice for one line that also has to stay inside [widthPx], with [columns]
+     * characters on it. The caption under a bar code is the case: its band is ten to twenty dots
+     * tall, but a long number would run past the bars at the face that height alone allows, so the
+     * width has to count too. [columns] of zero leaves the width out of it.
+     */
+    fun fitLine(
+        family: LabelFont,
+        columns: Int,
+        heightPx: Float,
+        widthPx: Float,
+        bold: Boolean,
+    ): FittedPixelFont? {
         val names = FILES[family] ?: return null
         var best: FittedPixelFont? = null
         for (name in names) {
             val file = if (bold) BOLD[family]?.get(name) ?: name else name
             val font = face(file) ?: face(name) ?: continue
-            val scale = (heightPx / font.cellHeight).toInt()
+            val byHeight = (heightPx / font.cellHeight).toInt()
+            val scale =
+                if (columns > 0) minOf(byHeight, (widthPx / (columns * font.cellWidth)).toInt())
+                else byHeight
             if (scale < 1) {
                 if (best == null) best = FittedPixelFont(font, 1)
                 continue

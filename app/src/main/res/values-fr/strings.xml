@@ -262,7 +262,7 @@
     <string name="print_need_printer">Une imprimante doit être connectée pour imprimer.</string>
     <string name="perm_bluetooth_missing">L\'autorisation Bluetooth est manquante. Sans elle, aucune imprimante ne peut se connecter.</string>
     <string name="print_printer_settings">Paramètres de l\'imprimante</string>
-    <string name="prop_barcode_caption">Afficher le texte</string>
+    <string name="prop_barcode_caption">Légende</string>
     <string name="prop_barcode_data">Contenu</string>
     <string name="prop_barcode_type">Type</string>
     <string name="prop_image_threshold">Seuil</string>
@@ -356,4 +356,5 @@
     <string name="code_hint_upca">Commerce, exactement 12 chiffres</string>
     <string name="code_hint_code39">Majuscules et chiffres, très répandu</string>
     <string name="code_hint_itf">Chiffres uniquement, toujours par paires</string>
+    <string name="size_auto">Auto</string>
 </resources>

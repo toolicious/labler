@@ -424,7 +424,6 @@ object LabelRenderer {
 
     private fun drawPixelText(canvas: Canvas, e: TextElement, layout: PixelLayout) {
         val fitted = layout.fitted
-        val font = fitted.font
         val scale = fitted.scale.toFloat()
         val paint = Paint().apply { color = Color.BLACK; isAntiAlias = false }
         layout.lines.forEachIndexed { row, line ->
@@ -435,31 +434,45 @@ object LabelRenderer {
                 LabelTextAlign.RIGHT -> layout.width - lineWidth
             }.toFloat()
             val originY = (row * fitted.cellHeight).toFloat()
-            line.forEachIndexed { column, character ->
-                val left = originX + column * fitted.cellWidth
-                // Whole runs of set dots become one rectangle, which is a good deal fewer draw
-                // calls than one per dot on a long label.
-                for (y in 0 until font.cellHeight) {
-                    var runStart = -1
-                    for (x in 0..font.cellWidth) {
-                        val set = x < font.cellWidth && font.isDark(character.code, x, y)
-                        if (set && runStart < 0) runStart = x
-                        if (!set && runStart >= 0) {
-                            canvas.drawRect(
-                                left + runStart * scale,
-                                originY + y * scale,
-                                left + x * scale,
-                                originY + (y + 1) * scale,
-                                paint,
-                            )
-                            runStart = -1
-                        }
-                    }
-                }
-            }
+            drawPixelLine(canvas, fitted, line, originX, originY, paint)
             if (e.underline && line.isNotEmpty()) {
                 val y = originY + fitted.cellHeight - scale
                 canvas.drawRect(originX, y, originX + lineWidth, y + scale, paint)
+            }
+        }
+    }
+
+    /** One line of glyphs, its top left corner at [left], [top]. */
+    private fun drawPixelLine(
+        canvas: Canvas,
+        fitted: FittedPixelFont,
+        line: String,
+        left: Float,
+        top: Float,
+        paint: Paint,
+    ) {
+        val font = fitted.font
+        val scale = fitted.scale.toFloat()
+        line.forEachIndexed { column, character ->
+            val cellLeft = left + column * fitted.cellWidth
+            // Whole runs of set dots become one rectangle, which is a good deal fewer draw calls
+            // than one per dot on a long label.
+            for (y in 0 until font.cellHeight) {
+                var runStart = -1
+                for (x in 0..font.cellWidth) {
+                    val set = x < font.cellWidth && font.isDark(character.code, x, y)
+                    if (set && runStart < 0) runStart = x
+                    if (!set && runStart >= 0) {
+                        canvas.drawRect(
+                            cellLeft + runStart * scale,
+                            top + y * scale,
+                            cellLeft + x * scale,
+                            top + (y + 1) * scale,
+                            paint,
+                        )
+                        runStart = -1
+                    }
+                }
             }
         }
     }
@@ -591,13 +604,36 @@ object LabelRenderer {
 
     // ----- Barcode / QR (ZXing, integer module scaling -> no staircase effect) -----
 
-    private fun barcodeCaptionHeight(e: BarcodeElement): Float =
-        if (!e.symbology.isMatrix && e.showText) (e.heightPx * 0.26f).coerceIn(10f, 20f) else 0f
+    /**
+     * Smallest and largest caption band that can be set by hand. The floor is the one a text
+     * element has for its type, and it is also about where the bitmap faces run out: the smallest
+     * of them is seven rows tall.
+     */
+    const val MIN_CAPTION_PX = 8
+    const val MAX_CAPTION_PX = 40
+
+    /**
+     * The band a caption gets when its size is left on automatic, and what the editor offers as
+     * the first step out of it. A share of the code rather than a fixed height, so it keeps its
+     * proportions as the code is dragged bigger.
+     */
+    fun autoCaptionHeightPx(codeHeightPx: Float): Float = (codeHeightPx * 0.26f).coerceIn(10f, 20f)
+
+    private fun barcodeCaptionHeight(e: BarcodeElement): Float {
+        if (e.symbology.isMatrix || !e.showText) return 0f
+        val size = e.captionSizePx ?: return autoCaptionHeightPx(e.heightPx)
+        // Held to half the code, so the bars always keep the larger share of it however large the
+        // caption was set on a code that has since been dragged small.
+        val room = maxOf(MIN_CAPTION_PX.toFloat(), e.heightPx * 0.5f)
+        return size.coerceIn(MIN_CAPTION_PX.toFloat(), room)
+    }
 
     private fun barcodeMatrix(e: BarcodeElement): BitMatrix? {
         if (e.data.isBlank()) return null
-        // showText changes the encoded height (it reserves a caption band), so it must be in the key.
-        val key = "${e.symbology}:${e.widthPx.toInt()}:${e.heightPx.toInt()}:${e.showText}:${e.data}"
+        // The caption reserves a band and so changes the height the code is encoded at, which puts
+        // both the switch and the size it was given into the key.
+        val key = "${e.symbology}:${e.widthPx.toInt()}:${e.heightPx.toInt()}:" +
+            "${e.showText}:${e.captionSizePx?.toInt()}:${e.data}"
         matrixCache.get(key)?.let { return it }
         if (e.symbology == Symbology.RMQR) {
             val matrix = rmqrMatrix(e)
@@ -680,15 +716,45 @@ object LabelRenderer {
         val oy = snap(e.y + (codeAreaH - mh) / 2f)
         canvas.drawBitmap(bmp, ox, oy, nnPaint)
         bmp.recycle()
-        if (captionH > 0f) {
+        if (captionH > 0f) drawBarcodeCaption(canvas, e, frameW, codeAreaH, captionH)
+    }
+
+    /**
+     * The line under a bar code, in the face the element carries.
+     *
+     * A bitmap face is worth having here: the band is a quarter of the code and at most twenty
+     * dots, so on a low bar code the caption comes out around eight dots tall, where an outline
+     * smudges the same way the small label text did (issue #21). Such a face is picked to fit the
+     * band in height and the code in width, so a long number drops to a narrower one instead of
+     * running past the bars. Every other font goes the way it always did.
+     */
+    private fun drawBarcodeCaption(
+        canvas: Canvas,
+        e: BarcodeElement,
+        frameW: Float,
+        codeAreaH: Float,
+        captionH: Float,
+    ) {
+        val fitted =
+            if (e.captionCustomFont == null && PixelFonts.isPixel(e.captionFont))
+                PixelFonts.fitLine(e.captionFont, e.data.length, captionH, frameW, bold = false)
+            else null
+        if (fitted == null) {
             val tp = TextPaint().apply {
                 isAntiAlias = true
                 color = Color.BLACK
                 textSize = captionH * 0.8f
                 textAlign = Paint.Align.CENTER
+                typeface = FontRegistry.base(e.captionFont, e.captionCustomFont)
             }
             canvas.drawText(e.data, e.x + frameW / 2f, e.y + codeAreaH + captionH * 0.75f, tp)
+            return
         }
+        val paint = Paint().apply { color = Color.BLACK; isAntiAlias = false }
+        val lineWidth = e.data.length * fitted.cellWidth
+        val left = snap(e.x + (frameW - lineWidth) / 2f)
+        val top = snap(e.y + codeAreaH + (captionH - fitted.cellHeight) / 2f)
+        drawPixelLine(canvas, fitted, e.data, left, top, paint)
     }
 
     // ----- Image (imported, dithered) -----

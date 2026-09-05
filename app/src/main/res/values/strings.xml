@@ -331,7 +331,7 @@
     <string name="code_hint_upca">Retail, exactly 12 digits</string>
     <string name="code_hint_code39">Capitals and digits, widely read</string>
     <string name="code_hint_itf">Digits only, always in pairs</string>
-    <string name="prop_barcode_caption">Show text</string>
+    <string name="prop_barcode_caption">Caption</string>
 
     <!-- QR content -->
     <string name="qr_content">QR content</string>
@@ -372,4 +372,5 @@
     <string name="backup_ok">Backup done.</string>
     <string name="backup_failed">Backup failed.</string>
     <string name="about_repo" translatable="false">https://github.com/toolicious/labler</string>
+    <string name="size_auto">Auto</string>
 </resources>

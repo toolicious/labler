@@ -262,7 +262,7 @@
     <string name="print_need_printer">必须连接打印机才能打印。</string>
     <string name="perm_bluetooth_missing">缺少蓝牙权限。没有它就无法连接打印机。</string>
     <string name="print_printer_settings">打印机设置</string>
-    <string name="prop_barcode_caption">显示文本</string>
+    <string name="prop_barcode_caption">说明文字</string>
     <string name="prop_barcode_data">内容</string>
     <string name="prop_barcode_type">类型</string>
     <string name="prop_image_threshold">阈值</string>
@@ -356,4 +356,5 @@
     <string name="code_hint_upca">零售，正好 12 位数字</string>
     <string name="code_hint_code39">大写字母和数字，广泛可读</string>
     <string name="code_hint_itf">仅数字，且必须是偶数个</string>
+    <string name="size_auto">自动</string>
 </resources>

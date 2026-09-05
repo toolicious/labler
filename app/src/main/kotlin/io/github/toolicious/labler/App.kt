@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import io.github.toolicious.labler.render.FontRegistry
 import io.github.toolicious.labler.render.PixelFonts
+import io.github.toolicious.labler.ui.editor.lastCaptionFont
 import io.github.toolicious.labler.ui.editor.lastSymbolTab
 import io.github.toolicious.labler.ui.home.lastOverviewPrefs
 import io.github.toolicious.labler.ui.info.wrapWithAppLanguage
@@ -26,10 +27,14 @@ class App : Application() {
         container = AppContainer(this)
         FontRegistry.init(this)
         PixelFonts.init(this)
-        // Load the most recently used symbol/emoji tab and the overview's layout and order into
-        // their caches. The splash holds long enough on a cold start for both to arrive in time.
+        // Load the most recently used symbol/emoji tab, the font a bar code caption last got and
+        // the overview's layout and order into their caches. The splash holds long enough on a
+        // cold start for them to arrive in time.
         container.applicationScope.launch {
             lastSymbolTab = container.settings.lastSymbolTab.first()
+        }
+        container.applicationScope.launch {
+            lastCaptionFont = container.settings.captionFont.first()
         }
         container.applicationScope.launch {
             lastOverviewPrefs = container.settings.overviewPrefs.first()

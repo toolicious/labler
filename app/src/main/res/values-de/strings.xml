@@ -309,7 +309,7 @@
     <string name="code_hint_upca">Handel, genau 12 Ziffern</string>
     <string name="code_hint_code39">Großbuchstaben und Ziffern</string>
     <string name="code_hint_itf">Nur Ziffern, immer paarweise</string>
-    <string name="prop_barcode_caption">Text anzeigen</string>
+    <string name="prop_barcode_caption">Beschriftung</string>
 
     <!-- QR-Inhalt -->
     <string name="qr_content">QR-Inhalt</string>
@@ -367,4 +367,5 @@
     <string name="err_no_cassette">Keine Bandkassette im Drucker</string>
     <string name="err_battery_too_low">Akku zu schwach zum Drucken</string>
     <string name="err_print_canceled">Druck am Gerät abgebrochen</string>
+    <string name="size_auto">Auto</string>
 </resources>

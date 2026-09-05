@@ -264,7 +264,7 @@
     <string name="print_need_printer">Yazdırmak için bir yazıcı bağlı olmalı.</string>
     <string name="perm_bluetooth_missing">Bluetooth izni eksik. İzin verilmeden hiçbir yazıcıya bağlanılamaz.</string>
     <string name="print_printer_settings">Yazıcı ayarları</string>
-    <string name="prop_barcode_caption">Metni göster</string>
+    <string name="prop_barcode_caption">Açıklama</string>
     <string name="prop_barcode_data">İçerik</string>
     <string name="prop_barcode_type">Tür</string>
     <string name="prop_image_threshold">Eşik</string>
@@ -358,4 +358,5 @@
     <string name="code_hint_upca">Perakende, tam 12 rakam</string>
     <string name="code_hint_code39">Büyük harf ve rakam, yaygın okunur</string>
     <string name="code_hint_itf">Yalnızca rakam, her zaman çift sayıda</string>
+    <string name="size_auto">Otomatik</string>
 </resources>
