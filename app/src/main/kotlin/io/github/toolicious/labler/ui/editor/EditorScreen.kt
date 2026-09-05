@@ -6,6 +6,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -99,10 +100,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.takeOrElse
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.toolicious.labler.App
@@ -126,6 +133,7 @@ import io.github.toolicious.labler.printer.dither.DitherMode
 import io.github.toolicious.labler.printer.dither.OutlineMethod
 import io.github.toolicious.labler.render.FontRegistry
 import io.github.toolicious.labler.render.LabelRenderer
+import io.github.toolicious.labler.render.PixelFonts
 import io.github.toolicious.labler.ui.components.ClearButton
 import io.github.toolicious.labler.ui.components.appDateFormat
 import io.github.toolicious.labler.ui.components.appTimeFormat
@@ -161,6 +169,7 @@ fun EditorScreen(
     val canRedo by vm.canRedo.collectAsState()
     var showPrintSheet by remember { mutableStateOf(false) }
     var showMetaDialog by remember { mutableStateOf(false) }
+
     val withBlePermissions = rememberBlePermissionRunner()
 
     val t = template
@@ -261,6 +270,7 @@ fun EditorScreen(
                 onEdgeDragBy = vm::dragEdgeBy,
                 onEdgeDragEnd = vm::endEdgeDrag,
                 onEdgeFit = vm::fitEdge,
+
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -741,6 +751,46 @@ private fun rememberFontRepository(): CustomFontRepository {
  * Chip caption set in the font it selects, capped in width so that one long family name cannot
  * push the whole row out of shape.
  */
+/**
+ * Chip caption drawn out of the face's own dots, for the bitmap fonts.
+ *
+ * Every family is sampled at the same dot size, so the captions come out as different in height as
+ * the faces are: Fixed, seven rows tall, ends up visibly smaller than Terminus at twelve. That is
+ * the point of it, the chip has to show which one belongs on tiny text.
+ */
+@Composable
+private fun PixelFontChipLabel(font: LabelFont, text: String) {
+    val density = LocalDensity.current
+    val line = fontChipLineHeight()
+    val sample = remember(font, text, density.density, line) {
+        PixelFonts.sample(font, with(density) { line.toPx() })?.rasterize(text)?.asImageBitmap()
+    }
+    if (sample == null) {
+        FontChipLabel(text, null)
+        return
+    }
+    Row(modifier = Modifier.height(line), verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            painterResource(R.drawable.ic_font_pixel),
+            contentDescription = null,
+            modifier = Modifier.size(FONT_CHIP_ICON),
+        )
+        Spacer(Modifier.width(4.dp))
+        Image(
+            bitmap = sample,
+            contentDescription = text,
+            // Unfiltered, or the dots go soft and the picture stops being the argument it is
+            // meant to be.
+            filterQuality = FilterQuality.None,
+            colorFilter = ColorFilter.tint(LocalContentColor.current),
+            modifier = Modifier.size(
+                with(density) { sample.width.toDp() },
+                with(density) { sample.height.toDp() },
+            ),
+        )
+    }
+}
+
 @Composable
 private fun FontChipLabel(text: String, fontFamily: FontFamily?) {
     Text(
@@ -779,6 +829,23 @@ private fun SectionActionButton(text: String, onClick: () -> Unit, modifier: Mod
 
 /** What minimumInteractiveComponentSize reserves around a chip, and what the chip fills out. */
 private val TOUCH_TARGET = 48.dp
+
+/** The mark that tells the three kinds of font in the chip row apart. */
+private val FONT_CHIP_ICON = 13.dp
+
+/**
+ * One line of chip caption, as tall as the text in the plain chips beside it.
+ *
+ * Taken from the type scale rather than written down as a number: the captions are set in sp and
+ * grow with the reader's font size, while a drawing is in dp and does not. Pinning the drawings to
+ * this keeps every chip in the row the same height whatever that setting is.
+ */
+@Composable
+private fun fontChipLineHeight(): Dp {
+    val style = MaterialTheme.typography.labelLarge
+    val height = style.lineHeight.takeOrElse { style.fontSize * 1.4f }
+    return with(LocalDensity.current) { height.toDp() }
+}
 
 /**
  * Compact selectable chip: less horizontal padding than the stock FilterChip, so more fit per row.
@@ -1309,19 +1376,22 @@ private fun TextProperties(
                 selected = element.customFont == null && element.font == f,
                 onClick = { onUpdate(element.copy(font = f, customFont = null)) },
                 label = {
-                    FontChipLabel(
-                        text = when (f) {
-                            LabelFont.SANS -> stringResource(R.string.font_sans)
-                            LabelFont.SERIF -> stringResource(R.string.font_serif)
-                            LabelFont.MONO -> stringResource(R.string.font_mono)
-                            LabelFont.OSWALD -> "Oswald"
-                            LabelFont.ZILLA_SLAB -> "Slab"
-                            LabelFont.COMFORTAA -> "Rund"
-                            LabelFont.CAVEAT -> "Caveat"
-                            LabelFont.PACIFICO -> "Pacifico"
-                        },
-                        fontFamily = labelFontFamily(font = f)
-                    )
+                    val name = when (f) {
+                        LabelFont.SANS -> stringResource(R.string.font_sans)
+                        LabelFont.SERIF -> stringResource(R.string.font_serif)
+                        LabelFont.MONO -> stringResource(R.string.font_mono)
+                        LabelFont.OSWALD -> "Oswald"
+                        LabelFont.ZILLA_SLAB -> "Slab"
+                        LabelFont.COMFORTAA -> "Rund"
+                        LabelFont.CAVEAT -> "Caveat"
+                        LabelFont.PACIFICO -> "Pacifico"
+                        LabelFont.PIXEL_FIXED -> "Fixed"
+                        LabelFont.PIXEL_TERMINUS -> "Terminus"
+                    }
+                    // A bitmap face has no Typeface to hand Compose, and a substitute would hide
+                    // the one thing that makes it worth picking.
+                    if (PixelFonts.isPixel(f)) PixelFontChipLabel(f, name)
+                    else FontChipLabel(name, labelFontFamily(font = f))
                 }
             )
         }
@@ -1331,7 +1401,21 @@ private fun TextProperties(
                 // element.font is left alone on purpose, it stays the fallback for this element.
                 onClick = { onUpdate(element.copy(customFont = custom.family)) },
                 label = {
-                    FontChipLabel(custom.label, labelFontFamily(customFamily = custom.family))
+                    // Marks the chip as a font of the user's own, so the three kinds in this row
+                    // are told apart at a glance: plain text for the built-in ones, dots for the
+                    // bitmap ones, and this for the imported ones.
+                    Row(
+                        modifier = Modifier.height(fontChipLineHeight()),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.ic_font_custom),
+                            contentDescription = null,
+                            modifier = Modifier.size(FONT_CHIP_ICON),
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        FontChipLabel(custom.label, labelFontFamily(customFamily = custom.family))
+                    }
                 }
             )
         }

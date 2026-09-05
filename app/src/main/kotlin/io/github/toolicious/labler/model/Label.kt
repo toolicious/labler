@@ -127,6 +127,9 @@ enum class LabelTextAlign { LEFT, CENTER, RIGHT }
 enum class LabelFont {
     SANS, SERIF, MONO,
     OSWALD, ZILLA_SLAB, COMFORTAA, CAVEAT, PACIFICO,
+
+    /** Bitmap faces, for text too small for an outline to survive rastering. See PixelFont. */
+    PIXEL_FIXED, PIXEL_TERMINUS,
 }
 
 /** Icon fonts bundled with the app, as stored in [IconElement.iconFont]. */

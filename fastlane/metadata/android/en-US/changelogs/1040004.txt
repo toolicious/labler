@@ -9,3 +9,5 @@
 - Labels can carry a rectangular Micro QR code, which keeps its modules large by growing along the tape instead of upwards (#26)
 - Data Matrix joins the code types, and they are now picked from a menu that says what each one is for (#26)
 - Resizing an image no longer crashes the app when it passes through its own original size (#27)
+- Two pixel fonts, Fixed and Terminus, keep small text readable where the normal fonts blur (#21)
+- Text sits on whole print dots now, so the same letter comes out the same width every time (#21)

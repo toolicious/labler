@@ -244,7 +244,8 @@ object LabelRenderer {
     }
 
     fun measure(element: LabelElement): ElementSize = when (element) {
-        is TextElement -> textLayout(element).let { ElementSize(it.width.toFloat(), it.height.toFloat()) }
+        is TextElement -> pixelLayout(element)?.let { ElementSize(it.width.toFloat(), it.height.toFloat()) }
+            ?: textLayout(element).let { ElementSize(it.width.toFloat(), it.height.toFloat()) }
         is IconElement -> ElementSize(element.sizePx, element.sizePx)
         is FrameElement -> ElementSize(element.widthPx, element.heightPx)
         is BarcodeElement -> {
@@ -320,8 +321,20 @@ object LabelRenderer {
 
     // ----- Text -----
 
+    /**
+     * @param antiAlias smooth edges. Off for anything that ends up on the tape, because the label
+     *   is turned into black and white by a threshold at half grey: a soft edge does not print
+     *   soft, it flips to black or white depending on how much of the dot the glyph happened to
+     *   cover. Small text came out ragged that way (issue #21). On the magnified canvas the editor
+     *   draws the element being edited on, smoothing is right and is asked for.
+     */
     private fun textPaint(e: TextElement): TextPaint = TextPaint().apply {
         isAntiAlias = true
+        // Whole-dot glyph positions and grid fitting, so the same letter always rasterizes the
+        // same way. Set rather than left to the platform default, which has changed before.
+        isSubpixelText = false
+        isLinearText = false
+        hinting = Paint.HINTING_ON
         color = Color.BLACK
         textSize = e.fontSizePx
         val base = FontRegistry.base(e.font, e.customFont)
@@ -353,9 +366,102 @@ object LabelRenderer {
 
     private fun drawText(canvas: Canvas, e: TextElement) {
         canvas.save()
-        canvas.translate(e.x, e.y)
-        textLayout(e).draw(canvas)
+        // On whole dots for the same reason the other elements are: a fractional origin makes the
+        // rasterizer place the same glyph differently, so one stem comes out a dot wide and the
+        // next two.
+        canvas.translate(snap(e.x), snap(e.y))
+        val pixel = pixelLayout(e)
+        if (pixel != null) drawPixelText(canvas, e, pixel) else textLayout(e).draw(canvas)
         canvas.restore()
+    }
+
+    // ----- Text out of a bitmap face (issue #21) -----
+
+    private class PixelLayout(
+        val lines: List<String>,
+        val fitted: FittedPixelFont,
+        val width: Int,
+        val height: Int,
+    )
+
+    /**
+     * Null for every font that is an outline, which is all of them but the two bitmap families.
+     *
+     * A font the user added wins over [TextElement.font], because picking one only sets customFont
+     * and leaves font standing as the fallback; see FontRegistry.base, which orders them the same
+     * way. Reading font alone left an element stuck on its bitmap face.
+     */
+    private fun pixelLayout(e: TextElement): PixelLayout? {
+        if (e.customFont != null || !PixelFonts.isPixel(e.font)) return null
+        val fitted = PixelFonts.fit(e.font, e.fontSizePx, e.bold) ?: return null
+        val advance = fitted.cellWidth
+        // Every glyph is the same width, so wrapping and aligning is arithmetic rather than
+        // another layout engine.
+        val perLine = e.boxWidthPx?.let { (it / advance).toInt().coerceAtLeast(1) }
+        val lines = e.text.split('\n').flatMap { wrapPixelLine(it, perLine) }
+        val widest = lines.maxOfOrNull { it.length } ?: 0
+        return PixelLayout(
+            lines = lines,
+            fitted = fitted,
+            width = (e.boxWidthPx?.toInt() ?: (widest * advance)).coerceAtLeast(1),
+            height = (lines.size * fitted.cellHeight).coerceAtLeast(fitted.cellHeight),
+        )
+    }
+
+    /** Greedy wrap at whole words, breaking a word that is longer than the line on its own. */
+    private fun wrapPixelLine(line: String, perLine: Int?): List<String> {
+        if (perLine == null || line.length <= perLine) return listOf(line)
+        val out = mutableListOf<String>()
+        var rest = line
+        while (rest.length > perLine) {
+            val cut = rest.lastIndexOf(' ', perLine).takeIf { it > 0 } ?: perLine
+            out += rest.substring(0, cut)
+            rest = rest.substring(cut).trimStart()
+        }
+        out += rest
+        return out
+    }
+
+    private fun drawPixelText(canvas: Canvas, e: TextElement, layout: PixelLayout) {
+        val fitted = layout.fitted
+        val font = fitted.font
+        val scale = fitted.scale.toFloat()
+        val paint = Paint().apply { color = Color.BLACK; isAntiAlias = false }
+        layout.lines.forEachIndexed { row, line ->
+            val lineWidth = line.length * fitted.cellWidth
+            val originX = when (e.align) {
+                LabelTextAlign.LEFT -> 0
+                LabelTextAlign.CENTER -> (layout.width - lineWidth) / 2
+                LabelTextAlign.RIGHT -> layout.width - lineWidth
+            }.toFloat()
+            val originY = (row * fitted.cellHeight).toFloat()
+            line.forEachIndexed { column, character ->
+                val left = originX + column * fitted.cellWidth
+                // Whole runs of set dots become one rectangle, which is a good deal fewer draw
+                // calls than one per dot on a long label.
+                for (y in 0 until font.cellHeight) {
+                    var runStart = -1
+                    for (x in 0..font.cellWidth) {
+                        val set = x < font.cellWidth && font.isDark(character.code, x, y)
+                        if (set && runStart < 0) runStart = x
+                        if (!set && runStart >= 0) {
+                            canvas.drawRect(
+                                left + runStart * scale,
+                                originY + y * scale,
+                                left + x * scale,
+                                originY + (y + 1) * scale,
+                                paint,
+                            )
+                            runStart = -1
+                        }
+                    }
+                }
+            }
+            if (e.underline && line.isNotEmpty()) {
+                val y = originY + fitted.cellHeight - scale
+                canvas.drawRect(originX, y, originX + lineWidth, y + scale, paint)
+            }
+        }
     }
 
     // ----- Icon (emoji/symbol, dithered) -----

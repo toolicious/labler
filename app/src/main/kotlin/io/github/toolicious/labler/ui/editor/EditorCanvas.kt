@@ -195,6 +195,7 @@ fun EditorCanvas(
     onEdgeDragBy: (Float) -> Unit = {},
     onEdgeDragEnd: () -> Unit = {},
     onEdgeFit: (LabelEdge) -> Unit = {},
+
     modifier: Modifier = Modifier,
 ) {
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
@@ -451,7 +452,8 @@ fun EditorCanvas(
                     android.graphics.RectF(0f, 0f, labelW, labelH),
                     basePaint,
                 )
-                // Drawn last, so the text being edited sits in front of everything else.
+                // Drawn last, so the text being edited sits in front of everything else. Smoothed,
+                // because this one is magnified and not the raster that will be printed.
                 elements.find { it.id == vectorId }?.let {
                     val inner = nc.save()
                     nc.translate(offsetPx, 0f)
