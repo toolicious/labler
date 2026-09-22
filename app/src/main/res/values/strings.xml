@@ -145,6 +145,7 @@
     <string name="prop_stroke">Stroke</string>
     <string name="prop_radius">Corner radius</string>
     <string name="prop_contrast">Contrast</string>
+    <string name="prop_midtone">Midtone</string>
     <string name="prop_outline_detail">Sensitivity</string>
     <string name="prop_line_width">Line thickness</string>
     <string name="prop_outline_style">Style</string>

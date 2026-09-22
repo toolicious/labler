@@ -1516,6 +1516,12 @@ private fun ImageProperties(element: ImageElement, onUpdate: (LabelElement) -> U
                 onValueChange = { onUpdate(element.copy(contrast = it.roundToInt())) },
                 valueRange = -100f..100f,
             )
+            GroupLabel(stringResource(R.string.prop_midtone) + ": ${element.midtone}")
+            Slider(
+                value = element.midtone.toFloat(),
+                onValueChange = { onUpdate(element.copy(midtone = it.roundToInt())) },
+                valueRange = 0f..100f,
+            )
         }
     }
     if (element.dither != DitherMode.OUTLINE) {
@@ -1866,6 +1872,12 @@ private fun IconProperties(
             value = element.contrast.toFloat(),
             onValueChange = { onUpdate(element.copy(contrast = it.roundToInt())) },
             valueRange = -100f..100f
+        )
+        GroupLabel(stringResource(R.string.prop_midtone) + ": ${element.midtone}")
+        Slider(
+            value = element.midtone.toFloat(),
+            onValueChange = { onUpdate(element.copy(midtone = it.roundToInt())) },
+            valueRange = 0f..100f,
         )
     }
     if (element.dither != DitherMode.OUTLINE) {

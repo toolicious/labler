@@ -226,6 +226,7 @@ data class IconElement(
     val sizePx: Float = 48f,
     val dither: DitherMode = DitherMode.THRESHOLD,
     val contrast: Int = 0,
+    val midtone: Int = 50,
     val outlineSensitivity: Int = 88,
     val outlineThickness: Int = 1,
     val outlineMethod: OutlineMethod = OutlineMethod.LINES, // symbols default to region-based lines
@@ -298,6 +299,7 @@ data class ImageElement(
     val invert: Boolean = false,
     val threshold: Int = 128,
     val contrast: Int = 0,
+    val midtone: Int = 50,
     val outlineSensitivity: Int = 88,
     val outlineThickness: Int = 1,
     val outlineMethod: OutlineMethod = OutlineMethod.CANNY, // photos default to gradient edge detection

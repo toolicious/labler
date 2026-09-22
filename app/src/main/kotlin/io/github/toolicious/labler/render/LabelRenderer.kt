@@ -34,6 +34,7 @@ import io.github.toolicious.labler.printer.dither.Canny
 import io.github.toolicious.labler.printer.dither.DitherMode
 import io.github.toolicious.labler.printer.dither.OutlineMethod
 import io.github.toolicious.labler.printer.dither.Ditherer
+import io.github.toolicious.labler.printer.dither.Midtone
 import io.github.toolicious.labler.printer.dither.Outline
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -559,7 +560,7 @@ object LabelRenderer {
         } else {
             // Apply contrast only to the emoji/symbol shape; the background stays white. Invert flips
             // the glyph tones before dithering.
-            val adjusted = Contrast.adjust(gray, e.contrast)
+            val adjusted = Midtone.adjust(Contrast.adjust(gray, e.contrast), e.midtone)
             for (i in adjusted.indices) {
                 if (!isGlyph[i]) adjusted[i] = 255f else if (e.invert) adjusted[i] = 255f - adjusted[i]
             }
@@ -776,7 +777,7 @@ object LabelRenderer {
      */
     private fun imagePixels(e: ImageElement, w: Int, h: Int): IntArray? {
         val key = "${e.pngBase64.hashCode()}:${e.pngBase64.length}:$w:$h:${e.dither}:${e.invert}:" +
-            "${e.threshold}:${e.contrast}:${e.outlineMethod}:${e.outlineSensitivity}:${e.outlineThickness}:${e.outlineSmooth}"
+            "${e.threshold}:${e.contrast}:${e.midtone}:${e.outlineMethod}:${e.outlineSensitivity}:${e.outlineThickness}:${e.outlineSmooth}"
         imageCache.get(key)?.let { return it }
         val src = try {
             val bytes = Base64.decode(e.pngBase64, Base64.NO_WRAP)
@@ -813,7 +814,7 @@ object LabelRenderer {
             }
             when (e.dither) {
                 DitherMode.THRESHOLD -> BooleanArray(gray.size) { gray[it] < e.threshold }
-                else -> Ditherer.of(e.dither).dither(Contrast.adjust(gray, e.contrast), w, h)
+                else -> Ditherer.of(e.dither).dither(Midtone.adjust(Contrast.adjust(gray, e.contrast), e.midtone), w, h)
             }
         }
         // Mask by isGlyph so a transparent background never prints ink (e.g. after Invert).
